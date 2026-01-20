@@ -24,7 +24,12 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+
+// Analytics can only be initialized in the browser
+let analytics;
+if (typeof window !== "undefined") {
+  analytics = getAnalytics(app);
+}
 
 // Authentication
 const auth = getAuth(app);
@@ -32,4 +37,4 @@ const auth = getAuth(app);
 // Database
 const db = getFirestore(app);
 
-export { app, auth, db };
+export { app, auth, db, analytics };
