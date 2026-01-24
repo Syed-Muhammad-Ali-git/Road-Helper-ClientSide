@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import store, { RootState } from "@/redux/store";
 import PathChecker from "./utils/pathChecker";
 import { protectedRoutes } from "./utils/routes";
+import RouteGuard from "./utils/routeGuard";
 import { ToastContainer } from "react-toastify";
 import { useLayout } from "./context/layoutContext";
 import { Provider, useDispatch, useSelector } from "react-redux";
@@ -29,15 +30,12 @@ const ClientLayoutInner = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const role = getCookie("userRole");
-    const token = getCookie("token");
+    const token = getCookie("auth-token");
 
-    if (token) {
-      if (role === "client" && !customer) {
-        dispatch(setCustomer({ role: "client", token }));
-      } else if (role === "helper" && !helper) {
-        // In a real app, you'd fetch helper details here
-        dispatch(setHelper({ role: "helper", token }));
-      }
+    if (token && !customer && !helper) {
+      // Token exists but no user data in state - this shouldn't happen in normal flow
+      // The user data should be loaded during login
+      console.log("Token found but no user data in state");
     }
   }, [dispatch, customer, helper]);
 
@@ -68,11 +66,12 @@ const ClientLayoutInner = ({ children }: { children: ReactNode }) => {
 
   return (
     <>
+      <RouteGuard />
       <ToastContainer position="top-right" autoClose={2000} />
 
       {showSidebar && (
         <Box
-          className="fixed left-0 top-[70px] bottom-0 z-[99] bg-white border-r hidden md:block transition-all duration-300"
+          className="fixed left-0 top-17.5 bottom-0 z-99 bg-white border-r hidden md:block transition-all duration-300"
           style={{
             width: drawerOpen ? drawerWidth : 0,
             overflow: "hidden",

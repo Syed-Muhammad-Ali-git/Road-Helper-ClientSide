@@ -1,10 +1,19 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+interface Customer {
+  phone: string;
+  role: string;
+  uid: string;
+  fullName: string;
+}
+
 interface CustomerState {
-  customer: any | null;
+  customer: Customer | null;
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
+  confirmationResult: any;
+  phone: string;
 }
 
 const initialState: CustomerState = {
@@ -12,13 +21,15 @@ const initialState: CustomerState = {
   isAuthenticated: false,
   loading: false,
   error: null,
+  confirmationResult: null,
+  phone: "",
 };
 
 const customerSlice = createSlice({
   name: "customer",
   initialState,
   reducers: {
-    setCustomer: (state, action: PayloadAction<any>) => {
+    setCustomer: (state, action: PayloadAction<Customer | null>) => {
       state.customer = action.payload;
       state.isAuthenticated = !!action.payload;
       state.loading = false;
@@ -37,6 +48,12 @@ const customerSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
+    setConfirmationResult: (state, action: PayloadAction<any>) => {
+      state.confirmationResult = action.payload;
+    },
+    setPhone: (state, action: PayloadAction<string>) => {
+      state.phone = action.payload;
+    },
   },
 });
 
@@ -45,5 +62,7 @@ export const {
   setCustomerLoading,
   setCustomerError,
   logoutCustomer,
+  setConfirmationResult,
+  setPhone,
 } = customerSlice.actions;
 export default customerSlice.reducer;

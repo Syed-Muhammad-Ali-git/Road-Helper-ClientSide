@@ -4,35 +4,76 @@ import {
   setCustomerLoading,
   setCustomerError,
   logoutCustomer,
+  setConfirmationResult,
+  setPhone,
 } from "@/redux/reducers/customer-reducer";
+import { RecaptchaVerifier, signInWithPhoneNumber, signOut } from "firebase/auth";
+import { auth, db } from "@/lib/firebase/config";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { setCookie, deleteCookie } from "cookies-next";
 
-export const customerLoginAction =
-  (phone: string) => async (dispatch: AppDispatch) => {
-    try {
-      dispatch(setCustomerLoading(true));
-      // Simulated token generation from phone number
-      const token = btoa(`customer_${phone}_${Date.now()}`);
-      const customerData = {
-        phone,
-        role: "client",
-        uid: phone,
-        fullName: "Guest User",
-      }; // Using 'client' role to match existing paths
+interface Customer {
+  phone: string;
+  role: string;
+  uid: string;
+  fullName: string;
+}
 
-      setCookie("token", token, { path: "/" });
-      setCookie("userRole", "client", { path: "/" });
-      dispatch(setCustomer(customerData));
+export const sendOTPAction = (phone: string) => async (dispatch: AppDispatch) => {
+  dispatch(setCustomerLoading(true));
+  try {
+    const recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+      size: "invisible",
+    });
+    const confirmationResult = await signInWithPhoneNumber(auth, phone, recaptchaVerifier);
+    dispatch(setConfirmationResult(confirmationResult));
+    dispatch(setPhone(phone));
+    dispatch(setCustomerLoading(false));
+  } catch (error: any) {
+    dispatch(setCustomerError(error.message));
+  }
+};
 
-      return customerData;
-    } catch (error: any) {
-      dispatch(setCustomerError(error.message || "Login failed"));
-      throw error;
+export const customerLoginAction = (otp: string) => async (dispatch: AppDispatch, getState: any) => {
+  dispatch(setCustomerLoading(true));
+  try {
+    const { customer } = getState().customer;
+    if (!customer.confirmationResult) {
+      throw new Error("No OTP sent");
     }
-  };
+    const result = await customer.confirmationResult.confirm(otp);
+    const user = result.user;
 
-export const customerLogoutAction = () => async (dispatch: AppDispatch) => {
-  deleteCookie("token", { path: "/" });
-  deleteCookie("userRole", { path: "/" });
-  dispatch(logoutCustomer());
+    // Check if user exists in Firestore
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    let userData;
+    if (userDoc.exists()) {
+      userData = userDoc.data();
+    } else {
+      // Create new user
+      userData = {
+        uid: user.uid,
+        phone: customer.phone,
+        role: "client",
+        fullName: "",
+        createdAt: new Date().toISOString(),
+      };
+      await setDoc(doc(db, "users", user.uid), userData);
+    }
+
+    dispatch(setCustomer(userData as Customer));
+    setCookie("auth-token", user.accessToken);
+  } catch (error: any) {
+    dispatch(setCustomerError(error.message));
+  }
+};
+
+export const logoutCustomerAction = () => async (dispatch: AppDispatch) => {
+  try {
+    await signOut(auth);
+    dispatch(logoutCustomer());
+    deleteCookie("auth-token");
+  } catch (error: any) {
+    console.error("Logout error:", error);
+  }
 };

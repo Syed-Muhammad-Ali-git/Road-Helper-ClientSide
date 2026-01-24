@@ -21,8 +21,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/redux/store";
 import { useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { customerLogoutAction } from "@/redux/actions/customer-action";
-import { helperLogoutAction } from "@/redux/actions/helper-action";
+import { logoutCustomerAction } from "@/redux/actions/customer-action";
+import { logoutHelperAction } from "@/redux/actions/helper-action";
 
 interface HeaderProps {
   opened: boolean;
@@ -41,15 +41,15 @@ export default function Header({ opened, toggle }: HeaderProps) {
 
   const handleLogout = async () => {
     if (isHelper) {
-      await dispatch(helperLogoutAction());
+      await dispatch(logoutHelperAction());
     } else {
-      await dispatch(customerLogoutAction());
+      // await dispatch(customerLogoutAction());
     }
     router.push("/login");
   };
 
   return (
-    <Box className="h-[70px] border-b bg-white flex items-center px-4 justify-between sticky top-0 z-[100] shadow-sm">
+    <Box className="h-17.5 border-b bg-white flex items-center px-4 justify-between sticky top-0 z-100 shadow-sm">
       <Group>
         <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
         <motion.div

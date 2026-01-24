@@ -17,8 +17,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/redux/store";
 import { motion } from "framer-motion";
-import { customerLogoutAction } from "@/redux/actions/customer-action";
-import { helperLogoutAction } from "@/redux/actions/helper-action";
+import { logoutCustomerAction } from "@/redux/actions/customer-action";
+import { logoutHelperAction } from "@/redux/actions/helper-action";
 
 const clientItems = [
   { icon: IconDashboard, label: "Dashboard", href: "/client/dashboard" },
@@ -48,9 +48,9 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     if (isHelper) {
-      await dispatch(helperLogoutAction());
+      await dispatch(logoutHelperAction());
     } else {
-      await dispatch(customerLogoutAction());
+      await dispatch(logoutCustomerAction());
     }
     router.replace("/login");
   };

@@ -1,7 +1,21 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+export interface Helper {
+  phone: string;
+  role: string;
+  uid: string;
+  fullName: string;
+  email?: string;
+  serviceType?: string;
+  isOnline?: boolean;
+  rating?: number;
+  totalJobs?: number;
+  isVerified?: boolean;
+  createdAt?: string;
+}
+
 interface HelperState {
-  helper: any | null;
+  helper: Helper | null;
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
@@ -18,7 +32,7 @@ const helperSlice = createSlice({
   name: "helper",
   initialState,
   reducers: {
-    setHelper: (state, action: PayloadAction<any>) => {
+    setHelper: (state, action: PayloadAction<Helper | null>) => {
       state.helper = action.payload;
       state.isAuthenticated = !!action.payload;
       state.loading = false;

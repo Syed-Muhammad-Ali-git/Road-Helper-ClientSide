@@ -1,18 +1,24 @@
 /**
  * Public routes accessible without authentication
  */
-const publicRoutes = ["/login", "/register", "/forgot-password"];
+const publicRoutes = ["/login", "/register", "/forgot-password", "/client/login", "/helper/login"];
 
 /**
- * Protected routes requiring authentication
+ * Client-specific protected routes
  */
-const protectedRoutes = [
+const clientRoutes = [
   "/",
   "/client/dashboard",
   "/client/history",
   "/client/profile",
   "/client/request-help",
   "/client/request-status",
+];
+
+/**
+ * Helper-specific protected routes
+ */
+const helperRoutes = [
   "/helper/dashboard",
   "/helper/earnings",
   "/helper/profile",
@@ -20,4 +26,9 @@ const protectedRoutes = [
   "/helper/active-job",
 ];
 
-export { publicRoutes, protectedRoutes };
+/**
+ * All protected routes (for backward compatibility)
+ */
+const protectedRoutes = [...clientRoutes, ...helperRoutes];
+
+export { publicRoutes, protectedRoutes, clientRoutes, helperRoutes };

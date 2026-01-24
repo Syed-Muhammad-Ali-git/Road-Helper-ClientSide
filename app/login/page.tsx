@@ -205,6 +205,7 @@ export default function LoginPage() {
                       leftSection={
                         <Image
                           src="https://www.google.com/favicon.ico"
+                          alt="google icon"
                           w={16}
                           h={16}
                         />
