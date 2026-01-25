@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Title,
   Text,
@@ -10,77 +10,46 @@ import {
   Group,
   Button,
   Badge,
-  Loader,
-  SimpleGrid,
   ThemeIcon,
   Avatar,
+  SimpleGrid,
 } from "@mantine/core";
-import {
-  IconMapPin,
-  IconUser,
-  IconPhone,
-  IconAlertCircle,
-  IconCheck,
-} from "@tabler/icons-react";
-import {
-  collection,
-  query,
-  where,
-  onSnapshot,
-  updateDoc,
-  doc,
-  serverTimestamp,
-} from "firebase/firestore";
-import { db } from "@/lib/firebase/config";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
-import { toast, ToastContainer } from "react-toastify";
+import { IconAlertCircle, IconMapPin, IconCheck } from "@tabler/icons-react";
 
-export default function NearbyRequests() {
-  const [requests, setRequests] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { helper } = useSelector((state: RootState) => state.helper);
-  const userData = helper;
-  const user = helper;
-
-  useEffect(() => {
-    if (!userData?.serviceType) return;
-
-    const q = query(
-      collection(db, "serviceRequests"),
-      where("status", "==", "pending"),
-      where("serviceType", "==", userData.serviceType),
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setRequests(data);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [userData]);
-
-  const acceptRequest = async (requestId: string) => {
-    if (!user) return;
-    try {
-      await updateDoc(doc(db, "serviceRequests", requestId), {
-        status: "accepted",
-        helperId: user.uid,
-        helperName: userData?.fullName,
-        helperPhone: userData?.phone,
-        acceptedAt: serverTimestamp(),
-      });
-      toast.success("Request accepted! Go to 'Active Job' to track.");
-    } catch (error) {
-      toast.error("Failed to accept request.");
-    }
+export default function NearbyRequestsUI() {
+  // Mock helper info
+  const userData = {
+    fullName: "Ali Khan",
+    serviceType: "car_mechanic",
+    isOnline: true,
   };
+
+  // Hardcoded requests
+  const requests = [
+    {
+      id: "1",
+      clientName: "Ahmed Raza",
+      vehicleDetails: "Toyota Corolla White (XYZ-123)",
+      location: "Gulshan-e-Iqbal, Karachi",
+      issueDescription: "Car won't start, engine makes clicking sound",
+      createdAt: new Date(),
+    },
+    {
+      id: "2",
+      clientName: "Sara Khan",
+      vehicleDetails: "Honda Civic Red (ABC-456)",
+      location: "Clifton, Karachi",
+      issueDescription: "Flat tire, need urgent help to replace it",
+      createdAt: new Date(),
+    },
+  ];
+
+  const loading = false; // static, no async
 
   if (loading)
     return (
-      <Box className="p-8">
-        <Loader size="xl" />
+      <Box className="p-8 text-center">
+        <Text>Loading...</Text>
       </Box>
     );
 
@@ -102,13 +71,13 @@ export default function NearbyRequests() {
             className="bg-slate-50 border-dashed py-20"
           >
             <Stack align="center" gap="sm">
-              <ThemeIcon size={60} radius="xl" color="slate" variant="light">
+              <ThemeIcon size={60} radius="xl" color="gray" variant="light">
                 <IconAlertCircle size={30} />
               </ThemeIcon>
               <Text fw={600}>No requests in your area right now.</Text>
               <Text size="sm" c="dimmed">
                 Jobs matching your service (
-                {userData?.serviceType?.replace("_", " ")}) will appear here.
+                {userData.serviceType.replace("_", " ")}) will appear here.
               </Text>
             </Stack>
           </Paper>
@@ -127,14 +96,14 @@ export default function NearbyRequests() {
                     PENDING
                   </Badge>
                   <Text size="xs" c="dimmed">
-                    {req.createdAt?.toDate?.()?.toLocaleString()}
+                    {req.createdAt.toLocaleString()}
                   </Text>
                 </Group>
 
                 <Stack gap="md">
                   <Group gap="md">
                     <Avatar color="blue" radius="xl">
-                      {req.clientName?.charAt(0)}
+                      {req.clientName.charAt(0)}
                     </Avatar>
                     <Box>
                       <Text fw={700}>{req.clientName}</Text>
@@ -151,7 +120,7 @@ export default function NearbyRequests() {
                     </Text>
                   </Group>
 
-                  <Paper p="md" radius="lg" bg="slate.0" withBorder>
+                  <Paper p="md" radius="lg" bg="gray.0" withBorder>
                     <Text size="sm" lineClamp={3}>
                       {req.issueDescription}
                     </Text>
@@ -161,12 +130,11 @@ export default function NearbyRequests() {
                     <Button
                       className="bg-green-600 flex-1 h-12 rounded-xl"
                       leftSection={<IconCheck size={20} />}
-                      onClick={() => acceptRequest(req.id)}
-                      disabled={!userData?.isOnline}
+                      disabled={!userData.isOnline}
                     >
                       Accept Request
                     </Button>
-                    {!userData?.isOnline && (
+                    {!userData.isOnline && (
                       <Text size="xs" c="red" fw={600}>
                         Go Online to accept
                       </Text>

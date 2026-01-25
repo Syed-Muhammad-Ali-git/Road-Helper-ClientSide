@@ -26,95 +26,52 @@ import {
   IconCircleCheck,
 } from "@tabler/icons-react";
 import { useForm } from "@mantine/form";
-import { zodResolver } from "mantine-form-zod-resolver";
-import { z } from "zod";
-import { useSearchParams, useRouter } from "next/navigation";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase/config";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
-import { toast } from "react-toastify";
-
-const requestSchema = z.object({
-  serviceType: z.string().min(1, "Please select a service"),
-  location: z.string().min(3, "Location is required"),
-  vehicleDetails: z.string().min(3, "Vehicle details are required"),
-  issueDescription: z.string().min(5, "Please describe the issue"),
-});
 
 function RequestHelpContent() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const { customer } = useSelector((state: RootState) => state.customer);
-  const userData = customer;
-  const user = customer;
   const [active, setActive] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const form = useForm({
     initialValues: {
-      serviceType: searchParams.get("type") || "",
+      serviceType: "",
       location: "",
       vehicleDetails: "",
       issueDescription: "",
     },
-    validate: zodResolver(requestSchema),
   });
 
-  const nextStep = () => {
-    const { hasErrors } = form.validate();
-    if (!hasErrors)
-      setActive((current) => (current < 2 ? current + 1 : current));
-  };
-
-  const prevStep = () =>
-    setActive((current) => (current > 0 ? current - 1 : current));
-
-  const handleSubmit = async (values: typeof form.values) => {
-    if (!user) return;
+  const nextStep = () => setActive((prev) => prev + 1);
+  const prevStep = () => setActive((prev) => prev - 1);
+  const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
     setLoading(true);
-    try {
-      const docRef = await addDoc(collection(db, "serviceRequests"), {
-        ...values,
-        clientId: user.uid,
-        clientName: userData?.fullName,
-        clientPhone: userData?.phone,
-        status: "pending",
-        createdAt: serverTimestamp(),
-      });
-
-      toast.success("Request sent successfully!");
-      setActive(3); // Completion step
-      setTimeout(() => {
-        router.push(`/client/request-status?id=${docRef.id}`);
-      }, 3000);
-    } catch (error) {
-      toast.error("Failed to send request. Please try again.");
-    } finally {
+    const values = form.values;
+    console.log('Request Help Form Submitted:', values);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setActive(3); // Complete step
       setLoading(false);
-    }
+      console.log('Request submitted successfully!');
+    }, 1000);
   };
 
   return (
     <Box className="p-4 md:p-8 max-w-4xl mx-auto">
-      <Paper p="xl" radius="xl" withBorder className="shadow-sm">
-        <Stepper
-          active={active}
-          onStepClick={setActive}
-          allowNextStepsSelect={false}
-          color="blue"
-        >
+      <Paper p="xl" radius="xl" withBorder>
+        <Stepper active={active} allowNextStepsSelect={false}>
+          {/* STEP 1 */}
           <Stepper.Step
             label="Service"
             description="What do you need?"
             icon={<IconCar size={rem(18)} />}
+            className="w-full"
           >
-            <Stack gap="xl" mt="xl">
+            <Stack mt="xl">
               <Select
                 label="Emergency Service Type"
                 placeholder="Select service"
                 required
-                size="md"
                 data={[
                   { value: "bike_mechanic", label: "Bike Mechanic" },
                   { value: "car_mechanic", label: "Car Mechanic" },
@@ -125,84 +82,93 @@ function RequestHelpContent() {
               />
               <TextInput
                 label="Current Location"
-                placeholder="Enter street name, landmark or area"
                 required
-                size="md"
                 leftSection={<IconMapPin size={18} />}
                 {...form.getInputProps("location")}
               />
             </Stack>
           </Stepper.Step>
 
+          {/* STEP 2 */}
           <Stepper.Step
             label="Details"
             description="Vehicle & Issue"
             icon={<IconMessage2 size={rem(18)} />}
+            className="w-full"
           >
-            <Stack gap="xl" mt="xl">
+            <Stack mt="xl">
               <TextInput
                 label="Vehicle Information"
-                placeholder="e.g. Honda Civic Red (ABC-123)"
                 required
-                size="md"
                 {...form.getInputProps("vehicleDetails")}
               />
               <Textarea
                 label="Issue Description"
-                placeholder="Briefly describe what happened..."
                 required
-                size="md"
                 minRows={4}
                 {...form.getInputProps("issueDescription")}
               />
             </Stack>
           </Stepper.Step>
 
+          {/* STEP 3 */}
           <Stepper.Step
-            label="Confirm"
-            description="Review & Send"
+            label="Review"
+            description="Confirm details"
             icon={<IconCheck size={rem(18)} />}
+            className="w-full"
           >
-            <Stack gap="md" mt="xl">
+            <Stack mt="xl">
               <Title order={4}>Review Your Request</Title>
               <SimpleGrid cols={2}>
                 <Box>
-                  <Text fw={700} size="sm" c="dimmed">
-                    Service Type
-                  </Text>
+                  <Text fw={600}>Service</Text>
                   <Text>{form.values.serviceType.replace("_", " ")}</Text>
                 </Box>
                 <Box>
-                  <Text fw={700} size="sm" c="dimmed">
-                    Location
-                  </Text>
+                  <Text fw={600}>Location</Text>
                   <Text>{form.values.location}</Text>
                 </Box>
-                <Box mt="md">
-                  <Text fw={700} size="sm" c="dimmed">
-                    Vehicle
-                  </Text>
-                  <Text>{form.values.vehicleDetails}</Text>
-                </Box>
               </SimpleGrid>
-              <Box mt="md">
-                <Text fw={700} size="sm" c="dimmed">
-                  Description
-                </Text>
-                <Text fs="italic">{form.values.issueDescription}</Text>
+              <Box>
+                <Text fw={600}>Vehicle</Text>
+                <Text>{form.values.vehicleDetails}</Text>
+              </Box>
+              <Box>
+                <Text fw={600}>Description</Text>
+                <Text>{form.values.issueDescription}</Text>
               </Box>
             </Stack>
           </Stepper.Step>
 
+          {/* DONE */}
           <Stepper.Completed>
-            <Stack align="center" gap="md" py="xl">
-              <ThemeIcon size={80} radius="xl" color="green" variant="light">
-                <IconCircleCheck size={50} />
+            <Stack align="center" gap="md" className="text-center py-8">
+              <ThemeIcon
+                size="xl"
+                radius="xl"
+                color="green"
+                variant="light"
+              >
+                <IconCircleCheck size={32} />
               </ThemeIcon>
-              <Title order={2}>Request Sent!</Title>
-              <Text ta="center" c="dimmed">
-                We are searching for the nearest helpers. <br />
-                Redirecting you to the status tracking page...
+              <Title order={3}>Request Submitted!</Title>
+              <Text c="dimmed">
+                Your request has been logged to the console. In a real application, this would be sent to our servers.
+              </Text>
+              <Button
+                variant="light"
+                color="blue"
+                onClick={() => {
+                  setActive(0);
+                  form.reset();
+                }}
+                className="mt-4"
+              >
+                Make Another Request
+              </Button>
+              <Text size="sm" c="dimmed" mt="md">
+                Check browser console for submitted data
               </Text>
             </Stack>
           </Stepper.Completed>
@@ -210,23 +176,20 @@ function RequestHelpContent() {
 
         {active < 3 && (
           <Group justify="center" mt="xl">
-            {active !== 0 && (
-              <Button variant="default" onClick={prevStep} size="md">
+            {active > 0 && (
+              <Button variant="default" onClick={prevStep}>
                 Back
               </Button>
             )}
             {active < 2 ? (
-              <Button onClick={nextStep} size="md" className="bg-blue-600">
-                Next step
-              </Button>
+              <Button onClick={nextStep}>Next</Button>
             ) : (
-              <Button
-                onClick={() => form.onSubmit(handleSubmit)()}
-                loading={loading}
-                size="md"
-                className="bg-red-600"
+              <Button 
+                loading={loading} 
+                onClick={handleSubmit}
+                type="submit"
               >
-                Send Help Request
+                Send Request
               </Button>
             )}
           </Group>
@@ -238,13 +201,7 @@ function RequestHelpContent() {
 
 export default function RequestHelpPage() {
   return (
-    <Suspense
-      fallback={
-        <Box p="xl" className="text-center">
-          <Loader size="lg" />
-        </Box>
-      }
-    >
+    <Suspense fallback={<Loader size="lg" />}>
       <RequestHelpContent />
     </Suspense>
   );

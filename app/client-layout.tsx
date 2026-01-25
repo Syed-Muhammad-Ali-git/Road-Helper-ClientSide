@@ -3,16 +3,9 @@
 import React, { ReactNode, useEffect, useState, useMemo } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import { usePathname } from "next/navigation";
-import store, { RootState } from "@/redux/store";
-import PathChecker from "./utils/pathChecker";
 import { protectedRoutes } from "./utils/routes";
-import RouteGuard from "./utils/routeGuard";
 import { ToastContainer } from "react-toastify";
 import { useLayout } from "./context/layoutContext";
-import { Provider, useDispatch, useSelector } from "react-redux";
-import { getCookie } from "cookies-next";
-import { setCustomer } from "@/redux/reducers/customer-reducer";
-import { setHelper } from "@/redux/reducers/helper-reducer";
 import { Box, Center, Loader, Drawer, Stack, Text } from "@mantine/core";
 import Sidebar from "@/components/sidebar/sidebar";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,21 +16,6 @@ const ClientLayoutInner = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(true);
   const { isLayoutVisible } = useLayout();
-  const dispatch = useDispatch();
-
-  const customer = useSelector((state: RootState) => state.customer.customer);
-  const helper = useSelector((state: RootState) => state.helper.helper);
-
-  useEffect(() => {
-    const role = getCookie("userRole");
-    const token = getCookie("auth-token");
-
-    if (token && !customer && !helper) {
-      // Token exists but no user data in state - this shouldn't happen in normal flow
-      // The user data should be loaded during login
-      console.log("Token found but no user data in state");
-    }
-  }, [dispatch, customer, helper]);
 
   useEffect(() => {
     if (window.innerWidth < 768) {
@@ -66,7 +44,6 @@ const ClientLayoutInner = ({ children }: { children: ReactNode }) => {
 
   return (
     <>
-      <RouteGuard />
       <ToastContainer position="top-right" autoClose={2000} />
 
       {showSidebar && (
@@ -101,13 +78,6 @@ const ClientLayoutInner = ({ children }: { children: ReactNode }) => {
       </Drawer>
 
       <Box className="flex flex-col min-h-screen">
-        {pathname && isLayoutVisible && (
-          <PathChecker
-            pathName={pathname}
-            open={drawerOpen}
-            setOpen={setDrawerOpen}
-          />
-        )}
         <main style={mainStyle} className="relative">
           <AnimatePresence mode="wait">
             <motion.div
@@ -128,11 +98,7 @@ const ClientLayoutInner = ({ children }: { children: ReactNode }) => {
 };
 
 const ClientLayout = ({ children }: { children: ReactNode }) => {
-  return (
-    <Provider store={store}>
-      <ClientLayoutInner>{children}</ClientLayoutInner>
-    </Provider>
-  );
+  return <ClientLayoutInner>{children}</ClientLayoutInner>;
 };
 
 export default ClientLayout;

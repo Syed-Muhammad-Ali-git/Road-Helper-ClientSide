@@ -10,12 +10,9 @@ import {
   Avatar,
   TextInput,
   Button,
-  Group,
   Divider,
   Select,
 } from "@mantine/core";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
 import {
   IconUser,
   IconPhone,
@@ -24,9 +21,14 @@ import {
   IconTool,
 } from "@tabler/icons-react";
 
-export default function HelperProfilePage() {
-  const { helper } = useSelector((state: RootState) => state.helper);
-  const userData = helper;
+export default function HelperProfileUI() {
+  // Hardcoded user data
+  const userData = {
+    fullName: "Ali Khan",
+    email: "ali.khan@example.com",
+    phone: "+92 300 1234567",
+    serviceType: "car_mechanic",
+  };
 
   return (
     <Box className="p-4 md:p-8 max-w-2xl mx-auto">
@@ -34,15 +36,15 @@ export default function HelperProfilePage() {
         <Title order={1}>Helper Profile</Title>
 
         <Paper p="xl" radius="xl" withBorder className="text-center shadow-sm">
-          <Box className="relative inline-block mx-auto mb-lg">
+          <Box className="relative inline-block mx-auto mb-6">
             <Avatar size={120} radius="xl" color="red">
-              {userData?.fullName?.charAt(0)}
+              {userData.fullName.charAt(0)}
             </Avatar>
             <Box className="absolute bottom-0 right-0 bg-white p-2 rounded-full shadow-md border border-slate-100 cursor-pointer">
               <IconCamera size={20} className="text-red-600" />
             </Box>
           </Box>
-          <Title order={2}>{userData?.fullName}</Title>
+          <Title order={2}>{userData.fullName}</Title>
           <Text c="dimmed" fw={700}>
             VERIFIED HELPER
           </Text>
@@ -52,25 +54,25 @@ export default function HelperProfilePage() {
           <Stack gap="md">
             <TextInput
               label="Full Name"
-              value={userData?.fullName || ""}
+              value={userData.fullName}
               disabled
               leftSection={<IconUser size={18} />}
             />
             <TextInput
               label="Email Address"
-              value={userData?.email || ""}
+              value={userData.email}
               disabled
               leftSection={<IconMail size={18} />}
             />
             <TextInput
               label="Phone Number"
-              value={userData?.phone || ""}
+              value={userData.phone}
               disabled
               leftSection={<IconPhone size={18} />}
             />
             <Select
               label="Primary Service"
-              value={userData?.serviceType || ""}
+              value={userData.serviceType}
               disabled
               data={[
                 { value: "bike_mechanic", label: "Bike Mechanic" },

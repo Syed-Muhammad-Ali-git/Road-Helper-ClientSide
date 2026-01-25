@@ -7,19 +7,13 @@ import {
   IconHistory,
   IconUser,
   IconMapPin,
-  IconWallet,
-  IconListDetails,
-  IconArrowLeftRight,
   IconLogout,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState, AppDispatch } from "@/redux/store";
 import { motion } from "framer-motion";
-import { logoutCustomerAction } from "@/redux/actions/customer-action";
-import { logoutHelperAction } from "@/redux/actions/helper-action";
 
+/* ---------- MENU ITEMS ---------- */
 const clientItems = [
   { icon: IconDashboard, label: "Dashboard", href: "/client/dashboard" },
   { icon: IconMapPin, label: "Request Help", href: "/client/request-help" },
@@ -27,43 +21,25 @@ const clientItems = [
   { icon: IconUser, label: "Profile", href: "/client/profile" },
 ];
 
-const helperItems = [
-  { icon: IconDashboard, label: "Overview", href: "/helper/dashboard" },
-  { icon: IconListDetails, label: "Requests", href: "/helper/requests" },
-  { icon: IconArrowLeftRight, label: "Active Job", href: "/helper/active-job" },
-  { icon: IconWallet, label: "Earnings", href: "/helper/earnings" },
-  { icon: IconUser, label: "Profile", href: "/helper/profile" },
-];
-
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const dispatch: AppDispatch = useDispatch();
 
-  const customer = useSelector((state: RootState) => state.customer.customer);
-  const helper = useSelector((state: RootState) => state.helper.helper);
-
-  const isHelper = !!helper || pathname?.includes("/helper");
-  const items = isHelper ? helperItems : clientItems;
-
-  const handleLogout = async () => {
-    if (isHelper) {
-      await dispatch(logoutHelperAction());
-    } else {
-      await dispatch(logoutCustomerAction());
-    }
+  const handleLogout = () => {
     router.replace("/login");
   };
 
   return (
     <Box className="w-full bg-[#fcfcfc] h-[calc(100vh-70px)] p-4 border-r flex flex-col justify-between">
+      {/* ---------- TOP MENU ---------- */}
       <Stack gap="xs" className="flex-1 overflow-y-auto">
         <Text size="xs" fw={700} c="dimmed" tt="uppercase" px="md" mb="xs">
           Main Menu
         </Text>
 
-        {items.map((item, index) => {
+        {clientItems.map((item, index) => {
           const active = pathname === item.href;
+
           return (
             <motion.div
               key={item.label}
@@ -99,6 +75,7 @@ export default function Sidebar() {
         </UnstyledButton>
       </Stack>
 
+      {/* ---------- LOGOUT ---------- */}
       <Box pt="md">
         <UnstyledButton
           onClick={handleLogout}

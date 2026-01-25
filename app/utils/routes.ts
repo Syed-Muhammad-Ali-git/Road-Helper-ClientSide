@@ -1,7 +1,13 @@
 /**
  * Public routes accessible without authentication
  */
-const publicRoutes = ["/login", "/register", "/forgot-password", "/client/login", "/helper/login"];
+const publicRoutes = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/client/login",
+  "/helper/login",
+];
 
 /**
  * Client-specific protected routes

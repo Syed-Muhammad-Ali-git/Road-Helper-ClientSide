@@ -17,12 +17,8 @@ import {
   IconBell,
   IconChevronDown,
 } from "@tabler/icons-react";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState, AppDispatch } from "@/redux/store";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { logoutCustomerAction } from "@/redux/actions/customer-action";
-import { logoutHelperAction } from "@/redux/actions/helper-action";
 
 interface HeaderProps {
   opened: boolean;
@@ -30,32 +26,28 @@ interface HeaderProps {
 }
 
 export default function Header({ opened, toggle }: HeaderProps) {
-  const customer = useSelector((state: RootState) => state.customer.customer);
-  const helper = useSelector((state: RootState) => state.helper.helper);
-  const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
-  const pathname = usePathname();
 
-  const isHelper = !!helper || pathname?.includes("/helper");
-  const userData = isHelper ? helper : customer;
+  /* -------- Temporary Static Data (UI only) -------- */
+  const userData = {
+    fullName: "Guest User",
+    role: "guest",
+  };
 
-  const handleLogout = async () => {
-    if (isHelper) {
-      await dispatch(logoutHelperAction());
-    } else {
-      // await dispatch(customerLogoutAction());
-    }
+  const handleLogout = () => {
     router.push("/login");
   };
 
   return (
-    <Box className="h-17.5 border-b bg-white flex items-center px-4 justify-between sticky top-0 z-100 shadow-sm">
+    <Box className="h-17.5 border-b bg-white flex items-center px-4 justify-between sticky top-0 z-50 shadow-sm">
+      {/* ---------- LEFT ---------- */}
       <Group>
         <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.4 }}
         >
           <Group gap="xs">
             <Box className="w-8 h-8 rounded bg-blue-600 flex items-center justify-center">
@@ -74,6 +66,7 @@ export default function Header({ opened, toggle }: HeaderProps) {
         </motion.div>
       </Group>
 
+      {/* ---------- RIGHT ---------- */}
       <Group gap="md">
         <ActionIcon variant="subtle" color="gray" size="lg" radius="md">
           <IconBell size={20} />
@@ -88,24 +81,19 @@ export default function Header({ opened, toggle }: HeaderProps) {
           <Menu.Target>
             <UnstyledButton className="p-1 pr-2 hover:bg-slate-50 transition-colors rounded-lg">
               <Group gap="xs">
-                <Avatar
-                  src={null}
-                  alt={userData?.fullName || userData?.phone}
-                  radius="md"
-                  color={isHelper ? "red" : "blue"}
-                >
-                  {(userData?.fullName || userData?.phone || "G")
-                    .charAt(0)
-                    .toUpperCase()}
+                <Avatar radius="md" color="blue">
+                  {userData.fullName.charAt(0)}
                 </Avatar>
+
                 <Box className="hidden xs:block">
                   <Text size="sm" fw={600} mb={-3}>
-                    {userData?.fullName || userData?.phone}
+                    {userData.fullName}
                   </Text>
                   <Text size="xs" c="dimmed" tt="capitalize">
-                    {userData?.role || "Guest"}
+                    {userData.role}
                   </Text>
                 </Box>
+
                 <IconChevronDown size={14} className="text-slate-400" />
               </Group>
             </UnstyledButton>
@@ -113,15 +101,16 @@ export default function Header({ opened, toggle }: HeaderProps) {
 
           <Menu.Dropdown>
             <Menu.Label>Settings</Menu.Label>
+
             <Menu.Item
               leftSection={<IconUser size={14} />}
-              onClick={() =>
-                router.push(isHelper ? "/helper/profile" : "/client/profile")
-              }
+              onClick={() => router.push("/profile")}
             >
               My Profile
             </Menu.Item>
+
             <Menu.Divider />
+
             <Menu.Label>Session</Menu.Label>
             <Menu.Item
               color="red"

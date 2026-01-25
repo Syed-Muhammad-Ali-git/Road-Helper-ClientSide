@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   TextInput,
   PasswordInput,
@@ -22,9 +22,6 @@ import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Link from "next/link";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/redux/store";
-import { helperLoginAction } from "@/redux/actions/helper-action";
 import { motion } from "framer-motion";
 
 const helperSchema = z.object({
@@ -33,10 +30,8 @@ const helperSchema = z.object({
 });
 
 export default function HelperLoginPage() {
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const dispatch: AppDispatch = useDispatch();
-
-  const loading = useSelector((state: RootState) => state.helper.loading);
 
   const form = useForm({
     initialValues: { email: "", password: "" },
@@ -44,12 +39,34 @@ export default function HelperLoginPage() {
   });
 
   const handleSubmit = async (values: typeof form.values) => {
+    setLoading(true);
     try {
-      await dispatch(helperLoginAction(values));
+      // Simulate login verification - in real app, verify with backend
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+
+      // Mock user data for localStorage
+      const userData = {
+        uid: "mock-uid-" + Date.now(),
+        email: values.email,
+        role: "helper",
+        fullName: "",
+        serviceType: "",
+        isOnline: false,
+        rating: 0,
+        totalJobs: 0,
+        isVerified: false,
+        createdAt: new Date().toISOString(),
+      };
+
+      localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("auth-token", "mock-token-" + Date.now());
+
       toast.success("Helper login successful.");
       router.replace("/helper/dashboard");
     } catch (err: any) {
       toast.error(err.message || "Invalid helper credentials");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -61,7 +78,11 @@ export default function HelperLoginPage() {
         transition={{ duration: 0.6 }}
         className="flex-1 flex items-center justify-center p-8 bg-white lg:rounded-r-[60px] shadow-2xl z-20 relative order-2 lg:order-1"
       >
-        <LoadingOverlay visible={loading} zIndex={1000} overlayProps={{ blur: 2 }} />
+        <LoadingOverlay
+          visible={loading}
+          zIndex={1000}
+          overlayProps={{ blur: 2 }}
+        />
 
         <Container size={420} className="w-full">
           <Box className="mb-8">
@@ -122,6 +143,12 @@ export default function HelperLoginPage() {
                   Register Here
                 </Anchor>
               </Text>
+              <Text ta="center" mt="md" size="sm">
+                Are you a client?{" "}
+                <Anchor component={Link} href="/customer/login" fw={700}>
+                  Login as Client
+                </Anchor>
+              </Text>
             </Stack>
           </form>
 
@@ -144,10 +171,22 @@ export default function HelperLoginPage() {
         className="hidden lg:flex flex-1 relative overflow-hidden bg-[#1E293B] items-center justify-center p-12 order-1 lg:order-2"
       >
         <Box className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-          <Image src="/assets/images/logo.jpg" alt="Background" h="100%" w="100%" fit="cover" />
+          <Image
+            src="/assets/images/logo.jpg"
+            alt="Background"
+            h="100%"
+            w="100%"
+            fit="cover"
+          />
         </Box>
         <Stack align="center" gap="xl" className="z-10 text-white text-center">
-          <Title order={1} className="text-5xl font-black tracking-tight leading-tight">Join Our <br /> <span className="text-red-500">Service Network</span></Title>
+          <Title
+            order={1}
+            className="text-5xl font-black tracking-tight leading-tight"
+          >
+            Join Our <br />{" "}
+            <span className="text-red-500">Service Network</span>
+          </Title>
           <Text className="text-xl text-slate-300 max-w-md">
             Help travelers in need and grow your business with Road Helper.
           </Text>

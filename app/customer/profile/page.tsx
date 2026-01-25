@@ -13,14 +13,10 @@ import {
   Group,
   Divider,
 } from "@mantine/core";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+
 import { IconUser, IconPhone, IconMail, IconCamera } from "@tabler/icons-react";
 
 export default function ProfilePage() {
-  const { customer } = useSelector((state: RootState) => state.customer);
-  const userData = customer;
-
   return (
     <Box className="p-4 md:p-8 max-w-2xl mx-auto">
       <Stack gap="xl">
@@ -29,28 +25,28 @@ export default function ProfilePage() {
         <Paper p="xl" radius="xl" withBorder className="text-center shadow-sm">
           <Box className="relative inline-block mx-auto mb-lg">
             <Avatar size={120} radius="xl" color="blue">
-              {userData?.fullName?.charAt(0)}
+              ali{" "}
             </Avatar>
             <Box className="absolute bottom-0 right-0 bg-white p-2 rounded-full shadow-md border border-slate-100 cursor-pointer">
               <IconCamera size={20} className="text-blue-600" />
             </Box>
           </Box>
-          <Title order={2}>{userData?.fullName}</Title>
-          <Text c="dimmed">{userData?.role?.toUpperCase()}</Text>
+          <Title order={2}>Ali Ahmed</Title>
+          <Text c="dimmed">CUSTOMER</Text>
         </Paper>
 
         <Paper p="xl" radius="xl" withBorder shadow="sm">
           <Stack gap="md">
             <TextInput
               label="Full Name"
-              value={userData?.fullName || ""}
+              value="Ali Ahmed"
               disabled
               leftSection={<IconUser size={18} />}
             />
 
             <TextInput
               label="Phone Number"
-              value={userData?.phone || ""}
+              value="03001234567"
               disabled
               leftSection={<IconPhone size={18} />}
             />

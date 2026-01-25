@@ -6,13 +6,10 @@ import {
   Text,
   SimpleGrid,
   Paper,
-  Group,
   Stack,
   Button,
   Box,
-  Badge,
   ThemeIcon,
-  ActionIcon,
 } from "@mantine/core";
 import {
   IconCar,
@@ -20,10 +17,7 @@ import {
   IconDroplet,
   IconTruck,
   IconMapPin,
-  IconArrowRight,
 } from "@tabler/icons-react";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
 import Link from "next/link";
 
 const serviceCategories = [
@@ -58,15 +52,12 @@ const serviceCategories = [
 ];
 
 export default function ClientDashboard() {
-  const { customer } = useSelector((state: RootState) => state.customer);
-  const userData = customer;
-
   return (
     <Box className="p-4 md:p-8">
       <Stack gap="xl">
         <Box>
           <Title order={1} className="text-3xl font-bold text-slate-800">
-            Hello, {userData?.fullName?.split(" ")[0]} 👋
+            Hello, User 👋
           </Title>
           <Text c="dimmed" size="lg">
             Need roadside assistance? Select a service below.
@@ -94,58 +85,48 @@ export default function ClientDashboard() {
               radius="md"
               leftSection={<IconMapPin size={20} />}
               component={Link}
-              href="/client/request-help"
+              href="/customer/request-help"
             >
               Request Immediate Help
             </Button>
           </Box>
-          <Box className="absolute right-[-20px] bottom-[-40px] opacity-20 hidden md:block">
-            <IconTruck size={240} color="white" />
-          </Box>
         </Paper>
 
         <Box>
-          <Title order={3} mb="lg" className="text-slate-700">
-            Explore Services
+          <Title order={2} className="text-2xl font-bold text-slate-800 mb-6">
+            Services Available
           </Title>
-          <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
+
+          <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="lg">
             {serviceCategories.map((service) => (
               <Paper
                 key={service.id}
-                p="xl"
-                radius="xl"
                 withBorder
-                className="hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group"
+                p="lg"
+                radius="md"
                 component={Link}
-                href={`/client/request-help?type=${service.id}`}
+                href={`/customer/request-help?service=${service.id}`}
+                className="hover:shadow-md transition-shadow no-underline"
               >
-                <ThemeIcon
-                  size={56}
-                  radius="xl"
-                  color={service.color}
-                  variant="light"
-                  mb="md"
-                >
-                  <service.icon size={28} />
-                </ThemeIcon>
-                <Title
-                  order={4}
-                  mb={4}
-                  className="group-hover:text-blue-600 transition-colors"
-                >
-                  {service.title}
-                </Title>
-                <Text size="sm" c="dimmed" mb="lg">
-                  {service.desc}
-                </Text>
-                <Group justify="end">
-                  <ActionIcon variant="transparent">
-                    <IconArrowRight
-                      size={18}
-                      className="group-hover:translate-x-1 transition-transform"
-                    />
-                  </ActionIcon>
-                </Group>
+                <Stack align="center" gap="sm">
+                  <ThemeIcon
+                    variant="light"
+                    size="xl"
+                    radius="xl"
+                    color={service.color}
+                  >
+                    <service.icon size={24} />
+                  </ThemeIcon>
+                  <Text fw={600} size="lg" c="dark">
+                    {service.title}
+                  </Text>
+                  <Text c="dimmed" size="sm" ta="center">
+                    {service.desc}
+                  </Text>
+                  <Text size="sm" c={service.color} fw={500} mt="sm">
+                    Request now →
+                  </Text>
+                </Stack>
               </Paper>
             ))}
           </SimpleGrid>
@@ -183,7 +164,7 @@ export default function ClientDashboard() {
                   1. Stay with your vehicle
                 </Text>
                 <Text size="xs" c="dimmed">
-                  Unless it's unsafe, always stay near your car or bike.
+                  Unless it&apos;s unsafe, always stay near your car or bike.
                 </Text>
               </Paper>
               <Paper

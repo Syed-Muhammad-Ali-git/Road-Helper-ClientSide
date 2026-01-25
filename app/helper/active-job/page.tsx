@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Title,
   Text,
@@ -10,7 +10,6 @@ import {
   Group,
   Button,
   Badge,
-  Loader,
   ThemeIcon,
   Avatar,
   Divider,
@@ -25,65 +24,29 @@ import {
   IconNavigation,
   IconCheck,
 } from "@tabler/icons-react";
-import {
-  collection,
-  query,
-  where,
-  onSnapshot,
-  updateDoc,
-  doc,
-  serverTimestamp,
-} from "firebase/firestore";
-import { db } from "@/lib/firebase/config";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
-import { toast, ToastContainer } from "react-toastify";
 
-export default function ActiveJob() {
-  const [activeJob, setActiveJob] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const { helper } = useSelector((state: RootState) => state.helper);
-  const user = helper;
+export default function ActiveJobUI() {
+  const [activeJob, setActiveJob] = useState<any>({
+    clientName: "Ali Khan",
+    clientPhone: "+92 300 1234567",
+    location: "Gulshan-e-Iqbal, Karachi",
+    vehicleDetails: "Honda Civic Red (ABC-123)",
+    issueDescription: "Car broke down near main road, engine not starting.",
+    status: "accepted", // accepted | in_progress | completed
+  });
 
-  useEffect(() => {
-    if (!user) return;
-
-    const q = query(
-      collection(db, "serviceRequests"),
-      where("helperId", "==", user.uid),
-      where("status", "in", ["accepted", "in_progress"]),
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      if (!snapshot.empty) {
-        setActiveJob({ id: snapshot.docs[0].id, ...snapshot.docs[0].data() });
-      } else {
-        setActiveJob(null);
-      }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [user]);
-
-  const updateStatus = async (status: string) => {
-    if (!activeJob) return;
-    try {
-      await updateDoc(doc(db, "serviceRequests", activeJob.id), {
-        status: status,
-        updatedAt: serverTimestamp(),
-        ...(status === "completed" ? { completedAt: serverTimestamp() } : {}),
-      });
-      toast.success(`Job status updated to ${status.replace("_", " ")}`);
-    } catch (error) {
-      toast.error("Failed to update status.");
-    }
+  const updateStatus = (status: string) => {
+    setActiveJob((prev: any) => ({ ...prev, status }));
+    console.log(`Status updated to ${status}`);
   };
+
+  // Mock loading state
+  const loading = false;
 
   if (loading)
     return (
       <Box className="p-8 text-center">
-        <Loader size="xl" />
+        <Text>Loading...</Text>
       </Box>
     );
 
@@ -96,29 +59,16 @@ export default function ActiveJob() {
           withBorder
           className="text-center max-w-md bg-slate-50 border-dashed"
         >
-          <ThemeIcon
-            size={80}
-            radius="xl"
-            color="slate"
-            variant="light"
-            mb="md"
-          >
+          <ThemeIcon size={80} radius="xl" color="gray" variant="light" mb="md">
             <IconClock size={40} />
           </ThemeIcon>
           <Title order={3} mb="xs">
             No Active Job
           </Title>
           <Text c="dimmed" mb="xl">
-            You don't have any ongoing jobs right now. Grab one from the
-            requests panel!
+            You don&apos;t have any ongoing jobs right now.
           </Text>
-          <Button
-            color="red"
-            size="lg"
-            radius="md"
-            component="a"
-            href="/helper/requests"
-          >
+          <Button color="red" size="lg" radius="md">
             Find Nearby Jobs
           </Button>
         </Paper>
@@ -139,7 +89,7 @@ export default function ActiveJob() {
             variant="filled"
             p="lg"
           >
-            {activeJob.status?.replace("_", " ").toUpperCase()}
+            {activeJob.status.replace("_", " ").toUpperCase()}
           </Badge>
         </Group>
 
@@ -147,7 +97,7 @@ export default function ActiveJob() {
           <Group justify="space-between" mb="xl">
             <Group gap="md">
               <Avatar size="xl" radius="md" color="blue">
-                {activeJob.clientName?.charAt(0)}
+                {activeJob.clientName.charAt(0)}
               </Avatar>
               <Box>
                 <Title order={3}>{activeJob.clientName}</Title>
@@ -196,7 +146,13 @@ export default function ActiveJob() {
           <Divider my="xl" />
 
           <Timeline
-            active={activeJob.status === "accepted" ? 0 : 1}
+            active={
+              activeJob.status === "accepted"
+                ? 0
+                : activeJob.status === "in_progress"
+                  ? 1
+                  : 2
+            }
             bulletSize={30}
             lineWidth={2}
           >

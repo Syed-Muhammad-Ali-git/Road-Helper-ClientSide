@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
   TextInput,
   Button,
@@ -12,67 +12,16 @@ import {
   Stack,
   Box,
   Image,
-  LoadingOverlay,
   Paper,
+  LoadingOverlay,
 } from "@mantine/core";
-import { useForm } from "@mantine/form";
-import { zodResolver } from "mantine-form-zod-resolver";
-import { z } from "zod";
-import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
 import Link from "next/link";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/redux/store";
-import { sendOTPAction, customerLoginAction } from "@/redux/actions/customer-action";
 import { motion } from "framer-motion";
 
-const phoneSchema = z.object({
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
-});
-
-const otpSchema = z.object({
-  otp: z.string().min(6, "OTP must be 6 digits"),
-});
-
-export default function ClientLoginPage() {
-  const [otpSent, setOtpSent] = useState(false);
-  const router = useRouter();
-  const dispatch: AppDispatch = useDispatch();
-
-  const loading = useSelector((state: RootState) => state.customer.loading);
-
-  const phoneForm = useForm({
-    initialValues: { phone: "" },
-    validate: zodResolver(phoneSchema),
-  });
-
-  const otpForm = useForm({
-    initialValues: { otp: "" },
-    validate: zodResolver(otpSchema),
-  });
-
-  const handleSendOTP = async (values: typeof phoneForm.values) => {
-    try {
-      await dispatch(sendOTPAction(values.phone));
-      setOtpSent(true);
-      toast.success("OTP sent to your phone!");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to send OTP");
-    }
-  };
-
-  const handleConfirmOTP = async (values: typeof otpForm.values) => {
-    try {
-      await dispatch(customerLoginAction(values.otp));
-      toast.success("Welcome! Login successful.");
-      router.replace("/client/dashboard");
-    } catch (err: any) {
-      toast.error(err.message || "Invalid OTP");
-    }
-  };
-
+export default function ClientLoginPageUI() {
   return (
     <Box className="min-h-screen flex bg-slate-50">
+      {/* Left Hero Section */}
       <motion.div
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
@@ -83,9 +32,7 @@ export default function ClientLoginPage() {
           <Image
             src="/assets/images/ui-design.jpg"
             alt="Background"
-            h="100%"
-            w="100%"
-            fit="cover"
+            style={{ objectFit: "cover" }}
           />
         </Box>
         <Stack align="center" gap="xl" className="z-10 text-white text-center">
@@ -101,14 +48,13 @@ export default function ClientLoginPage() {
         </Stack>
       </motion.div>
 
+      {/* Right Login Section */}
       <motion.div
         initial={{ opacity: 0, x: 50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6 }}
         className="flex-1 flex items-center justify-center p-8 bg-white lg:rounded-l-[60px] shadow-2xl z-20 relative"
       >
-        <LoadingOverlay visible={loading} zIndex={1000} overlayProps={{ blur: 2 }} />
-
         <Container size={420} className="w-full">
           <Box className="mb-8">
             <Group gap="xs" mb="lg">
@@ -135,60 +81,53 @@ export default function ClientLoginPage() {
             </Text>
           </Paper>
 
-          {!otpSent ? (
-            <form onSubmit={phoneForm.onSubmit(handleSendOTP)}>
-              <Stack gap="lg">
-                <TextInput
-                  label="Phone Number"
-                  placeholder="Enter your phone number"
-                  required
-                  size="lg"
-                  radius="md"
-                  {...phoneForm.getInputProps("phone")}
-                />
-                <Button
-                  type="submit"
-                  fullWidth
-                  size="lg"
-                  radius="md"
-                  className="bg-blue-600 h-14"
-                >
-                  Send OTP
-                </Button>
-              </Stack>
-            </form>
-          ) : (
-            <form onSubmit={otpForm.onSubmit(handleConfirmOTP)}>
-              <Stack gap="lg">
-                <TextInput
-                  label="OTP"
-                  placeholder="Enter 6-digit OTP"
-                  required
-                  size="lg"
-                  radius="md"
-                  {...otpForm.getInputProps("otp")}
-                />
-                <Button
-                  type="submit"
-                  fullWidth
-                  size="lg"
-                  radius="md"
-                  className="bg-blue-600 h-14"
-                >
-                  Confirm OTP
-                </Button>
-                <Button
-                  variant="subtle"
-                  fullWidth
-                  size="lg"
-                  radius="md"
-                  onClick={() => setOtpSent(false)}
-                >
-                  Resend OTP
-                </Button>
-              </Stack>
-            </form>
-          )}
+          {/* Static Phone Input */}
+          <Stack gap="lg">
+            <TextInput
+              label="Phone Number"
+              placeholder="+92 300 0000000"
+              size="lg"
+              radius="md"
+              disabled
+            />
+            <Button
+              fullWidth
+              size="lg"
+              radius="md"
+              className="bg-blue-600 h-14"
+            >
+              Send OTP
+            </Button>
+          </Stack>
+
+          {/* OTP Input Section (Static) */}
+          <Stack gap="lg" mt="xl">
+            <TextInput
+              label="OTP"
+              placeholder="Enter 6-digit OTP"
+              size="lg"
+              radius="md"
+              disabled
+            />
+            <Button
+              fullWidth
+              size="lg"
+              radius="md"
+              className="bg-blue-600 h-14"
+            >
+              Confirm OTP
+            </Button>
+            <Button variant="subtle" fullWidth size="lg" radius="md">
+              Resend OTP
+            </Button>
+          </Stack>
+
+          <Text ta="center" mt="md" size="sm">
+            Are you a helper?{" "}
+            <Anchor component={Link} href="/helper/login" fw={700}>
+              Login as Helper
+            </Anchor>
+          </Text>
 
           <Text
             ta="center"
@@ -199,7 +138,6 @@ export default function ClientLoginPage() {
           >
             SECURE LOGGED-IN SESSION
           </Text>
-          <div id="recaptcha-container"></div>
         </Container>
       </motion.div>
     </Box>

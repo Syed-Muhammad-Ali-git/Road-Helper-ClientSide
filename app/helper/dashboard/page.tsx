@@ -12,23 +12,24 @@ import {
   Box,
   Badge,
   ThemeIcon,
-  Avatar,
 } from "@mantine/core";
 import {
   IconCash,
   IconChecklist,
   IconClock,
   IconStar,
-  IconMapPin,
   IconBriefcase,
 } from "@tabler/icons-react";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
 import Link from "next/link";
 
-export default function HelperDashboard() {
-  const { helper } = useSelector((state: RootState) => state.helper);
-  const userData = helper;
+export default function HelperDashboardUI() {
+  // Static/hardcoded data for UI
+  const userData = {
+    fullName: "Ali Khan",
+    isOnline: true,
+    totalJobs: 12,
+    rating: 4.9,
+  };
 
   const stats = [
     {
@@ -39,13 +40,13 @@ export default function HelperDashboard() {
     },
     {
       title: "Jobs Completed",
-      value: userData?.totalJobs || 0,
+      value: userData.totalJobs,
       icon: IconChecklist,
       color: "blue",
     },
     {
       title: "Current Rating",
-      value: userData?.rating || 5.0,
+      value: userData.rating,
       icon: IconStar,
       color: "yellow",
     },
@@ -58,7 +59,7 @@ export default function HelperDashboard() {
         <Group justify="space-between">
           <Box>
             <Title order={1} className="text-3xl font-bold text-slate-800">
-              Welcome back, {userData?.fullName?.split(" ")[0]}
+              Welcome back, {userData.fullName.split(" ")[0]}
             </Title>
             <Text c="dimmed" size="lg">
               Ready for some new jobs today?
@@ -67,11 +68,11 @@ export default function HelperDashboard() {
           <Badge
             size="xl"
             radius="md"
-            color={userData?.isOnline ? "green" : "red"}
+            color={userData.isOnline ? "green" : "red"}
             variant="light"
             p="lg"
           >
-            {userData?.isOnline ? "ONLINE & VISIBLE" : "OFFLINE"}
+            {userData.isOnline ? "ONLINE & VISIBLE" : "OFFLINE"}
           </Badge>
         </Group>
 

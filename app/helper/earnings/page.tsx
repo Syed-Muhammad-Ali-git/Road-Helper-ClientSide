@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Title,
   Text,
@@ -13,53 +13,35 @@ import {
   Table,
   Badge,
 } from "@mantine/core";
-import {
-  IconWallet,
-  IconTrendingUp,
-  IconCalendarEvent,
-  IconChecklist,
-} from "@tabler/icons-react";
-import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
-import { db } from "@/lib/firebase/config";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { IconWallet, IconTrendingUp, IconChecklist } from "@tabler/icons-react";
 
-export default function EarningsPage() {
-  const [earnings, setEarnings] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { helper } = useSelector((state: RootState) => state.helper);
-  const user = helper;
+export default function EarningsUI() {
+  // Hardcoded data
+  const earnings = [
+    {
+      id: "1",
+      clientName: "Ali Khan",
+      serviceType: "car_mechanic",
+      price: 80,
+      completedAt: new Date("2026-01-20T10:30:00"),
+    },
+    {
+      id: "2",
+      clientName: "Sara Ahmed",
+      serviceType: "bike_mechanic",
+      price: 50,
+      completedAt: new Date("2026-01-21T14:45:00"),
+    },
+    {
+      id: "3",
+      clientName: "Usman Ali",
+      serviceType: "towing",
+      price: 100,
+      completedAt: new Date("2026-01-22T09:15:00"),
+    },
+  ];
 
-  useEffect(() => {
-    const fetchEarnings = async () => {
-      if (!user) return;
-      try {
-        const q = query(
-          collection(db, "serviceRequests"),
-          where("helperId", "==", user.uid),
-          where("status", "==", "completed"),
-          orderBy("completedAt", "desc"),
-        );
-        const snapshot = await getDocs(q);
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setEarnings(data);
-      } catch (error) {
-        console.error("Error fetching earnings:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEarnings();
-  }, [user]);
-
-  const totalEarnings = earnings.reduce(
-    (sum, item) => sum + (item.price || 50),
-    0,
-  ); // Mock price if not exist
+  const totalEarnings = earnings.reduce((sum, item) => sum + item.price, 0);
 
   return (
     <Box className="p-4 md:p-8">
@@ -141,36 +123,21 @@ export default function EarningsPage() {
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {earnings.length === 0 ? (
-                <Table.Tr>
-                  <Table.Td
-                    colSpan={5}
-                    className="text-center py-12 text-slate-400"
-                  >
-                    No earnings history yet.
+              {earnings.map((job) => (
+                <Table.Tr key={job.id}>
+                  <Table.Td>{job.completedAt.toLocaleDateString()}</Table.Td>
+                  <Table.Td>{job.clientName}</Table.Td>
+                  <Table.Td>{job.serviceType.replace("_", " ")}</Table.Td>
+                  <Table.Td fw={700} c="green.7">
+                    ${job.price}
+                  </Table.Td>
+                  <Table.Td>
+                    <Badge color="green" variant="light">
+                      PAID
+                    </Badge>
                   </Table.Td>
                 </Table.Tr>
-              ) : (
-                earnings.map((job) => (
-                  <Table.Tr key={job.id}>
-                    <Table.Td>
-                      {job.completedAt?.toDate?.().toLocaleDateString()}
-                    </Table.Td>
-                    <Table.Td>{job.clientName}</Table.Td>
-                    <Table.Td tt="capitalize">
-                      {job.serviceType?.replace("_", " ")}
-                    </Table.Td>
-                    <Table.Td fw={700} c="green.7">
-                      ${job.price || 50}
-                    </Table.Td>
-                    <Table.Td>
-                      <Badge color="green" variant="light">
-                        PAID
-                      </Badge>
-                    </Table.Td>
-                  </Table.Tr>
-                ))
-              )}
+              ))}
             </Table.Tbody>
           </Table>
         </Paper>
