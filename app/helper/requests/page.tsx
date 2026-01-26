@@ -15,6 +15,7 @@ import {
   SimpleGrid,
 } from "@mantine/core";
 import { IconAlertCircle, IconMapPin, IconCheck } from "@tabler/icons-react";
+import { toast } from "react-toastify";
 
 export default function NearbyRequestsUI() {
   // Mock helper info
@@ -45,6 +46,11 @@ export default function NearbyRequestsUI() {
   ];
 
   const loading = false; // static, no async
+
+  const acceptRequest = (requestId: string) => {
+    console.log(`Accepted request ${requestId}`);
+    toast.success("Request accepted successfully!");
+  };
 
   if (loading)
     return (
@@ -133,6 +139,7 @@ export default function NearbyRequestsUI() {
                       className="bg-green-600 flex-1 h-12 rounded-xl"
                       leftSection={<IconCheck size={20} />}
                       disabled={!userData.isOnline}
+                      onClick={() => acceptRequest(req.id)}
                     >
                       Accept Request
                     </Button>

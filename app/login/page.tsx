@@ -52,7 +52,7 @@ export default function LoginPage() {
   const handleCustomerSubmit = async (values: typeof customerForm.values) => {
     console.log("Customer login form submitted:", values);
     toast.success("Customer login form submitted. Check console for data.");
-    router.replace("/client/dashboard");
+    router.replace("/customer/dashboard");
   };
 
   const handleHelperSubmit = async (values: typeof helperForm.values) => {

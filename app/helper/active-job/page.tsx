@@ -22,6 +22,7 @@ import {
   IconNavigation,
   IconCheck,
 } from "@tabler/icons-react";
+import { toast } from "react-toastify";
 
 export default function ActiveJobUI() {
   const [activeJob, setActiveJob] = useState<any>({
@@ -36,6 +37,7 @@ export default function ActiveJobUI() {
   const updateStatus = (status: string) => {
     setActiveJob((prev: any) => ({ ...prev, status }));
     console.log(`Status updated to ${status}`);
+    toast.success(`Job status updated to ${status.replace("_", " ")}`);
   };
 
   // Mock loading state

@@ -30,24 +30,19 @@ import {
   IconArrowLeft,
 } from "@tabler/icons-react";
 import {
-  collection,
-  query,
-  where,
   onSnapshot,
   updateDoc,
   doc,
   serverTimestamp,
-  getDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
-import { useSearchParams, useRouter } from "next/navigation";
-import { toast, ToastContainer } from "react-toastify";
+import { useSearchParams } from "next/navigation";
+import { toast } from "react-toastify";
 import Link from "next/link";
 
 function RequestStatusContent() {
   const searchParams = useSearchParams();
   const requestId = searchParams.get("id");
-  const router = useRouter();
   const [request, setRequest] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [rating, setRating] = useState(0);
@@ -83,6 +78,7 @@ function RequestStatusContent() {
       // Also update helper rating in a real app (omitted for brevity but mentioned)
       toast.success("Thank you for your feedback!");
     } catch (error) {
+      console.log("Error: ", error);
       toast.error("Failed to submit rating.");
     }
   };
@@ -98,7 +94,7 @@ function RequestStatusContent() {
     return (
       <Box className="p-4 md:p-8 flex flex-col items-center justify-center min-h-[70vh]">
         <Title order={3}>Request Not Found</Title>
-        <Button mt="lg" component={Link} href="/client/dashboard">
+        <Button mt="lg" component={Link} href="/customer/dashboard">
           Back to Dashboard
         </Button>
       </Box>
@@ -128,7 +124,7 @@ function RequestStatusContent() {
             variant="subtle"
             leftSection={<IconArrowLeft size={16} />}
             component={Link}
-            href="/client/dashboard"
+            href="/customer/dashboard"
           >
             Dashboard
           </Button>

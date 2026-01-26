@@ -93,25 +93,30 @@ const HelperSideBar = ({ open, setOpen }: SideBarProps) => {
     {
       text: "Dashboard",
       icon: <Image src={dashboardLogo} alt="" />,
-      path: "/",
+      path: "/helper/dashboard",
     },
     {
-      text: "Organization",
+      text: "Requests",
       icon: <Image src={organizationLogo} alt="" />,
-      path: "/organization",
+      path: "/helper/requests",
     },
   ];
 
   const otherMenuItems: SidebarItem[] = [
     {
-      text: "Audit",
+      text: "Active Job",
       icon: <Image src={auditLogo} alt="" />,
-      path: "/audit",
+      path: "/helper/active-job",
     },
     {
-      text: "Settings",
+      text: "Earnings",
+      icon: <Image src={auditLogo} alt="" />,
+      path: "/helper/earnings",
+    },
+    {
+      text: "Profile",
       icon: <Image src={settingsLogo} alt="" />,
-      path: "/settings",
+      path: "/helper/profile",
     },
   ];
 

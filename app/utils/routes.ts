@@ -2,7 +2,6 @@
  * customer-specific protected routes
  */
 const customerRoutes = [
-  "/",
   "/customer/dashboard",
   "/customer/history",
   "/customer/profile",

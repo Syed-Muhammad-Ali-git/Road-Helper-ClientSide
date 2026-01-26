@@ -104,6 +104,11 @@ const CustomerSideBar = ({ open, setOpen }: SideBarProps) => {
 
   const otherMenuItems: SidebarItem[] = [
     {
+      text: "Request Status",
+      icon: <Image src={auditLogo} alt="" />,
+      path: "/customer/request-status",
+    },
+    {
       text: "History",
       icon: <Image src={auditLogo} alt="" />,
       path: "/customer/history",

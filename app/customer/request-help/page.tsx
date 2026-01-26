@@ -26,6 +26,16 @@ import {
   IconCircleCheck,
 } from "@tabler/icons-react";
 import { useForm } from "@mantine/form";
+import z from "zod";
+import { toast } from "react-toastify";
+import { zodResolver } from "mantine-form-zod-resolver";
+
+const requestHelpSchema = z.object({
+  serviceType: z.string().min(1, "Service type is required"),
+  location: z.string().min(1, "Location is required"),
+  vehicleDetails: z.string().min(1, "Vehicle details are required"),
+  issueDescription: z.string().min(1, "Issue description is required"),
+});
 
 function RequestHelpContent() {
   const [active, setActive] = useState(0);
@@ -38,22 +48,28 @@ function RequestHelpContent() {
       vehicleDetails: "",
       issueDescription: "",
     },
+    validate: zodResolver(requestHelpSchema),
   });
 
   const nextStep = () => setActive((prev) => prev + 1);
   const prevStep = () => setActive((prev) => prev - 1);
   const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    setLoading(true);
-    const values = form.values;
-    console.log('Request Help Form Submitted:', values);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setActive(3); // Complete step
-      setLoading(false);
-      console.log('Request submitted successfully!');
-    }, 1000);
+    if (!form.validate().hasErrors) {
+      setLoading(true);
+      const values = form.values;
+      console.log("Request Help Form Submitted:", values);
+
+      // Simulate API call
+      setTimeout(() => {
+        setActive(3); // Complete step
+        setLoading(false);
+        toast.success("Request submitted successfully!");
+        console.log("Request submitted successfully!");
+      }, 1000);
+    } else {
+      toast.error("Please fill in all required fields correctly.");
+    }
   };
 
   return (
@@ -144,17 +160,13 @@ function RequestHelpContent() {
           {/* DONE */}
           <Stepper.Completed>
             <Stack align="center" gap="md" className="text-center py-8">
-              <ThemeIcon
-                size="xl"
-                radius="xl"
-                color="green"
-                variant="light"
-              >
+              <ThemeIcon size="xl" radius="xl" color="green" variant="light">
                 <IconCircleCheck size={32} />
               </ThemeIcon>
               <Title order={3}>Request Submitted!</Title>
               <Text c="dimmed">
-                Your request has been logged to the console. In a real application, this would be sent to our servers.
+                Your request has been logged to the console. In a real
+                application, this would be sent to our servers.
               </Text>
               <Button
                 variant="light"
@@ -184,11 +196,7 @@ function RequestHelpContent() {
             {active < 2 ? (
               <Button onClick={nextStep}>Next</Button>
             ) : (
-              <Button 
-                loading={loading} 
-                onClick={handleSubmit}
-                type="submit"
-              >
+              <Button loading={loading} onClick={handleSubmit} type="submit">
                 Send Request
               </Button>
             )}

@@ -61,7 +61,7 @@ export default function ServiceHistoryUI() {
             className="text-center bg-slate-50 border-dashed"
           >
             <Text c="dimmed">You haven&apos;t made any requests yet.</Text>
-            <Button mt="md" component={Link} href="/client/request-help">
+            <Button mt="md" component={Link} href="/customer/request-help">
               Get Help Now
             </Button>
           </Paper>
@@ -128,7 +128,7 @@ export default function ServiceHistoryUI() {
                         variant="subtle"
                         size="xs"
                         component={Link}
-                        href={`/client/request-status?id=${req.id}`}
+                        href={`/customer/request-status?id=${req.id}`}
                       >
                         View
                       </Button>
