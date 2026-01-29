@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import {
   TextInput,
   PasswordInput,
@@ -11,6 +11,8 @@ import {
   SegmentedControl,
   Select,
   Paper,
+  Loader,
+  Box,
 } from "@mantine/core";
 import Image from "next/image";
 import { useForm } from "@mantine/form";
@@ -34,7 +36,7 @@ const helperSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-export default function RegisterPage() {
+function RegisterPageContent() {
   const searchParams = useSearchParams();
   const defaultType =
     searchParams.get("type") === "helper" ? "helper" : "customer";
@@ -304,5 +306,19 @@ export default function RegisterPage() {
         </div>
       </motion.div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense
+      fallback={
+        <Box className="min-h-screen flex items-center justify-center">
+          <Loader size="xl" />
+        </Box>
+      }
+    >
+      <RegisterPageContent />
+    </Suspense>
   );
 }

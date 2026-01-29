@@ -106,7 +106,7 @@ const CustomerSideBar = ({ open, setOpen }: SideBarProps) => {
     {
       text: "Request Status",
       icon: <Image src={auditLogo} alt="" />,
-      path: "/customer/request-status/REQ-123",
+      path: "/customer/request-status",
     },
     {
       text: "History",
