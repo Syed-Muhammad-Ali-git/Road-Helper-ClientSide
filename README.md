@@ -2,11 +2,12 @@
 
 (app)
 
+Route (app)
 ┌ ○ /
 ├ ○ /\_not-found
+├ ○ /admin/dashboard
 ├ ○ /customer/dashboard
 ├ ○ /customer/history
-├ ○ /customer/login
 ├ ○ /customer/profile
 ├ ○ /customer/request-help
 ├ ○ /customer/request-status
