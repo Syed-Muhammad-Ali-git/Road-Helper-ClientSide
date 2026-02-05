@@ -182,7 +182,7 @@ const AdminSideBar = ({ open, setOpen }: SideBarProps) => {
           )}
           <IconButton
             onClick={() => setOpen(!open)}
-            sx={{ color: "black", backgroundColor: "white" }}
+            sx={{ color: "white", backgroundColor: "#1F1F1F", "&:hover": { backgroundColor: "#27272A" } }}
           >
             {open ? <ChevronLeftIcon /> : <MenuIcon />}
           </IconButton>
