@@ -23,6 +23,7 @@ const ClientLayout = ({ children }: ClientLayoutProps) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   // ----- MEDIA QUERY FOR DESKTOP VIEW -----
+  // Using 900px breakpoint to match MUI default for 'md'
   const isDesktop = useMediaQuery("(min-width: 900px)");
 
   // ----- EFFECT TO SET DRAWER STATE BASED ON VIEWPORT -----
@@ -35,16 +36,20 @@ const ClientLayout = ({ children }: ClientLayoutProps) => {
     helperRoutes.includes(pathname) ||
     customerRoutes.includes(pathname) ||
     adminRoutes.includes(pathname);
+
+  const isAdmin = pathname?.includes("/admin");
+
   // ----- DYNAMIC STYLING FOR THE MAIN CONTENT -----
   const mainStyle: React.CSSProperties = {
-    transition: "margin-left 200ms ease",
-    marginLeft:
-      showSidebar && drawerOpen && pathname
-        ? `${drawerWidth}px`
-        : showSidebar
-          ? "calc(59px + 1px)"
-          : undefined,
-    paddingTop: showSidebar ? "70px" : "0",
+    transition: "margin-left 225ms cubic-bezier(0.4, 0, 0.6, 1) 0ms",
+    marginLeft: !showSidebar
+      ? 0
+      : !isDesktop
+        ? 0 // Mobile: No margin, sidebar overlays
+        : drawerOpen
+          ? `${drawerWidth}px` // Desktop Open
+          : "70px", // Desktop Collapsed
+    paddingTop: showSidebar && !isAdmin ? "70px" : "0",
   };
 
   return (

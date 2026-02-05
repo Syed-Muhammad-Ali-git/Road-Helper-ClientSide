@@ -20,6 +20,13 @@ const helperRoutes = [
   "/helper/active-job",
 ];
 
+const adminRoutes = [
+  "/admin/dashboard",
+  "/admin/requests",
+  "/admin/users",
+  "/admin/settings",
+];
+
 /**
  * Public routes accessible without authentication
  */
@@ -28,7 +35,6 @@ const publicRoutes = ["/login", "/register", "/forgot-password"];
 /**
  * All protected routes (for backward compatibility)
  */
-const adminRoutes = ["/admin/dashboard"];
 
 /**
  * All protected routes (for backward compatibility)

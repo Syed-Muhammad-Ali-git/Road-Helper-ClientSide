@@ -2,24 +2,33 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Group, Avatar, Menu, Text, Badge } from "@mantine/core";
+import { Group, Avatar, Menu, Text, Badge, ActionIcon } from "@mantine/core";
 import Image from "next/image";
 import helpLogo from "../../assets/images/helpLogo.png";
 import myAccountLogo from "../../assets/images/myAccount.png";
 import signoutLogo from "../../assets/images/signout.png";
+import { IconMenu2 } from "@tabler/icons-react";
+import { useMediaQuery } from "@mantine/hooks";
 
 interface AdminHeaderProps {
   sidebarOpen?: boolean;
+  setSidebarOpen?: (open: boolean) => void;
 }
 
-const AdminHeader: React.FC<AdminHeaderProps> = ({ sidebarOpen = false }) => {
+const AdminHeader: React.FC<AdminHeaderProps> = ({
+  sidebarOpen = false,
+  setSidebarOpen,
+}) => {
   const router = useRouter();
   const [adminName, setAdminName] = useState<string>("Admin");
   const [adminEmail, setAdminEmail] = useState<string>("admin@example.com");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  // Responsive check
+  const isMobile = useMediaQuery("(max-width: 900px)");
+
   const drawerWidth = 260;
-  const collapsedWidth = 65;
+  const collapsedWidth = 70; // Updated to match sidebar.tsx
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -41,14 +50,38 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ sidebarOpen = false }) => {
     router.push("/login");
   };
 
+  const handleToggle = () => {
+    if (setSidebarOpen) {
+      setSidebarOpen(!sidebarOpen);
+    }
+  };
+
+  // Logic for 'left' position
+  // Mobile: 0 (header spans full width usually, sidebar overlays)
+  // Desktop: depends on sidebarOpen
+  const headerLeft = isMobile ? 0 : sidebarOpen ? drawerWidth : collapsedWidth;
+
   return (
     <div
-      className="h-16 fixed top-0 right-0 z-50 glass-dark flex items-center justify-between px-4 md:px-6 border-b border-white/10"
+      className="h-16 fixed top-0 right-0 z-40 glass-dark flex items-center justify-between px-4 md:px-6 border-b border-white/10 transition-all duration-200 ease-in-out"
       style={{
-        left: sidebarOpen ? drawerWidth : collapsedWidth,
+        left: headerLeft,
+        width: isMobile ? "100%" : `calc(100% - ${headerLeft}px)`,
+        // We need to set width because 'right: 0' and 'left' together define width.
+        // If left changes, width changes implicitly.
       }}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
+        {/* Toggle Button - Visible mainly when sidebar is collapsed or on mobile to open it */}
+        <ActionIcon
+          variant="subtle"
+          color="gray"
+          onClick={handleToggle}
+          className="text-gray-400 hover:text-white"
+        >
+          <IconMenu2 size={20} />
+        </ActionIcon>
+
         <Badge
           color="red"
           radius="xl"
@@ -63,7 +96,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ sidebarOpen = false }) => {
       </div>
 
       <Group gap={12}>
-        <div className="p-2 rounded-lg glass hover:bg-white/10 cursor-pointer transition-all">
+        <div className="p-2 rounded-lg glass hover:bg-white/10 cursor-pointer transition-all hidden sm:block">
           <Image
             src={helpLogo}
             alt="help"
@@ -107,36 +140,48 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ sidebarOpen = false }) => {
               <div>
                 <div className="font-bold text-sm text-white">{adminName}</div>
                 <div className="text-xs text-gray-400">{adminEmail}</div>
+                <Badge
+                  size="xs"
+                  variant="outline"
+                  color="green"
+                  className="mt-1"
+                >
+                  Online
+                </Badge>
               </div>
             </div>
 
             <Menu.Item
               onClick={() => router.push("/admin/dashboard")}
               className="text-gray-300 hover:text-white hover:bg-white/5 transition-all my-1"
+              leftSection={
+                <Image
+                  src={myAccountLogo}
+                  alt="my account"
+                  className="inline-block opacity-80"
+                  width={18}
+                  height={18}
+                />
+              }
               style={{ fontWeight: 500, padding: "12px 16px" }}
             >
-              <Image
-                src={myAccountLogo}
-                alt="my account"
-                className="inline-block opacity-80"
-                width={18}
-                height={18}
-              />
-              &nbsp; Overview
+              Overview
             </Menu.Item>
             <Menu.Item
               onClick={handleSignOut}
               className="text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all my-1"
+              leftSection={
+                <Image
+                  src={signoutLogo}
+                  alt="signout"
+                  className="inline-block opacity-80"
+                  width={18}
+                  height={18}
+                />
+              }
               style={{ fontWeight: 500, padding: "12px 16px" }}
             >
-              <Image
-                src={signoutLogo}
-                alt="signout"
-                className="inline-block opacity-80"
-                width={18}
-                height={18}
-              />
-              &nbsp; Sign Out
+              Sign Out
             </Menu.Item>
           </Menu.Dropdown>
         </Menu>
@@ -146,4 +191,3 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ sidebarOpen = false }) => {
 };
 
 export default AdminHeader;
-

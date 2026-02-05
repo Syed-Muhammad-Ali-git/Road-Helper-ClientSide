@@ -1,6 +1,11 @@
 /* ---------------- IMPORTS ---------------- */
 import React from "react";
-import { protectedRoutes, customerRoutes, helperRoutes, adminRoutes } from "./routes";
+import {
+  protectedRoutes,
+  customerRoutes,
+  helperRoutes,
+  adminRoutes,
+} from "./routes";
 import HelperSideBar from "../components/helperSidebar/sidebar";
 import HelperHeader from "../components/helperHeader/header";
 import CustomerSideBar from "../components/customerSidebar/sidebar";
@@ -45,7 +50,7 @@ const PathChecker = ({ pathName, open, setOpen }: PathCheckerProps) => {
   } else if (isAdminRoute) {
     return (
       <>
-        <AdminHeader sidebarOpen={open} />
+        <AdminHeader sidebarOpen={open} setSidebarOpen={setOpen} />
         <AdminSideBar open={open} setOpen={setOpen} />
       </>
     );
