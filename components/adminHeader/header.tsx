@@ -24,7 +24,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
   // Responsive check
   const isMobile = useMediaQuery("(max-width: 900px)");
 
-  const drawerWidth = 260;
+  const drawerWidth = 280;
   const collapsedWidth = 70;
 
   useEffect(() => {

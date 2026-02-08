@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Activity } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -15,6 +15,7 @@ import { setCookie } from "cookies-next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 import {
   Mail,
   Lock,
@@ -59,227 +60,258 @@ export default function AdminLoginPage() {
       const token = await userCredential.user.getIdToken();
       setCookie("role", "admin", { maxAge: 60 * 60 * 24 * 7, path: "/" });
       setCookie("token", token, { maxAge: 60 * 60 * 24 * 7, path: "/" });
-      toast.success("🎉 Welcome back, Admin!");
+      toast.success("🎉 Access Granted. Welcome, Administrator.");
       router.push("/admin/dashboard");
     } catch (error: any) {
       console.error(error);
-      toast.error("⚠️ Invalid credentials or not authorized as admin.");
+      toast.error(
+        "⚠️ Security Breach: Invalid credentials or unauthorized access.",
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-brand-black to-black font-satoshi text-white overflow-hidden relative p-4">
-      {/* Animated Background */}
+    <div className="min-h-screen flex bg-[#0a0a0a] font-satoshi text-white overflow-hidden relative">
+      {/* Background Decor */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {isClient &&
-          [...Array(15)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-2 h-2 bg-brand-red/30 rounded-full"
-              initial={{
-                x: Math.random() * window.innerWidth,
-                y: Math.random() * window.innerHeight,
-                scale: Math.random() * 0.5 + 0.5,
-              }}
-              animate={{
-                y: [null, Math.random() * window.innerHeight],
-                x: [null, Math.random() * window.innerWidth],
-                opacity: [0.2, 0.8, 0.2],
-                scale: [null, Math.random() * 1.5 + 0.5],
-              }}
-              transition={{
-                duration: Math.random() * 15 + 10,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-            />
-          ))}
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.05, 0.1, 0.05],
+          }}
+          transition={{ duration: 20, repeat: Infinity }}
+          className="absolute -top-[10%] -left-[5%] w-[50%] h-[50%] bg-brand-red/10 blur-[150px] rounded-full"
+        />
+        <motion.div
+          animate={{
+            scale: [1.3, 1, 1.3],
+            opacity: [0.03, 0.08, 0.03],
+          }}
+          transition={{ duration: 15, repeat: Infinity }}
+          className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] bg-blue-600/10 blur-[130px] rounded-full"
+        />
       </div>
 
+      {/* --- LEFT SIDE: THEMATIC SIDEBAR --- */}
       <motion.div
-        animate={{
-          scale: [1, 1.2, 1],
-          rotate: [0, 180, 360],
-        }}
-        transition={{
-          duration: 25,
-          repeat: Infinity,
-          ease: "linear",
-        }}
-        className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand-red/20 blur-[150px] rounded-full"
-      />
-
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6 }}
-        className="w-full max-w-md relative z-10"
+        initial={{ opacity: 0, x: -100 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 1 }}
+        className="hidden lg:flex w-1/2 relative flex-col justify-between p-16 z-10 border-r border-white/5 bg-black"
       >
-        <Link
-          href="/"
-          className="absolute -top-16 left-0 text-gray-400 hover:text-white transition-colors flex items-center gap-2 group"
-        >
-          <ArrowRight
-            className="rotate-180 group-hover:-translate-x-1 transition-transform"
-            size={16}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/assets/images/login-sidebar.png"
+            alt="Admin Background"
+            fill
+            className="object-cover opacity-20 grayscale"
+            priority
           />
-          <span className="text-sm font-bold">Back to Home</span>
+          <div className="absolute inset-0 bg-gradient-to-l from-black via-black/80 to-transparent" />
+        </div>
+
+        <div className="relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-4 mb-12"
+          >
+            <div className="w-12 h-12 relative bg-white rounded-xl p-2 shadow-2xl">
+              <Image
+                src="/assets/images/logo.png"
+                alt="Logo"
+                fill
+                className="object-contain"
+              />
+            </div>
+            <span className="font-manrope font-black text-2xl tracking-tighter">
+              Road<span className="text-brand-red">Helper</span>{" "}
+              <span className="text-gray-500 text-sm font-bold ml-2 uppercase tracking-[0.3em]">
+                HQ
+              </span>
+            </span>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <h1 className="text-7xl font-black leading-[1.1] mb-8 tracking-tighter">
+              Central <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500">
+                Command
+              </span>
+              <br /> Center.
+            </h1>
+            <p className="text-gray-400 text-xl max-w-md leading-relaxed font-medium">
+              Enterprise-grade infrastructure management and real-time
+              operational oversight for the world's most reliable rescue
+              network.
+            </p>
+          </motion.div>
+        </div>
+
+        <div className="relative z-10 flex gap-6">
+          <div className="flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl">
+            <Shield className="text-brand-red" size={24} />
+            <div>
+              <p className="text-white font-black text-xl leading-none mb-1">
+                SECURED
+              </p>
+              <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">
+                Encrypted Access
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl">
+            <Activity className="text-orange-500" size={24} />
+            <div>
+              <p className="text-white font-black text-xl leading-none mb-1">
+                SYSTEMS
+              </p>
+              <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">
+                100% Operational
+              </p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* --- RIGHT SIDE: FORM --- */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative z-10">
+        <Link href="/" className="absolute top-8 right-8 group">
+          <motion.div
+            whileHover={{ x: 5 }}
+            className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-white transition-all"
+          >
+            <span>Back to Portal</span>
+            <ArrowRight
+              size={16}
+              className="group-hover:translate-x-1 transition-transform"
+            />
+          </motion.div>
         </Link>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-8"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+          className="w-full max-w-[440px]"
         >
-          <motion.div
-            whileHover={{ rotate: [0, 5, -5, 0], scale: 1.1 }}
-            transition={{ duration: 0.5 }}
-            className="inline-block p-6 rounded-3xl bg-gradient-to-br from-brand-red/30 to-orange-500/30 mb-6 border-2 border-brand-red/30 shadow-2xl shadow-brand-red/30 backdrop-blur-xl"
-          >
-            <Shield size={56} className="text-brand-red" />
-          </motion.div>
-          <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-            Admin Portal
-          </h1>
-          <p className="text-gray-400 text-lg">
-            Sign in to manage the platform
-          </p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="glass-dark p-8 rounded-3xl border-2 border-white/10 backdrop-blur-xl shadow-2xl"
-        >
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="text-center mb-12">
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
-              className="space-y-2"
+              animate={{
+                rotate: [0, 10, -10, 0],
+                y: [0, -5, 0],
+              }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="inline-block p-6 rounded-[32px] bg-gradient-to-br from-brand-red/20 to-orange-500/20 border-2 border-brand-red/30 shadow-2xl mb-8 backdrop-blur-3xl"
             >
-              <Label className="text-gray-300 text-xs uppercase tracking-wider font-bold flex items-center gap-2">
-                <Mail size={14} className="text-brand-red" />
-                Admin Email
+              <Shield size={52} className="text-brand-red" />
+            </motion.div>
+            <h2 className="text-4xl font-black mb-3 text-white tracking-tight">
+              Admin Authentication
+            </h2>
+            <p className="text-gray-500 font-medium">
+              Verify your administrative credentials to enter the HQ
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="space-y-2">
+              <Label className="uppercase text-[10px] font-black text-gray-500 tracking-[0.2em] ml-1">
+                Professional Identity
               </Label>
-              <motion.div
-                whileFocus={{ scale: 1.01 }}
-                className="relative group"
-              >
-                <Mail className="absolute left-4 top-3.5 h-5 w-5 text-gray-500 group-focus-within:text-brand-red transition-colors z-10" />
+              <div className="relative group">
+                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-600 group-focus-within:text-brand-red transition-all" />
                 <Input
                   {...register("email")}
-                  className="pl-12 h-14 bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red rounded-xl transition-all hover:bg-white/10 hover:border-brand-red/50"
-                  placeholder="admin@roadhelper.com"
+                  placeholder="name@protocol.com"
+                  className="pl-14 h-16 bg-white/[0.03] border-2 border-white/5 focus:border-brand-red text-white rounded-2xl transition-all font-medium"
                 />
-                <motion.div className="absolute inset-0 rounded-xl bg-gradient-to-r from-brand-red/20 to-transparent opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity pointer-events-none" />
-              </motion.div>
+              </div>
               {errors.email && (
-                <motion.span
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-red-400 text-xs ml-1 flex items-center gap-1"
-                >
-                  ⚠️ {errors.email.message as string}
-                </motion.span>
+                <p className="text-brand-red text-xs font-bold mt-1 ml-1 animate-pulse">
+                  ⚠ {errors.email.message as string}
+                </p>
               )}
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
-              className="space-y-2"
-            >
-              <Label className="text-gray-300 text-xs uppercase tracking-wider font-bold flex items-center gap-2">
-                <Lock size={14} className="text-brand-red" />
-                Password
-              </Label>
-              <motion.div
-                whileFocus={{ scale: 1.01 }}
-                className="relative group"
-              >
-                <Lock className="absolute left-4 top-4 h-5 w-5 text-gray-500 group-focus-within:text-brand-red transition-colors z-10" />
+            <div className="space-y-2">
+              <div className="flex justify-between items-center px-1">
+                <Label className="uppercase text-[10px] font-black text-gray-500 tracking-[0.2em]">
+                  Security Key
+                </Label>
+                <Link
+                  href="/forgot-password"
+                  size="xs"
+                  className="text-[10px] font-black text-brand-red/70 hover:text-brand-red transition-colors uppercase tracking-widest no-underline"
+                >
+                  Reset Link?
+                </Link>
+              </div>
+              <div className="relative group">
+                <Lock className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-600 group-focus-within:text-brand-red transition-all" />
                 <Input
                   {...register("password")}
                   type={showPassword ? "text" : "password"}
-                  className="pl-12 pr-12 h-14 bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red rounded-xl transition-all hover:bg-white/10 hover:border-brand-red/50"
                   placeholder="••••••••"
+                  className="pl-14 pr-14 h-16 bg-white/[0.03] border-2 border-white/5 focus:border-brand-red text-white rounded-2xl transition-all font-medium"
                 />
-                <motion.button
+                <button
                   type="button"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-4 text-gray-500 hover:text-brand-red transition-colors z-10 cursor-pointer"
+                  className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-600 hover:text-white transition-colors cursor-pointer"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </motion.button>
-                <motion.div className="absolute inset-0 rounded-xl bg-gradient-to-r from-brand-red/20 to-transparent opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity pointer-events-none" />
-              </motion.div>
-              {errors.password && (
-                <motion.span
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-red-400 text-xs ml-1 flex items-center gap-1"
-                >
-                  ⚠️ {errors.password.message as string}
-                </motion.span>
-              )}
-              {/* Forgot Password Link */}
-              <div className="text-right pt-1">
-                <Link
-                  href="/forgot-password"
-                  className="text-xs font-semibold text-brand-red hover:text-white transition-colors hover:underline cursor-pointer inline-flex items-center gap-1 group"
-                >
-                  <Lock size={12} className="group-hover:animate-pulse" />
-                  Forgot Password?
-                </Link>
+                </button>
               </div>
-            </motion.div>
+              {errors.password && (
+                <p className="text-brand-red text-xs font-bold mt-1 ml-1 animate-pulse">
+                  ⚠ {errors.password.message as string}
+                </p>
+              )}
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full h-18 bg-brand-red hover:bg-brand-dark-red text-white rounded-2xl font-black text-lg tracking-tight shadow-3xl shadow-brand-red/30 border-none transition-all active:scale-95 group relative overflow-hidden"
             >
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full h-16 text-lg font-bold bg-gradient-to-r from-brand-red via-brand-dark-red to-brand-red bg-size-200 hover:shadow-2xl hover:shadow-brand-red/50 transition-all duration-500 rounded-xl border-2 border-brand-red/50 hover:border-brand-red group relative overflow-hidden cursor-pointer"
-                style={{ backgroundSize: "200% 100%" }}
-              >
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                  animate={{ x: ["-100%", "100%"] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                />
-                <span className="relative z-10 flex items-center justify-center gap-2">
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="animate-spin" size={20} />
-                      Signing In...
-                    </>
-                  ) : (
-                    <>
-                      <Shield size={20} />
-                      Admin Login
-                      <ArrowRight
-                        className="group-hover:translate-x-1 transition-transform"
-                        size={20}
-                      />
-                    </>
-                  )}
-                </span>
-              </Button>
-            </motion.div>
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                animate={{ x: ["-100%", "100%"] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+              />
+              <span className="relative z-10 flex items-center justify-center gap-3">
+                {isLoading ? (
+                  <>
+                    <Loader2 className="animate-spin" size={24} />
+                    AUTHORIZING...
+                  </>
+                ) : (
+                  <>
+                    INITIALIZE SECURE ACCESS
+                    <ArrowRight
+                      className="group-hover:translate-x-2 transition-transform"
+                      size={24}
+                    />
+                  </>
+                )}
+              </span>
+            </Button>
           </form>
+
+          <div className="mt-12 pt-8 border-t border-white/5 text-center">
+            <Text className="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em]">
+              System Operator Priority Access Only
+            </Text>
+          </div>
         </motion.div>
-      </motion.div>
+      </div>
     </div>
   );
 }

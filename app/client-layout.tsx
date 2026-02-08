@@ -15,7 +15,7 @@ interface ClientLayoutProps {
 }
 
 /* ---------------- CONSTANTS ---------------- */
-const drawerWidth = 260;
+const drawerWidth = 280;
 
 /* ---------------- COMPONENT ---------------- */
 const ClientLayout = ({ children }: ClientLayoutProps) => {

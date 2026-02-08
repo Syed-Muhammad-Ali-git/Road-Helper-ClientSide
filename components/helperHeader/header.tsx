@@ -51,7 +51,7 @@ const HelperHeader: React.FC<HeaderProps> = ({
     }
   }, []);
 
-  const drawerWidth = 260;
+  const drawerWidth = 280;
   const collapsedWidth = 70;
 
   // ---------------- SIGN OUT FUNCTION ----------------
