@@ -265,26 +265,28 @@ export default function LoginPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="relative bg-white/5 p-1.5 rounded-2xl border border-white/10 mb-8 backdrop-blur-xl shadow-xl"
+            className="relative bg-white/5 p-1.5 rounded-2xl border-2 border-white/20 mb-8 backdrop-blur-xl shadow-xl"
           >
             <motion.div
               layout
               className={cn(
-                "absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-gradient-to-r from-brand-red to-brand-dark-red rounded-xl shadow-lg shadow-brand-red/30",
+                "absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-gradient-to-r from-brand-red to-brand-dark-red rounded-xl shadow-lg shadow-brand-red/30 border border-brand-red/50",
                 loginType === "helper" ? "left-[calc(50%+3px)]" : "left-1.5",
               )}
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
             />
-            <div className="relative z-10 flex">
+            <div className="relative z-10 flex gap-1">
               {["customer", "helper"].map((type) => (
                 <motion.button
                   key={type}
                   onClick={() => setLoginType(type as any)}
-                  whileHover={{ scale: 1.02 }}
+                  whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   className={cn(
-                    "flex-1 py-3.5 text-sm font-bold rounded-xl transition-colors duration-300",
-                    loginType === type ? "text-white" : "text-gray-400",
+                    "flex-1 py-3.5 text-sm font-bold rounded-xl transition-all duration-300 cursor-pointer border-2",
+                    loginType === type
+                      ? "text-white border-transparent"
+                      : "text-gray-400 border-transparent hover:border-white/10 hover:text-white",
                   )}
                 >
                   {type === "customer" ? "👤 Customer" : "🛠️ Helper"}

@@ -1,159 +1,267 @@
 "use client";
 
-import React from "react";
-import {
-  TextInput,
-  PasswordInput,
-  Checkbox,
-  Button,
-  Title,
-  Text,
-  Anchor,
-  Paper,
-  Container,
-  Group,
-  Divider,
-} from "@mantine/core";
-import { useForm } from "@mantine/form";
-import { motion } from "framer-motion";
-import { IconLock, IconMail, IconArrowRight } from "@tabler/icons-react";
-import Link from "next/link";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { motion } from "framer-motion";
+import { toast } from "react-toastify";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase/config";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Mail,
+  Lock,
+  ArrowRight,
+  Loader2,
+  Shield,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 
-export default function AdminLogin() {
-  const form = useForm({
-    initialValues: {
-      email: "",
-      password: "",
-      keepLoggedIn: false,
-    },
-    validate: {
-      email: (val) => (/^\S+@\S+$/.test(val) ? null : "Invalid email"),
-      password: (val) =>
-        val.length < 6 ? "Password must include at least 6 characters" : null,
-    },
+const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+export default function AdminLoginPage() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
   });
 
+  const onSubmit = async (data: any) => {
+    setIsLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, data.email, data.password);
+      toast.success("🎉 Welcome back, Admin!");
+      router.push("/admin/dashboard");
+    } catch (error: any) {
+      console.error(error);
+      toast.error("⚠️ Invalid credentials or not authorized as admin.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-brand-black flex items-center justify-center relative overflow-hidden font-satoshi">
-      {/* Background Ambience */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-brand-red/10 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-blue-600/5 rounded-full blur-[100px] translate-x-1/2 translate-y-1/2" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-brand-black to-black font-satoshi text-white overflow-hidden relative p-4">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {isClient &&
+          [...Array(15)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-brand-red/30 rounded-full"
+              initial={{
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                scale: Math.random() * 0.5 + 0.5,
+              }}
+              animate={{
+                y: [null, Math.random() * window.innerHeight],
+                x: [null, Math.random() * window.innerWidth],
+                opacity: [0.2, 0.8, 0.2],
+                scale: [null, Math.random() * 1.5 + 0.5],
+              }}
+              transition={{
+                duration: Math.random() * 15 + 10,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+            />
+          ))}
       </div>
 
-      <Container size={420} className="relative z-10 w-full">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+      <motion.div
+        animate={{
+          scale: [1, 1.2, 1],
+          rotate: [0, 180, 360],
+        }}
+        transition={{
+          duration: 25,
+          repeat: Infinity,
+          ease: "linear",
+        }}
+        className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand-red/20 blur-[150px] rounded-full"
+      />
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-md relative z-10"
+      >
+        <Link
+          href="/"
+          className="absolute -top-16 left-0 text-gray-400 hover:text-white transition-colors flex items-center gap-2 group"
         >
-          <div className="text-center mb-8">
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="inline-block mb-4 p-4 rounded-2xl bg-gradient-to-br from-white/10 to-transparent border border-white/5 shadow-2xl"
-            >
-              <Image src="/logo.png" alt="Road Helper" width={60} height={60} />
-            </motion.div>
-            <Title className="text-white font-manrope text-3xl font-extrabold tracking-tight">
-              Admin Portal
-            </Title>
-            <Text className="text-gray-400 mt-2 text-sm">
-              Secure access for platform administrators
-            </Text>
-          </div>
+          <ArrowRight
+            className="rotate-180 group-hover:-translate-x-1 transition-transform"
+            size={16}
+          />
+          <span className="text-sm font-bold">Back to Home</span>
+        </Link>
 
-          <Paper
-            radius="xl"
-            p={30}
-            className="bg-[#0A0A0A]/80 backdrop-blur-xl border border-white/10 shadow-[0_0_50px_-10px_rgba(0,0,0,0.5)]"
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-8"
+        >
+          <motion.div
+            whileHover={{ rotate: [0, 5, -5, 0], scale: 1.1 }}
+            transition={{ duration: 0.5 }}
+            className="inline-block p-6 rounded-3xl bg-gradient-to-br from-brand-red/30 to-orange-500/30 mb-6 border-2 border-brand-red/30 shadow-2xl shadow-brand-red/30 backdrop-blur-xl"
           >
-            <form onSubmit={form.onSubmit(() => {})}>
-              <Text className="text-gray-300 text-sm font-bold mb-1 uppercase tracking-wider">
-                Email Address
-              </Text>
-              <TextInput
-                required
-                placeholder="admin@roadhelper.com"
-                leftSection={<IconMail size={16} />}
-                {...form.getInputProps("email")}
-                classNames={{
-                  input:
-                    "bg-[#18181B] border-[#27272A] text-white focus:border-brand-red h-12 rounded-lg",
-                }}
-                mb="md"
-              />
-
-              <Text className="text-gray-300 text-sm font-bold mb-1 uppercase tracking-wider">
-                Password
-              </Text>
-              <PasswordInput
-                required
-                placeholder="Your secure password"
-                leftSection={<IconLock size={16} />}
-                {...form.getInputProps("password")}
-                classNames={{
-                  input:
-                    "bg-[#18181B] border-[#27272A] text-white focus:border-brand-red h-12 rounded-lg",
-                  innerInput: "h-12",
-                }}
-                mb="md"
-              />
-
-              <Group justify="space-between" mt="lg" mb="xl">
-                <Checkbox
-                  label="Keep me signed in"
-                  classNames={{
-                    label: "text-gray-300",
-                    input:
-                      "bg-transparent border-gray-600 checked:bg-brand-red checked:border-brand-red",
-                  }}
-                  {...form.getInputProps("keepLoggedIn", { type: "checkbox" })}
-                />
-                <Anchor
-                  component={Link}
-                  href="/forgot-password"
-                  size="sm"
-                  className="text-brand-red hover:text-brand-dark-red"
-                >
-                  Forgot password?
-                </Anchor>
-              </Group>
-
-              <Button
-                fullWidth
-                size="lg"
-                type="submit"
-                rightSection={<IconArrowRight size={18} />}
-                className="bg-brand-red hover:bg-brand-dark-red text-white h-12 rounded-lg transition-transform hover:scale-[1.02] active:scale-[0.98]"
-              >
-                Sign In
-              </Button>
-            </form>
-
-            <Divider my="lg" label="Or" labelPosition="center" color="dark.4" />
-
-            <Group justify="center">
-              <Text size="sm" className="text-gray-400">
-                New Administrator?{" "}
-                <Link
-                  href="/admin/signup"
-                  className="text-brand-red hover:underline font-bold"
-                >
-                  Request Access
-                </Link>
-              </Text>
-            </Group>
-          </Paper>
-
-          <Text ta="center" size="xs" className="text-gray-600 mt-8">
-            &copy; {new Date().getFullYear()} Road Helper. Secure Admin
-            Environment.
-          </Text>
+            <Shield size={56} className="text-brand-red" />
+          </motion.div>
+          <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+            Admin Portal
+          </h1>
+          <p className="text-gray-400 text-lg">
+            Sign in to manage the platform
+          </p>
         </motion.div>
-      </Container>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="glass-dark p-8 rounded-3xl border-2 border-white/10 backdrop-blur-xl shadow-2xl"
+        >
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+              className="space-y-2"
+            >
+              <Label className="text-gray-300 text-xs uppercase tracking-wider font-bold flex items-center gap-2">
+                <Mail size={14} className="text-brand-red" />
+                Admin Email
+              </Label>
+              <motion.div
+                whileFocus={{ scale: 1.01 }}
+                className="relative group"
+              >
+                <Mail className="absolute left-4 top-3.5 h-5 w-5 text-gray-500 group-focus-within:text-brand-red transition-colors z-10" />
+                <Input
+                  {...register("email")}
+                  className="pl-12 h-14 bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red rounded-xl transition-all hover:bg-white/10 hover:border-brand-red/50"
+                  placeholder="admin@roadhelper.com"
+                />
+                <motion.div className="absolute inset-0 rounded-xl bg-gradient-to-r from-brand-red/20 to-transparent opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity pointer-events-none" />
+              </motion.div>
+              {errors.email && (
+                <motion.span
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-red-400 text-xs ml-1 flex items-center gap-1"
+                >
+                  ⚠️ {errors.email.message as string}
+                </motion.span>
+              )}
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+              className="space-y-2"
+            >
+              <Label className="text-gray-300 text-xs uppercase tracking-wider font-bold flex items-center gap-2">
+                <Lock size={14} className="text-brand-red" />
+                Password
+              </Label>
+              <motion.div
+                whileFocus={{ scale: 1.01 }}
+                className="relative group"
+              >
+                <Lock className="absolute left-4 top-4 h-5 w-5 text-gray-500 group-focus-within:text-brand-red transition-colors z-10" />
+                <Input
+                  {...register("password")}
+                  type={showPassword ? "text" : "password"}
+                  className="pl-12 pr-12 h-14 bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red rounded-xl transition-all hover:bg-white/10 hover:border-brand-red/50"
+                  placeholder="••••••••"
+                />
+                <motion.button
+                  type="button"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-4 text-gray-500 hover:text-brand-red transition-colors z-10 cursor-pointer"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </motion.button>
+                <motion.div className="absolute inset-0 rounded-xl bg-gradient-to-r from-brand-red/20 to-transparent opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity pointer-events-none" />
+              </motion.div>
+              {errors.password && (
+                <motion.span
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-red-400 text-xs ml-1 flex items-center gap-1"
+                >
+                  ⚠️ {errors.password.message as string}
+                </motion.span>
+              )}
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full h-16 text-lg font-bold bg-gradient-to-r from-brand-red via-brand-dark-red to-brand-red bg-size-200 hover:shadow-2xl hover:shadow-brand-red/50 transition-all duration-500 rounded-xl border-2 border-brand-red/50 hover:border-brand-red group relative overflow-hidden cursor-pointer"
+                style={{ backgroundSize: "200% 100%" }}
+              >
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                  animate={{ x: ["-100%", "100%"] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                />
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="animate-spin" size={20} />
+                      Signing In...
+                    </>
+                  ) : (
+                    <>
+                      <Shield size={20} />
+                      Admin Login
+                      <ArrowRight
+                        className="group-hover:translate-x-1 transition-transform"
+                        size={20}
+                      />
+                    </>
+                  )}
+                </span>
+              </Button>
+            </motion.div>
+          </form>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
