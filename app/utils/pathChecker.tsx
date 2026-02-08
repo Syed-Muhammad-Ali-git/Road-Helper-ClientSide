@@ -46,14 +46,14 @@ const PathChecker = ({ pathName, open, setOpen }: PathCheckerProps) => {
   if (isCustomerRoute) {
     return (
       <>
-        <CustomerHeader sidebarOpen={open} />
+        <CustomerHeader sidebarOpen={open} setSidebarOpen={setOpen} />
         <CustomerSideBar open={open} setOpen={setOpen} />
       </>
     );
   } else if (isHelperRoute) {
     return (
       <>
-        <HelperHeader sidebarOpen={open} />
+        <HelperHeader sidebarOpen={open} setSidebarOpen={setOpen} />
         <HelperSideBar open={open} setOpen={setOpen} />
       </>
     );

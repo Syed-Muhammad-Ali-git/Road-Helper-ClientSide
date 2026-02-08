@@ -1,23 +1,32 @@
 "use client";
 
 /* ---------------- IMPORTS ---------------- */
-import React, { useState, useEffect, memo } from "react";
+import React, { useState, useEffect, memo, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Group, Avatar, Menu } from "@mantine/core";
+import { Group, Avatar, Menu, ActionIcon, Badge, Text } from "@mantine/core";
 import Image from "next/image";
+import { IconMenu2 } from "@tabler/icons-react";
+import { useMediaQuery } from "@mantine/hooks";
 
 /* ---------------- INTERFACES ---------------- */
 interface HeaderProps {
   sidebarOpen?: boolean;
+  setSidebarOpen?: (open: boolean) => void;
 }
 
 /* ---------------- COMPONENT ---------------- */
-const HelperHeader: React.FC<HeaderProps> = ({ sidebarOpen = false }) => {
+const HelperHeader: React.FC<HeaderProps> = ({
+  sidebarOpen = false,
+  setSidebarOpen,
+}) => {
   const router = useRouter();
   const [profile, setProfile] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>("");
   const [userEmail, setUserEmail] = useState<string>("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // Responsive check
+  const isMobile = useMediaQuery("(max-width: 900px)");
 
   // ---------------- LOAD USER DATA FROM LOCAL STORAGE ----------------
   useEffect(() => {
@@ -43,25 +52,58 @@ const HelperHeader: React.FC<HeaderProps> = ({ sidebarOpen = false }) => {
   }, []);
 
   const drawerWidth = 260;
-  const collapsedWidth = 65;
+  const collapsedWidth = 70;
 
   // ---------------- SIGN OUT FUNCTION ----------------
-  const handleSignOut = () => {
+  const handleSignOut = useCallback(() => {
     localStorage.clear();
     router.push("/login");
-  };
+  }, [router]);
+
+  const handleToggle = useCallback(() => {
+    if (setSidebarOpen) {
+      setSidebarOpen(!sidebarOpen);
+    }
+  }, [setSidebarOpen, sidebarOpen]);
+
+  const headerLeft = isMobile ? 0 : sidebarOpen ? drawerWidth : collapsedWidth;
 
   return (
     <div
-      className="h-16 fixed top-0 right-0 z-50 glass-dark border-b border-white/10 flex items-center justify-end px-6 transition-all duration-200"
+      className="h-16 fixed top-0 right-0 z-40 glass-dark flex items-center justify-between px-4 md:px-6 border-b border-white/10 transition-all duration-200 ease-in-out"
       style={{
-        left: sidebarOpen ? drawerWidth : collapsedWidth,
+        left: headerLeft,
+        width: isMobile ? "100%" : `calc(100% - ${headerLeft}px)`,
       }}
     >
+      {/* ---------------- LEFT CONTROLS ---------------- */}
+      <div className="flex items-center gap-3">
+        <ActionIcon
+          variant="subtle"
+          color="gray"
+          onClick={handleToggle}
+          className="text-gray-400 hover:text-white cursor-pointer"
+        >
+          <IconMenu2 size={20} />
+        </ActionIcon>
+
+        <Badge
+          color="orange"
+          radius="xl"
+          variant="filled"
+          className="bg-orange-600 text-white uppercase tracking-wide text-[10px]"
+        >
+          Helper Dashboard
+        </Badge>
+        <Text size="sm" className="text-gray-400 hidden sm:inline">
+          Manage your jobs & earnings
+        </Text>
+      </div>
+
       {/* ---------------- RIGHT CONTROLS ---------------- */}
       <Group gap={12}>
         {/* ---------------- HELP BUTTON ---------------- */}
-        <div className="p-2 rounded-lg glass hover:bg-white/10 cursor-pointer transition-all">
+        <div className="p-2 rounded-lg glass hover:bg-white/10 cursor-pointer transition-all hidden sm:block">
           <Image
             src="/assets/images/helpLogo.png"
             alt="help"
@@ -89,9 +131,11 @@ const HelperHeader: React.FC<HeaderProps> = ({ sidebarOpen = false }) => {
               alt="profile"
               radius="xl"
               size="md"
-              className="cursor-pointer ring-2 ring-brand-red/20 hover:ring-brand-red/40 transition-all"
+              className="cursor-pointer ring-2 ring-orange-500/40 hover:ring-orange-500/60 transition-all bg-orange-600/20 text-white"
               onClick={() => setIsDropdownOpen((o) => !o)}
-            />
+            >
+              {!profile && userName.charAt(0).toUpperCase()}
+            </Avatar>
           </Menu.Target>
 
           <Menu.Dropdown>
@@ -102,8 +146,10 @@ const HelperHeader: React.FC<HeaderProps> = ({ sidebarOpen = false }) => {
                 alt="profile"
                 radius="xl"
                 size="lg"
-                className="ring-2 ring-brand-red/30"
-              />
+                className="ring-2 ring-orange-500/40 bg-orange-600/20 text-white"
+              >
+                {!profile && userName.charAt(0).toUpperCase()}
+              </Avatar>
               <div>
                 <div className="font-bold text-sm text-white">
                   {userName || "User"}
@@ -111,6 +157,14 @@ const HelperHeader: React.FC<HeaderProps> = ({ sidebarOpen = false }) => {
                 <div className="text-xs text-gray-400">
                   {userEmail || "email@example.com"}
                 </div>
+                <Badge
+                  size="xs"
+                  variant="outline"
+                  color="orange"
+                  className="mt-1"
+                >
+                  Active Pro
+                </Badge>
               </div>
             </div>
 
@@ -118,30 +172,34 @@ const HelperHeader: React.FC<HeaderProps> = ({ sidebarOpen = false }) => {
             <Menu.Item
               onClick={() => router.push("/helper/profile")}
               className="text-gray-300 hover:text-white hover:bg-white/5 transition-all my-1"
+              leftSection={
+                <Image
+                  src="/assets/images/myAccount.png"
+                  alt="my account"
+                  className="inline-block opacity-80"
+                  width={18}
+                  height={18}
+                />
+              }
               style={{ fontWeight: "500", padding: "12px 16px" }}
             >
-              <Image
-                src="/assets/images/myAccount.png"
-                alt="my account"
-                className="inline-block opacity-80"
-                width={18}
-                height={18}
-              />
-              &nbsp; My Profile
+              My Profile
             </Menu.Item>
             <Menu.Item
               onClick={handleSignOut}
               className="text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all my-1"
+              leftSection={
+                <Image
+                  src="/assets/images/signout.png"
+                  alt="signout"
+                  className="inline-block opacity-80"
+                  width={18}
+                  height={18}
+                />
+              }
               style={{ fontWeight: "500", padding: "12px 16px" }}
             >
-              <Image
-                src="/assets/images/signout.png"
-                alt="signout"
-                className="inline-block opacity-80"
-                width={18}
-                height={18}
-              />
-              &nbsp; Sign Out
+              Sign Out
             </Menu.Item>
           </Menu.Dropdown>
         </Menu>

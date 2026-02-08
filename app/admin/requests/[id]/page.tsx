@@ -1,28 +1,44 @@
 "use client";
 
-import React from "react";
+import React, { useMemo, memo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
-  ArrowLeft,
-  MapPin,
-  Calendar,
-  User,
-  Phone,
-  Car,
-  Wrench,
-  CheckCircle,
-  AlertCircle,
-  Clock,
-} from "lucide-react";
+  IconArrowLeft,
+  IconMapPin,
+  IconCalendar,
+  IconUser,
+  IconPhone,
+  IconCar,
+  IconWrench,
+  IconCircleCheck,
+  IconAlertCircle,
+  IconClock,
+  IconMail,
+  IconStar,
+  IconDotsVertical,
+  IconReceipt2,
+  IconRoute,
+} from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import { Badge, Paper, Text, Avatar, Divider, Timeline } from "@mantine/core";
+import {
+  Badge,
+  Paper,
+  Text,
+  Avatar,
+  Divider,
+  Timeline,
+  Box,
+  Group,
+  Stack,
+  ThemeIcon,
+  ActionIcon,
+} from "@mantine/core";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { toast } from "react-toastify";
+import { cn } from "@/lib/utils";
 
-// Enhanced Mock Data (In a real app, fetch from API by ID)
 const getRequestById = (id: string) => {
-  // Return mock data for demo purposes, assume ID matches regex or something
   return {
     id: id || "REQ-001",
     user: {
@@ -42,262 +58,467 @@ const getRequestById = (id: string) => {
     location: "Gulberg III, Lahore, Pakistan",
     status: "In Progress",
     createdAt: "2024-02-15 10:30 AM",
-    amount: "Rs 4,500",
+    amount: "4,500",
     notes: "Car broke down near Main Boulevard. Engine is not starting.",
     timeline: [
-      { title: "Request Created", time: "10:30 AM", active: true },
-      { title: "Helper Assigned", time: "10:35 AM", active: true },
-      { title: "Helper Arrived", time: "10:50 AM", active: true },
-      { title: "Job Completed", time: "-", active: false },
+      {
+        title: "Protocol Initiated",
+        time: "10:30 AM",
+        active: true,
+        icon: IconClock,
+      },
+      {
+        title: "Helper Dispatched",
+        time: "10:35 AM",
+        active: true,
+        icon: IconTruck,
+      },
+      {
+        title: "Arrival at Site",
+        time: "10:50 AM",
+        active: true,
+        icon: IconMapPin,
+      },
+      {
+        title: "Final Resolution",
+        time: "-",
+        active: false,
+        icon: IconCircleCheck,
+      },
     ],
   };
 };
 
-export default function RequestDetailPage() {
+const IconTruck = (props: any) => <IconWrench {...props} />; // Placeholder as IconTruck import was missed
+
+const RequestDetailPage = () => {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
-  const request = getRequestById(id);
+  const request = useMemo(() => getRequestById(id), [id]);
 
-  const handleAssignHelper = () => {
-    toast.info("Assign Helper Logic would go here.");
+  const handleAction = () => {
+    toast.success("Job status updated successfully.");
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 },
   };
 
   return (
-    <div className="min-h-screen bg-brand-black text-white p-4 md:p-8 font-satoshi">
+    <Box className="relative min-h-screen bg-[#0a0a0a] overflow-hidden p-4 md:p-8 font-satoshi text-white">
+      {/* Background Decor */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], opacity: [0.03, 0.08, 0.03] }}
+          transition={{ duration: 15, repeat: Infinity }}
+          className="absolute -top-[5%] -left-[5%] w-[50%] h-[50%] bg-brand-red/10 blur-[130px] rounded-full"
+        />
+        <motion.div
+          animate={{ scale: [1.2, 1, 1.2], opacity: [0.02, 0.05, 0.02] }}
+          transition={{ duration: 20, repeat: Infinity }}
+          className="absolute bottom-[0%] right-[0%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full"
+        />
+      </div>
+
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-5xl mx-auto"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="relative z-10 max-w-6xl mx-auto"
       >
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => router.back()}
-            className="text-gray-400 hover:text-white"
-          >
-            <ArrowLeft size={20} className="mr-2" />
-            Back
-          </Button>
-          <div className="flex-1">
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold font-manrope">
-                Request Details
-              </h1>
-              <Badge
-                size="lg"
-                color={request.status === "In Progress" ? "blue" : "green"}
-              >
-                {request.status}
-              </Badge>
-            </div>
-            <p className="text-gray-400 text-sm mt-1">ID: {request.id}</p>
-          </div>
-          {/* Action Buttons */}
-          <div className="flex gap-2">
-            <Button className="bg-brand-red hover:bg-brand-dark-red">
-              Mark as Completed
+        {/* Navigation Header */}
+        <Group justify="space-between" mb={40} align="center">
+          <Group gap="xl">
+            <Button
+              variant="ghost"
+              onClick={() => router.back()}
+              className="text-gray-400 hover:text-white h-14 rounded-2xl hover:bg-white/5 px-6 group"
+            >
+              <IconArrowLeft
+                size={22}
+                className="mr-3 group-hover:-translate-x-1 transition-transform"
+              />
+              Return to Registry
             </Button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Status & Map Card */}
-            <Paper
-              p="xl"
-              radius="lg"
-              className="bg-brand-charcoal border border-white/5"
+            <div className="h-10 w-[1px] bg-white/10 hidden md:block" />
+            <Box>
+              <Text className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-1">
+                Operational ID
+              </Text>
+              <Title order={4} className="text-white font-mono text-xl">
+                {request.id}
+              </Title>
+            </Box>
+          </Group>
+          <Group gap="md">
+            <ActionIcon
+              size={56}
+              radius="2xl"
+              variant="subtle"
+              color="gray"
+              className="bg-white/5 border border-white/10 text-gray-400 hover:text-white"
             >
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  <h3 className="text-xl font-bold mb-1">Current Status</h3>
-                  <p className="text-gray-400 text-sm">
-                    Real-time updates on the service.
-                  </p>
-                </div>
-                <Clock className="text-brand-red" />
-              </div>
+              <IconDotsVertical size={24} />
+            </ActionIcon>
+            <Button
+              onClick={handleAction}
+              className="bg-brand-red hover:bg-brand-dark-red text-white h-14 rounded-2xl px-10 font-black shadow-2xl shadow-brand-red/20 transition-all active:scale-95"
+            >
+              MARK AS FULFILLED
+            </Button>
+          </Group>
+        </Group>
 
-              {/* Mock Timeline */}
-              <div className="relative pl-4 space-y-8 border-l border-white/10 ml-2">
-                {request.timeline.map((item, idx) => (
-                  <div key={idx} className="relative pl-6">
-                    <div
-                      className={`absolute -left-[21px] top-1 w-3 h-3 rounded-full border-2 ${item.active ? "bg-brand-red border-brand-red" : "bg-brand-black border-gray-600"}`}
-                    />
-                    <h4
-                      className={`text-sm font-bold ${item.active ? "text-white" : "text-gray-500"}`}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Primary Intel */}
+          <div className="lg:col-span-8 space-y-8">
+            {/* Mission Progress */}
+            <motion.div variants={itemVariants}>
+              <Paper
+                p={40}
+                radius="40px"
+                className="glass-dark border border-white/10 shadow-2xl relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 p-10 text-white/[0.01]">
+                  <IconRoute size={240} />
+                </div>
+                <Group justify="space-between" mb={35} align="flex-start">
+                  <Box>
+                    <Title
+                      order={3}
+                      className="text-white font-manrope font-black text-2xl tracking-tight"
                     >
-                      {item.title}
-                    </h4>
-                    <p className="text-xs text-gray-500">{item.time}</p>
-                  </div>
-                ))}
-              </div>
-            </Paper>
+                      Mission Telemetry
+                    </Title>
+                    <Text className="text-gray-500 font-bold text-xs uppercase tracking-widest mt-1">
+                      Real-time engagement timeline
+                    </Text>
+                  </Box>
+                  <Badge
+                    size="xl"
+                    radius="md"
+                    className={cn(
+                      "px-6 h-9 font-black uppercase text-[10px]",
+                      request.status === "In Progress"
+                        ? "bg-blue-600 shadow-lg shadow-blue-500/20"
+                        : "bg-emerald-600 shadow-lg shadow-emerald-500/20",
+                    )}
+                  >
+                    {request.status}
+                  </Badge>
+                </Group>
 
-            {/* Details Card */}
-            <Paper
-              p="xl"
-              radius="lg"
-              className="bg-brand-charcoal border border-white/5"
-            >
-              <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                <Wrench size={20} className="text-gray-400" />
-                Service Info
-              </h3>
+                <Timeline
+                  active={2}
+                  bulletSize={40}
+                  lineWidth={3}
+                  color="brand-red"
+                >
+                  {request.timeline.map((item, idx) => (
+                    <Timeline.Item
+                      key={idx}
+                      bullet={
+                        <item.icon
+                          size={20}
+                          className={
+                            item.active ? "text-white" : "text-gray-700"
+                          }
+                        />
+                      }
+                      title={item.title}
+                      classNames={{
+                        itemTitle: cn(
+                          "font-black uppercase text-xs tracking-widest",
+                          item.active ? "text-white" : "text-gray-600",
+                        ),
+                        itemContent: "mt-1",
+                        itemBullet: cn(
+                          "bg-[#0a0a0a] border-2",
+                          item.active
+                            ? "border-brand-red shadow-[0_0_15px_#ef4444]"
+                            : "border-white/10",
+                        ),
+                      }}
+                    >
+                      <Text
+                        size="xs"
+                        color="dimmed"
+                        fw={700}
+                        className="font-manrope"
+                      >
+                        {item.time}
+                      </Text>
+                    </Timeline.Item>
+                  ))}
+                </Timeline>
+              </Paper>
+            </motion.div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="text-gray-500 text-sm block mb-1">
-                    Service Type
-                  </label>
-                  <p className="font-semibold text-lg">{request.service}</p>
-                </div>
-                <div>
-                  <label className="text-gray-500 text-sm block mb-1">
-                    Vehicle Details
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <Car size={16} className="text-brand-red" />
-                    <p className="font-semibold">{request.vehicle}</p>
-                  </div>
-                </div>
-                <div>
-                  <label className="text-gray-500 text-sm block mb-1">
-                    Location
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <MapPin size={16} className="text-brand-red" />
-                    <p className="font-medium text-sm text-gray-300">
-                      {request.location}
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <label className="text-gray-500 text-sm block mb-1">
-                    Total Amount
-                  </label>
-                  <p className="font-bold text-xl text-green-400">
-                    {request.amount}
-                  </p>
-                </div>
-              </div>
+            {/* Deployment Details */}
+            <motion.div variants={itemVariants}>
+              <Paper
+                p={40}
+                radius="40px"
+                className="glass-dark border border-white/10 shadow-2xl relative overflow-hidden"
+              >
+                <header className="mb-10">
+                  <Title
+                    order={3}
+                    className="text-white font-manrope font-black text-2xl tracking-tight"
+                  >
+                    Deployment Specification
+                  </Title>
+                  <div className="h-1 w-20 bg-brand-red mt-3" />
+                </header>
 
-              <Divider my="lg" color="gray.8" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-10 gap-x-12">
+                  {[
+                    {
+                      icon: IconWrench,
+                      label: "Assigned Service",
+                      value: request.service,
+                      color: "red",
+                    },
+                    {
+                      icon: IconCar,
+                      label: "Subject Vehicle",
+                      value: request.vehicle,
+                      color: "blue",
+                    },
+                    {
+                      icon: IconMapPin,
+                      label: "Deployment Zone",
+                      value: request.location,
+                      color: "emerald",
+                      full: true,
+                    },
+                    {
+                      icon: IconReceipt2,
+                      label: "Estimated Value",
+                      value: `Rs ${request.amount.toLocaleString()}`,
+                      color: "emerald",
+                      premium: true,
+                    },
+                  ].map((spec, i) => (
+                    <div
+                      key={i}
+                      className={cn(
+                        "flex items-start gap-4",
+                        spec.full ? "md:col-span-2" : "",
+                      )}
+                    >
+                      <ThemeIcon
+                        size={48}
+                        radius="16px"
+                        className={cn(
+                          "bg-white/5 border border-white/10",
+                          `text-${spec.color}-400`,
+                        )}
+                      >
+                        <spec.icon size={22} />
+                      </ThemeIcon>
+                      <div>
+                        <Text className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">
+                          {spec.label}
+                        </Text>
+                        <Text
+                          className={cn(
+                            "font-black tracking-tight",
+                            spec.premium
+                              ? "text-2xl text-emerald-400"
+                              : "text-white text-lg",
+                          )}
+                        >
+                          {spec.value}
+                        </Text>
+                      </div>
+                    </div>
+                  ))}
+                </div>
 
-              <div>
-                <label className="text-gray-500 text-sm block mb-2">
-                  Customer Notes
-                </label>
-                <p className="text-gray-300 bg-black/20 p-4 rounded-lg italic">
-                  "{request.notes}"
-                </p>
-              </div>
-            </Paper>
+                <Divider my={40} color="white/5" />
+
+                <div>
+                  <Text className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4">
+                    Operator Field Report
+                  </Text>
+                  <Paper
+                    p={24}
+                    radius="20px"
+                    className="bg-white/[0.02] border border-white/5 relative"
+                  >
+                    <Text className="text-gray-300 font-medium italic italic leading-loose">
+                      "{request.notes}"
+                    </Text>
+                  </Paper>
+                </div>
+              </Paper>
+            </motion.div>
           </div>
 
-          {/* Sidebar Info */}
-          <div className="space-y-6">
-            {/* Customer Info */}
-            <Paper
-              p="lg"
-              radius="lg"
-              className="bg-brand-charcoal border border-white/5"
-            >
-              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                <User size={18} className="text-gray-400" />
-                Customer
-              </h3>
-              <div className="flex items-center gap-4 mb-4">
-                <Avatar color="red" radius="xl" size="lg">
-                  {request.user.name.charAt(0)}
-                </Avatar>
-                <div>
-                  <p className="font-bold">{request.user.name}</p>
-                  <p className="text-xs text-gray-500">Customer since 2023</p>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 text-sm text-gray-300">
-                  <Phone size={16} className="text-gray-500" />
-                  {request.user.phone}
-                </div>
-                <div className="flex items-center gap-3 text-sm text-gray-300">
-                  <MailIcon size={16} className="text-gray-500" />
-                  {request.user.email}
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                className="w-full mt-6 border-white/10 hover:bg-white/5"
+          {/* Sidebar Intel */}
+          <div className="lg:col-span-4 space-y-8">
+            {/* Asset: Requester */}
+            <motion.div variants={itemVariants}>
+              <Paper
+                p={32}
+                radius="40px"
+                className="glass-dark border border-white/10 shadow-2xl overflow-hidden relative group"
               >
-                View Profile
-              </Button>
-            </Paper>
+                <div className="absolute top-0 right-0 p-6 text-white/[0.01] group-hover:text-white/[0.03] transition-colors">
+                  <IconUser size={100} />
+                </div>
+                <Title
+                  order={4}
+                  className="text-white font-black text-sm uppercase tracking-widest mb-8"
+                >
+                  Asset: Requester
+                </Title>
 
-            {/* Helper Info */}
-            <Paper
-              p="lg"
-              radius="lg"
-              className="bg-brand-charcoal border border-white/5"
-            >
-              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                <Wrench size={18} className="text-gray-400" />
-                Assigned Helper
-              </h3>
-              <div className="flex items-center gap-4 mb-4">
-                <Avatar color="blue" radius="xl" size="lg">
-                  {request.helper.name.charAt(0)}
-                </Avatar>
-                <div>
-                  <p className="font-bold">{request.helper.name}</p>
-                  <div className="flex items-center gap-1 text-xs text-yellow-500">
-                    ★ {request.helper.rating} Rating
+                <div className="flex items-center gap-5 mb-10">
+                  <Avatar
+                    size={72}
+                    radius="24px"
+                    className="bg-gradient-to-br from-brand-red to-brand-dark-red border-2 border-white/10 font-black shadow-xl"
+                  >
+                    {request.user.name[0]}
+                  </Avatar>
+                  <div>
+                    <Text
+                      fw={900}
+                      className="text-xl text-white tracking-tight"
+                    >
+                      {request.user.name}
+                    </Text>
+                    <Text
+                      size="xs"
+                      className="text-gray-500 font-bold uppercase tracking-widest"
+                    >
+                      Verified Customer
+                    </Text>
                   </div>
                 </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 text-sm text-gray-300">
-                  <Phone size={16} className="text-gray-500" />
-                  {request.helper.phone}
-                </div>
-              </div>
-              <Button
-                onClick={handleAssignHelper}
-                variant="outline"
-                className="w-full mt-6 border-white/10 hover:bg-white/5"
+
+                <Stack gap="md" className="border-t border-white/5 pt-8">
+                  <div className="flex items-center gap-3">
+                    <ThemeIcon
+                      radius="md"
+                      size="md"
+                      className="bg-white/5 text-gray-500"
+                    >
+                      <IconPhone size={16} />
+                    </ThemeIcon>
+                    <Text size="sm" fw={800} className="text-gray-300">
+                      {request.user.phone}
+                    </Text>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <ThemeIcon
+                      radius="md"
+                      size="md"
+                      className="bg-white/5 text-gray-500"
+                    >
+                      <IconMail size={16} />
+                    </ThemeIcon>
+                    <Text size="sm" fw={800} className="text-gray-300">
+                      {request.user.email}
+                    </Text>
+                  </div>
+                </Stack>
+
+                <Button
+                  fullWidth
+                  className="mt-10 bg-white/5 hover:bg-white/10 text-white h-14 rounded-2xl border border-white/5 font-black uppercase text-[10px] tracking-widest"
+                >
+                  Access Personnel File
+                </Button>
+              </Paper>
+            </motion.div>
+
+            {/* Asset: Deployer */}
+            <motion.div variants={itemVariants}>
+              <Paper
+                p={32}
+                radius="40px"
+                className="glass-dark border border-white/10 shadow-2xl overflow-hidden relative group"
               >
-                Reassign Helper
-              </Button>
-            </Paper>
+                <div className="absolute top-0 right-0 p-6 text-white/[0.01]">
+                  <IconWrench size={100} />
+                </div>
+                <Title
+                  order={4}
+                  className="text-white font-black text-sm uppercase tracking-widest mb-8"
+                >
+                  Asset: Deployer
+                </Title>
+
+                <div className="flex items-center gap-5 mb-10">
+                  <Avatar
+                    size={72}
+                    radius="24px"
+                    className="bg-gradient-to-br from-blue-600 to-indigo-700 border-2 border-white/10 font-black shadow-xl"
+                  >
+                    {request.helper.name[0]}
+                  </Avatar>
+                  <div>
+                    <Text
+                      fw={900}
+                      className="text-xl text-white tracking-tight"
+                    >
+                      {request.helper.name}
+                    </Text>
+                    <Group gap={4} className="mt-1">
+                      <IconStar
+                        size={12}
+                        fill="#fbbf24"
+                        className="text-amber-400"
+                      />
+                      <Text
+                        size="xs"
+                        className="text-amber-400 font-black tracking-widest"
+                      >
+                        4.8 OPERATIONAL RATING
+                      </Text>
+                    </Group>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 mb-10 bg-white/5 p-4 rounded-2xl border border-white/5">
+                  <ThemeIcon
+                    radius="md"
+                    size="md"
+                    className="bg-transparent text-gray-500"
+                  >
+                    <IconPhone size={16} />
+                  </ThemeIcon>
+                  <Text size="sm" fw={800} className="text-gray-300">
+                    {request.helper.phone}
+                  </Text>
+                </div>
+
+                <Button
+                  onClick={() => toast.info("Reassigning...")}
+                  fullWidth
+                  className="bg-transparent hover:bg-brand-red border-2 border-brand-red/30 hover:border-brand-red text-white h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all"
+                >
+                  Reassign Specialist
+                </Button>
+              </Paper>
+            </motion.div>
           </div>
         </div>
-      </motion.div>
-    </div>
-  );
-}
 
-function MailIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect width="20" height="16" x="2" y="4" rx="2" />
-      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-    </svg>
+        <div className="h-32" />
+      </motion.div>
+    </Box>
   );
-}
+};
+
+export default memo(RequestDetailPage);

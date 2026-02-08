@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase/config";
+import { setCookie } from "cookies-next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,6 +26,7 @@ import {
   EyeOff,
   Sparkles,
   Zap,
+  Shield,
 } from "lucide-react";
 
 const loginSchema = z.object({
@@ -36,8 +38,8 @@ export default function LoginPage() {
   const [loginType, setLoginType] = useState<"customer" | "helper">("customer");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
   const [isClient, setIsClient] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
@@ -51,26 +53,61 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = async (data: any) => {
-    setIsLoading(true);
-    try {
-      await signInWithEmailAndPassword(auth, data.email, data.password);
-      toast.success(
-        `🎉 Welcome back, ${loginType === "customer" ? "User" : "Partner"}!`,
-      );
+  const onSubmit = useCallback(
+    async (data: any) => {
+      setIsLoading(true);
+      try {
+        await signInWithEmailAndPassword(auth, data.email, data.password);
+        toast.success(
+          `🎉 Welcome back, ${loginType === "customer" ? "User" : "Partner"}!`,
+        );
 
-      if (loginType === "customer") {
-        router.push("/customer/dashboard");
-      } else {
-        router.push("/helper/dashboard");
+        if (loginType === "customer") {
+          setCookie("userRole", "customer", {
+            maxAge: 60 * 60 * 24 * 7,
+            path: "/",
+          });
+          setCookie("authToken", "verified", {
+            maxAge: 60 * 60 * 24 * 7,
+            path: "/",
+          });
+          router.push("/customer/dashboard");
+        } else {
+          setCookie("userRole", "helper", {
+            maxAge: 60 * 60 * 24 * 7,
+            path: "/",
+          });
+          setCookie("authToken", "verified", {
+            maxAge: 60 * 60 * 24 * 7,
+            path: "/",
+          });
+          router.push("/helper/dashboard");
+        }
+      } catch (error: any) {
+        console.error(error);
+        toast.error("⚠️ Invalid email or password.");
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error: any) {
-      console.error(error);
-      toast.error("⚠️ Invalid email or password.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    [loginType, router],
+  );
+
+  const togglePasswordVisibility = useCallback(() => {
+    setShowPassword((prev) => !prev);
+  }, []);
+
+  const tabIcon = useMemo(
+    () => (loginType === "customer" ? "👤" : "🔧"),
+    [loginType],
+  );
+  const tabColor = useMemo(
+    () =>
+      loginType === "customer"
+        ? "from-blue-600 to-blue-800"
+        : "from-orange-600 to-orange-800",
+    [loginType],
+  );
 
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-black via-brand-black to-black font-satoshi text-white overflow-hidden relative">
@@ -226,7 +263,7 @@ export default function LoginPage() {
         <Link href="/" className="absolute top-8 right-8 group">
           <motion.div
             whileHover={{ scale: 1.05, x: 5 }}
-            className="flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-brand-red transition-all"
+            className="flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-brand-red transition-all cursor-pointer"
           >
             <span>Back to Home</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -246,11 +283,50 @@ export default function LoginPage() {
             className="mb-8 text-center"
           >
             <motion.div
-              whileHover={{ rotate: [0, 5, -5, 0], scale: 1.1 }}
-              transition={{ duration: 0.5 }}
-              className="inline-block p-5 rounded-2xl bg-gradient-to-br from-brand-red/20 to-orange-500/20 mb-6 border border-brand-red/20 shadow-2xl shadow-brand-red/20 backdrop-blur-xl"
+              animate={{
+                rotate: [0, 10, -10, 0],
+                scale: [1, 1.05, 1],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className="inline-block mb-6"
             >
-              <UserCircle size={48} className="text-brand-red" />
+              <div
+                className={cn(
+                  "p-6 rounded-3xl bg-gradient-to-br border-2 shadow-2xl backdrop-blur-xl relative overflow-hidden transition-all duration-500",
+                  loginType === "customer"
+                    ? "from-blue-600/30 to-indigo-600/30 border-blue-500/30 shadow-blue-500/30"
+                    : "from-orange-600/30 to-red-600/30 border-orange-500/30 shadow-orange-500/30",
+                )}
+              >
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
+                  animate={{ x: ["-200%", "200%"] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                />
+                <motion.div
+                  key={loginType}
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  exit={{ scale: 0, rotate: 180 }}
+                  transition={{ duration: 0.5, type: "spring" }}
+                >
+                  {loginType === "customer" ? (
+                    <UserCircle
+                      size={52}
+                      className="text-blue-500 relative z-10"
+                    />
+                  ) : (
+                    <Sparkles
+                      size={52}
+                      className="text-orange-500 relative z-10"
+                    />
+                  )}
+                </motion.div>
+              </div>
             </motion.div>
             <h2 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
               Welcome Back
@@ -260,7 +336,7 @@ export default function LoginPage() {
             </p>
           </motion.div>
 
-          {/* Toggle Switch */}
+          {/* Enhanced Toggle Switch */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -270,26 +346,43 @@ export default function LoginPage() {
             <motion.div
               layout
               className={cn(
-                "absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-gradient-to-r from-brand-red to-brand-dark-red rounded-xl shadow-lg shadow-brand-red/30 border border-brand-red/50",
+                "absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] rounded-xl shadow-xl border-2 transition-all duration-300",
                 loginType === "helper" ? "left-[calc(50%+3px)]" : "left-1.5",
+                loginType === "customer"
+                  ? "bg-gradient-to-r from-blue-600 to-blue-800 shadow-blue-500/40 border-blue-400/50"
+                  : "bg-gradient-to-r from-orange-600 to-orange-800 shadow-orange-500/40 border-orange-400/50",
               )}
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
             />
             <div className="relative z-10 flex gap-1">
-              {["customer", "helper"].map((type) => (
+              {[
+                {
+                  type: "customer",
+                  icon: "👤",
+                  label: "Customer",
+                  color: "blue",
+                },
+                {
+                  type: "helper",
+                  icon: "🔧",
+                  label: "Helper",
+                  color: "orange",
+                },
+              ].map((item) => (
                 <motion.button
-                  key={type}
-                  onClick={() => setLoginType(type as any)}
+                  key={item.type}
+                  onClick={() => setLoginType(item.type as any)}
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   className={cn(
-                    "flex-1 py-3.5 text-sm font-bold rounded-xl transition-all duration-300 cursor-pointer border-2",
-                    loginType === type
+                    "flex-1 py-4 text-sm font-bold rounded-xl transition-all duration-300 cursor-pointer border-2 flex items-center justify-center gap-2",
+                    loginType === item.type
                       ? "text-white border-transparent"
-                      : "text-gray-400 border-transparent hover:border-white/10 hover:text-white",
+                      : `text-gray-400 border-transparent hover:border-${item.color}-500/20 hover:text-white hover:bg-${item.color}-500/5`,
                   )}
                 >
-                  {type === "customer" ? "👤 Customer" : "🛠️ Helper"}
+                  <span className="text-lg">{item.icon}</span>
+                  <span>{item.label}</span>
                 </motion.button>
               ))}
             </div>
@@ -313,7 +406,7 @@ export default function LoginPage() {
                 <Mail className="absolute left-4 top-3.5 h-5 w-5 text-gray-500 group-focus-within:text-brand-red transition-colors z-10" />
                 <Input
                   {...register("email")}
-                  className="pl-12 h-14 bg-white/5 backdrop-blur-xl border-white/10 text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red rounded-xl transition-all hover:bg-white/10 hover:border-brand-red/50"
+                  className="pl-12 h-14 bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red rounded-xl transition-all hover:bg-white/10 hover:border-brand-red/50"
                   placeholder="name@example.com"
                 />
                 <motion.div className="absolute inset-0 rounded-xl bg-gradient-to-r from-brand-red/20 to-transparent opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity pointer-events-none" />
@@ -335,18 +428,10 @@ export default function LoginPage() {
               transition={{ delay: 0.4 }}
               className="space-y-2"
             >
-              <div className="flex justify-between items-center">
-                <Label className="text-gray-300 text-xs uppercase tracking-wider font-bold flex items-center gap-2">
-                  <Lock size={14} className="text-brand-red" />
-                  Password
-                </Label>
-                <Link
-                  href="/forgot-password"
-                  className="text-xs text-brand-red hover:text-white transition-colors hover:underline"
-                >
-                  Forgot?
-                </Link>
-              </div>
+              <Label className="text-gray-300 text-xs uppercase tracking-wider font-bold flex items-center gap-2">
+                <Lock size={14} className="text-brand-red" />
+                Password
+              </Label>
               <motion.div
                 whileFocus={{ scale: 1.01 }}
                 className="relative group"
@@ -355,15 +440,15 @@ export default function LoginPage() {
                 <Input
                   {...register("password")}
                   type={showPassword ? "text" : "password"}
-                  className="pl-12 pr-12 h-14 bg-white/5 backdrop-blur-xl border-white/10 text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red rounded-xl transition-all hover:bg-white/10 hover:border-brand-red/50"
+                  className="pl-12 pr-12 h-14 bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red rounded-xl transition-all hover:bg-white/10 hover:border-brand-red/50"
                   placeholder="••••••••"
                 />
                 <motion.button
                   type="button"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-4 text-gray-500 hover:text-brand-red transition-colors z-10"
+                  onClick={togglePasswordVisibility}
+                  className="absolute right-4 top-4 text-gray-500 hover:text-brand-red transition-colors z-10 cursor-pointer"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </motion.button>
@@ -378,6 +463,17 @@ export default function LoginPage() {
                   ⚠️ {errors.password.message as string}
                 </motion.span>
               )}
+
+              {/* Forgot Password Link */}
+              <div className="text-right pt-1">
+                <Link
+                  href="/forgot-password"
+                  className="text-xs font-semibold text-brand-red hover:text-white transition-colors hover:underline cursor-pointer inline-flex items-center gap-1 group"
+                >
+                  <Lock size={12} className="group-hover:animate-pulse" />
+                  Forgot Password?
+                </Link>
+              </div>
             </motion.div>
 
             <motion.div
@@ -388,7 +484,7 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-16 text-lg font-bold bg-gradient-to-r from-brand-red via-brand-dark-red to-brand-red bg-size-200 bg-pos-0 hover:bg-pos-100 hover:shadow-2xl hover:shadow-brand-red/50 transition-all duration-500 rounded-xl mt-4 group relative overflow-hidden"
+                className="w-full h-16 text-lg font-bold bg-gradient-to-r from-brand-red via-brand-dark-red to-brand-red bg-size-200 bg-pos-0 hover:bg-pos-100 hover:shadow-2xl hover:shadow-brand-red/50 transition-all duration-500 rounded-xl mt-4 group relative overflow-hidden border-2 border-brand-red/50 hover:border-brand-red cursor-pointer"
                 style={{ backgroundSize: "200% 100%" }}
               >
                 <motion.div
@@ -420,18 +516,33 @@ export default function LoginPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="mt-8 text-center"
+            className="mt-8 space-y-4"
           >
-            <p className="text-gray-500">
+            <p className="text-gray-500 text-center">
               Don't have an account?{" "}
               <Link
                 href={`/register?type=${loginType}`}
-                className="text-white font-bold hover:text-brand-red transition-colors relative group"
+                className="text-white font-bold hover:text-brand-red transition-colors relative group cursor-pointer"
               >
                 Create Account
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-brand-red group-hover:w-full transition-all duration-300"></span>
               </Link>
             </p>
+
+            {/* Admin Link */}
+            <div className="text-center pt-4 border-t border-white/10">
+              <Link
+                href="/admin/login"
+                className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-brand-red transition-all group cursor-pointer px-4 py-2 rounded-xl hover:bg-white/5"
+              >
+                <Shield size={16} className="group-hover:animate-pulse" />
+                <span>Are you an Admin?</span>
+                <ArrowRight
+                  size={14}
+                  className="group-hover:translate-x-1 transition-transform"
+                />
+              </Link>
+            </div>
           </motion.div>
         </motion.div>
       </div>

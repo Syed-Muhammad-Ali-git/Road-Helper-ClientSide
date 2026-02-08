@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo, memo } from "react";
 import {
   SimpleGrid,
   Paper,
@@ -14,6 +14,7 @@ import {
   Box,
   Tooltip,
   Avatar,
+  ActionIcon,
 } from "@mantine/core";
 import {
   IconUsers,
@@ -25,6 +26,7 @@ import {
   IconUserShield,
   IconMapPin,
   IconArrowRight,
+  IconCrown,
 } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import {
@@ -37,41 +39,47 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import Image from "next/image";
-import mapBg from "../../../../assets/images/backgrounds/map-bg.svg";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
-// Mock Data (Moved from original page)
+const mapBg = "/assets/images/backgrounds/map-bg.svg";
+
 const stats = [
   {
     title: "Total Users",
     value: "3,240",
-    subtitle: "Customers + Helpers",
-    change: "+8.4% this week",
+    subtitle: "Active Community",
+    change: "+8.4%",
     icon: IconUsers,
     color: "blue",
+    gradient: "from-blue-600/20 to-indigo-600/20",
   },
   {
     title: "Active Helpers",
     value: "158",
-    subtitle: "Online now",
-    change: "+12 new",
+    subtitle: "On-Duty Now",
+    change: "+12",
     icon: IconActivity,
     color: "green",
+    gradient: "from-emerald-600/20 to-teal-600/20",
   },
   {
-    title: "Completed Requests",
+    title: "Completed Jobs",
     value: "1,284",
-    subtitle: "All time",
-    change: "+32 today",
+    subtitle: "Total Success",
+    change: "+32",
     icon: IconTrendingUp,
     color: "violet",
+    gradient: "from-violet-600/20 to-purple-600/20",
   },
   {
-    title: "Pending Requests",
+    title: "Pending Help",
     value: "18",
-    subtitle: "Need attention",
-    change: "5 older than 30m",
+    subtitle: "High Priority",
+    change: "5 critical",
     icon: IconAlertCircle,
-    color: "orange",
+    color: "red",
+    gradient: "from-red-600/20 to-rose-600/20",
   },
 ];
 
@@ -83,7 +91,7 @@ const revenueData = [
   { day: "Fri", total: 4600, platform: 920 },
   { day: "Sat", total: 3800, platform: 760 },
   { day: "Sun", total: 3000, platform: 600 },
-  { day: "Mon", total: 3800, platform: 760 }, // Added extra data point for smoothness
+  { day: "Mon", total: 3800, platform: 760 },
 ];
 
 const recentRequests = [
@@ -125,104 +133,54 @@ const recentRequests = [
   },
 ];
 
-export default function OverviewTab() {
-  const totalCommission = recentRequests.reduce(
-    (sum, r) => sum + r.amount * 0.2,
-    0,
-  );
-  const paidCommission = recentRequests
-    .filter((r) => r.hasCommissionPaid)
-    .reduce((sum, r) => sum + r.amount * 0.2, 0);
-  const pendingCommission = totalCommission - paidCommission;
+const OverviewTab = () => {
+  const totalCommission = useMemo(() => recentRequests.reduce((sum, r) => sum + r.amount * 0.2, 0), []);
+  const paidCommission = useMemo(() => recentRequests.filter((r) => r.hasCommissionPaid).reduce((sum, r) => sum + r.amount * 0.2, 0), []);
+  const pendingCommission = useMemo(() => totalCommission - paidCommission, [totalCommission, paidCommission]);
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 100 } },
+  };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      initial="hidden"
+      animate="visible"
+      variants={{
+        visible: { transition: { staggerChildren: 0.1 } }
+      }}
     >
-      {/* Header Section */}
-      <Group justify="space-between" mb="xl" align="flex-end">
-        <Box>
-          <Text className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400 mb-2">
-            Control Center
-          </Text>
-          <Title className="font-manrope text-3xl md:text-4xl font-extrabold text-white tracking-tight">
-            Admin Dashboard
-          </Title>
-          <Text className="text-gray-400 mt-2 font-medium">
-            Live overview of users, helpers, requests & 20% platform fee.
-          </Text>
-        </Box>
-        <Group gap="sm">
-          <Button
-            component={motion.button}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            variant="default"
-            className="bg-white/5 text-gray-200 border-white/10 hover:bg-white/10 hover:text-white transition-all rounded-xl shadow-lg shadow-black/20"
-          >
-            Download Report
-          </Button>
-        </Group>
-      </Group>
-
       {/* Stats Grid */}
-      <SimpleGrid cols={{ base: 1, md: 4 }} spacing="lg" mb="xl">
-        {stats.map((stat, i) => (
-          <motion.div
-            key={stat.title}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1, duration: 0.4 }}
-          >
+      <SimpleGrid cols={{ base: 1, md: 4 }} spacing={20} mb={40}>
+        {stats.map((stat) => (
+          <motion.div key={stat.title} variants={itemVariants}>
             <Paper
-              p="xl"
-              radius="xl"
-              className="glass-dark border border-white/5 h-full relative overflow-hidden group hover:border-white/20 transition-all duration-300"
+              p={30}
+              radius="32px"
+              className="glass-dark border border-white/5 relative overflow-hidden group hover:border-white/20 transition-all duration-500 h-full shadow-xl"
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-bl-full -mr-8 -mt-8 pointer-events-none group-hover:from-white/10 transition-all" />
-
-              <Group justify="space-between" mb="md" className="relative z-10">
-                <ThemeIcon
-                  size="xl"
-                  radius="md"
-                  variant="light"
-                  color={stat.color}
-                  className="bg-white/5 text-white shadow-inner"
-                >
-                  <stat.icon size={22} stroke={1.5} />
-                </ThemeIcon>
-                <Badge
-                  size="sm"
-                  variant="outline"
-                  className="bg-white/5 text-gray-400 border-white/10 group-hover:border-white/20 transition-colors"
-                >
-                  {stat.subtitle}
-                </Badge>
+              <div className={cn("absolute inset-0 bg-gradient-to-br opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500", stat.gradient)} />
+              
+              <Group justify="space-between" mb={24}>
+                <div className={cn("h-12 w-12 rounded-2xl flex items-center justify-center border border-white/5 bg-white/5 shadow-inner transition-transform group-hover:scale-110")}>
+                  <stat.icon size={24} className={cn(
+                    stat.color === "blue" ? "text-blue-400" :
+                    stat.color === "green" ? "text-emerald-400" :
+                    stat.color === "violet" ? "text-violet-400" : "text-brand-red"
+                  )} />
+                </div>
+                <Badge variant="dot" color="gray" className="text-gray-500 border-none px-0">{stat.subtitle}</Badge>
               </Group>
 
-              <div className="relative z-10">
-                <Text
-                  size="xs"
-                  fw={700}
-                  tt="uppercase"
-                  className="text-gray-500 tracking-wider mb-2 font-manrope"
-                >
-                  {stat.title}
-                </Text>
-                <Title
-                  order={2}
-                  className="font-manrope text-white mb-2 text-3xl"
-                >
-                  {stat.value}
-                </Title>
-                <Group gap={6}>
-                  <IconTrendingUp size={16} className="text-emerald-400" />
-                  <Text size="sm" className="text-emerald-300 font-semibold">
-                    {stat.change}
-                  </Text>
-                </Group>
+              <Text className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">{stat.title}</Text>
+              <Title order={2} className="text-white text-4xl font-black mb-3">{stat.value}</Title>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full text-[10px] font-black border border-emerald-500/20">
+                  <IconTrendingUp size={12} />
+                  {stat.change}
+                </div>
+                <Text className="text-[10px] font-bold text-gray-600">Growth</Text>
               </div>
             </Paper>
           </motion.div>
@@ -230,367 +188,231 @@ export default function OverviewTab() {
       </SimpleGrid>
 
       {/* Charts & Map Grid */}
-      <SimpleGrid cols={{ base: 1, lg: 3 }} spacing="xl" mb="xl">
+      <SimpleGrid cols={{ base: 1, lg: 3 }} spacing={24} mb={40}>
         {/* Revenue Chart */}
-        <Paper
-          p="xl"
-          radius="xl"
-          className="glass-dark border border-white/5 lg:col-span-2 h-full flex flex-col relative overflow-hidden"
-        >
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/40 pointer-events-none" />
-          <Group justify="space-between" mb="lg" className="relative z-10">
-            <Group gap="md">
-              <ThemeIcon
-                size="xl"
-                radius="lg"
-                className="bg-brand-red/10 text-brand-red ring-1 ring-brand-red/20"
-              >
-                <IconReceipt size={24} />
-              </ThemeIcon>
+        <motion.div variants={itemVariants} className="lg:col-span-2">
+          <Paper
+            p={40}
+            radius="32px"
+            className="glass-dark border border-white/5 h-full flex flex-col relative overflow-hidden shadow-2xl"
+          >
+            <div className="absolute top-0 right-0 p-10 text-white/[0.02]">
+              <IconReceipt size={240} />
+            </div>
+            
+            <Group justify="space-between" mb={40} align="flex-end">
               <Box>
-                <Title
-                  order={3}
-                  className="font-manrope text-xl text-white tracking-tight"
-                >
-                  Revenue & 20% Platform Share
-                </Title>
-                <Text size="sm" className="text-gray-400 mt-1">
-                  Track how much customers paid and how much 20% commission is
-                  received.
-                </Text>
+                <Title order={3} className="font-manrope text-2xl font-black text-white tracking-tight">Financial Performance</Title>
+                <Text className="text-gray-500 font-bold text-xs uppercase tracking-widest mt-1">Platform Revenue Share Analytics</Text>
               </Box>
-            </Group>
-          </Group>
+            </Box>
 
-          <Box className="h-72 md:h-80 mb-8 relative z-10">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={revenueData}>
-                <defs>
-                  <linearGradient id="total" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="platform" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#27272a"
-                  vertical={false}
-                />
-                <XAxis
-                  dataKey="day"
-                  stroke="#52525b"
-                  tick={{ fill: "#71717a", fontSize: 12 }}
-                  axisLine={false}
-                  tickLine={false}
-                  dy={10}
-                />
-                <YAxis
-                  stroke="#52525b"
-                  tick={{ fill: "#71717a", fontSize: 12 }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(value) => `$${value}`}
-                  dx={-10}
-                />
-                <RechartsTooltip
-                  contentStyle={{
-                    backgroundColor: "#09090b",
-                    borderRadius: 12,
-                    border: "1px solid #27272a",
-                    color: "white",
-                    boxShadow: "0 10px 40px -10px rgba(0,0,0,0.5)",
-                  }}
-                  itemStyle={{ padding: 0 }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="total"
-                  stroke="#ef4444"
-                  strokeWidth={3}
-                  fillOpacity={1}
-                  fill="url(#total)"
-                  name="Total Paid"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="platform"
-                  stroke="#10b981"
-                  strokeWidth={3}
-                  fillOpacity={1}
-                  fill="url(#platform)"
-                  name="Platform Share"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </Box>
+            <Box className="h-[350px] mb-10 relative z-10 w-full" style={{ minWidth: "100%" }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={revenueData}>
+                  <defs>
+                    <linearGradient id="total-tab" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="platform-tab" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
+                  <XAxis 
+                    dataKey="day" 
+                    stroke="#ffffff20" 
+                    tick={{ fill: "#666", fontSize: 11, fontWeight: 700 }}
+                    axisLine={false}
+                    tickLine={false}
+                    dy={15}
+                  />
+                  <YAxis 
+                    stroke="#ffffff20" 
+                    tick={{ fill: "#666", fontSize: 11, fontWeight: 700 }}
+                    axisLine={false}
+                    tickLine={false}
+                    dx={-15}
+                    tickFormatter={(val) => `$${val}`}
+                  />
+                  <RechartsTooltip
+                    contentStyle={{
+                      backgroundColor: "#0f0f0f",
+                      borderRadius: 20,
+                      border: "1px solid #ffffff10",
+                      color: "white",
+                      padding: 15,
+                      boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
+                    }}
+                    cursor={{ stroke: '#ffffff10', strokeWidth: 1 }}
+                  />
+                  <Area type="monotone" dataKey="total" stroke="#ef4444" strokeWidth={4} fillOpacity={1} fill="url(#total-tab)" name="Gross Value" />
+                  <Area type="monotone" dataKey="platform" stroke="#10b981" strokeWidth={4} fillOpacity={1} fill="url(#platform-tab)" name="20% Share" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </Box>
 
-          <div className="relative z-10 mt-auto">
-            <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
+            <SimpleGrid cols={{ base: 1, sm: 3 }} spacing={16} className="mt-auto">
               {[
-                {
-                  label: "20% Given",
-                  value: `Rs ${paidCommission.toFixed(0)}`,
-                  color: "emerald",
-                  icon: IconPercentage,
-                },
-                {
-                  label: "20% Pending",
-                  value: `Rs ${pendingCommission.toFixed(0)}`,
-                  color: "amber",
-                  icon: IconAlertCircle,
-                },
-                {
-                  label: "Active Customers",
-                  value: "1,024",
-                  color: "sky",
-                  icon: IconUserShield,
-                },
+                { label: "Commission Paid", value: `Rs ${paidCommission.toFixed(0)}`, color: "emerald", icon: IconPercentage },
+                { label: "Fees Pending", value: `Rs ${pendingCommission.toFixed(0)}`, color: "amber", icon: IconAlertCircle },
+                { label: "Platform Growth", value: "+24%", color: "sky", icon: IconActivity },
               ].map((item, idx) => (
-                <Paper
-                  key={idx}
-                  p="md"
-                  radius="lg"
-                  className={`bg-white/5 border border-white/5 hover:border-${item.color}-500/30 transition-colors group`}
-                >
-                  <Group gap="xs" mb={1}>
-                    <ThemeIcon
-                      size="md"
-                      radius="xl"
-                      className={`bg-${item.color}-500/10 text-${item.color}-400 group-hover:scale-110 transition-transform`}
-                    >
+                <Paper key={idx} p={24} radius="24px" className="bg-white/[0.03] border border-white/[0.05] hover:border-white/10 transition-colors group">
+                  <Group gap="sm" mb={12}>
+                    <ThemeIcon size="sm" radius="md" className={cn("bg-white/5", `text-${item.color}-400`)}>
                       <item.icon size={14} />
                     </ThemeIcon>
-                    <Text
-                      size="xs"
-                      className="text-gray-400 uppercase font-bold tracking-wide"
-                    >
-                      {item.label}
-                    </Text>
+                    <Text className="text-gray-500 font-black uppercase text-[9px] tracking-widest">{item.label}</Text>
                   </Group>
-                  <Text
-                    className={`text-${item.color}-300 text-xl font-bold font-manrope`}
-                  >
-                    {item.value}
-                  </Text>
+                  <Text className="text-white text-2xl font-black font-manrope">{item.value}</Text>
                 </Paper>
               ))}
             </SimpleGrid>
-          </div>
-        </Paper>
+          </Paper>
+        </motion.div>
 
-        {/* Live Map Card */}
-        <Paper
-          p={0}
-          radius="xl"
-          className="glass-dark border border-white/5 h-full relative overflow-hidden flex flex-col"
-        >
-          <div className="p-6 relative z-10 bg-gradient-to-b from-brand-black/90 to-transparent">
-            <Group justify="space-between">
-              <Group gap="md">
-                <ThemeIcon
-                  size="lg"
-                  radius="lg"
-                  className="bg-white/10 text-white"
-                >
-                  <IconMapPin size={20} />
-                </ThemeIcon>
-                <Box>
-                  <Title
-                    order={3}
-                    className="font-manrope text-lg text-white mb-0"
-                  >
-                    Live Map Snapshot
-                  </Title>
-                  <Text size="xs" className="text-gray-400">
-                    User density & requests
-                  </Text>
-                </Box>
+        {/* Map Snapshot */}
+        <motion.div variants={itemVariants}>
+          <Paper
+            radius="32px"
+            className="glass-dark border border-white/5 h-full relative overflow-hidden flex flex-col shadow-2xl"
+          >
+            <div className="p-8 relative z-10 bg-gradient-to-b from-[#0a0a0a] to-transparent">
+              <Group justify="space-between">
+                 <Box>
+                    <Title order={3} className="font-manrope text-2xl font-black text-white tracking-tight">Heat Map</Title>
+                    <Text className="text-gray-500 font-bold text-xs uppercase tracking-widest mt-1">Global Traffic Density</Text>
+                 </Box>
               </Group>
-            </Group>
-          </div>
-
-          <div className="flex-1 relative bg-brand-charcoal overflow-hidden">
-            <Image
-              src={mapBg}
-              alt="Map Overview"
-              fill
-              className="object-cover opacity-30 hover:opacity-40 transition-opacity duration-500 scale-105"
-            />
-            {/* Pulsing Dots */}
-            <div className="absolute top-1/3 left-1/4 w-4 h-4 rounded-full bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.6)] animate-pulse" />
-            <div
-              className="absolute bottom-1/4 right-1/3 w-4 h-4 rounded-full bg-red-500 shadow-[0_0_20px_rgba(239,68,68,0.6)] animate-pulse"
-              style={{ animationDelay: "0.5s" }}
-            />
-            <div
-              className="absolute top-1/2 right-1/4 w-4 h-4 rounded-full bg-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.6)] animate-pulse"
-              style={{ animationDelay: "1s" }}
-            />
-
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[90%]">
-              <Button
-                component={motion.button}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                fullWidth
-                variant="filled"
-                rightSection={<IconArrowRight size={16} />}
-                className="bg-brand-red hover:bg-brand-dark-red text-white border-none backdrop-blur-md shadow-lg"
-              >
-                Open Detailed Map
-              </Button>
             </div>
-          </div>
-        </Paper>
+
+            <Box className="flex-1 relative bg-[#0f0f0f]">
+              <div className="absolute inset-0 opacity-10 grayscale brightness-150">
+                 <Image src={mapBg} alt="Map" fill className="object-cover" />
+              </div>
+              
+              <div className="absolute top-[40%] left-[30%] h-4 w-4 rounded-full bg-emerald-500 shadow-[0_0_20px_#10b981] animate-ping" />
+              <div className="absolute top-[60%] left-[50%] h-3 w-3 rounded-full bg-brand-red shadow-[0_0_15px_#ef4444] animate-pulse" />
+              <div className="absolute top-[30%] left-[70%] h-5 w-5 rounded-full bg-amber-400 shadow-[0_0_25px_#fbbf24] animate-bounce" />
+              
+              <div className="absolute bottom-10 left-8 right-8 space-y-4">
+                 <div className="p-6 glass-dark border border-white/20 rounded-[28px] backdrop-blur-2xl">
+                    <div className="flex items-center gap-4 mb-4">
+                       <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center text-white border border-white/10">
+                          <IconActivity size={20} />
+                       </div>
+                       <div>
+                          <Text className="text-white font-black text-sm uppercase">Active Traffic</Text>
+                          <Text className="text-green-400 font-black text-xs">STABLE LOAD</Text>
+                       </div>
+                    </div>
+                    <Button
+                      fullWidth
+                      radius="xl"
+                      className="bg-brand-red hover:bg-brand-dark-red text-white font-black h-12 shadow-xl shadow-brand-red/20"
+                      rightSection={<IconArrowRight size={18} />}
+                    >
+                       Live Tracking
+                    </Button>
+                 </div>
+              </div>
+            </Box>
+          </Paper>
+        </motion.div>
       </SimpleGrid>
 
-      {/* Recent Requests Table */}
-      <Paper
-        p="xl"
-        radius="xl"
-        className="glass-dark border border-white/5 relative overflow-hidden"
-      >
-        <Group justify="space-between" mb="xl">
-          <Box>
-            <Title order={3} className="font-manrope text-xl text-white">
-              Recent Requests
-            </Title>
-            <Text size="sm" className="text-gray-400 mt-1">
-              Latest job statuses and commission payments.
-            </Text>
-          </Box>
-          <Button variant="subtle" color="gray" className="hover:bg-white/5">
-            View All
-          </Button>
-        </Group>
-
-        <Table
-          verticalSpacing="md"
-          horizontalSpacing="lg"
-          className="text-gray-300"
+      {/* Requests Table */}
+      <motion.div variants={itemVariants}>
+        <Paper
+          p={40}
+          radius="32px"
+          className="glass-dark border border-white/5 shadow-2xl relative overflow-hidden"
         >
-          <Table.Thead className="bg-white/5">
-            <Table.Tr>
-              <Table.Th className="text-gray-400 font-medium">User</Table.Th>
-              <Table.Th className="text-gray-400 font-medium">Type</Table.Th>
-              <Table.Th className="text-gray-400 font-medium">Status</Table.Th>
-              <Table.Th className="text-gray-400 font-medium">Helper</Table.Th>
-              <Table.Th className="text-gray-400 font-medium text-right">
-                Amount
-              </Table.Th>
-              <Table.Th className="text-gray-400 font-medium">20% Fee</Table.Th>
-              <Table.Th className="text-gray-400 font-medium"></Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {recentRequests.map((req) => (
-              <Table.Tr
-                key={req.id}
-                className="hover:bg-white/5 transition-colors group"
-              >
-                <Table.Td>
-                  <Group gap="sm">
-                    <Avatar
-                      size="sm"
-                      radius="xl"
-                      color="blue"
-                      className="bg-blue-500/20 text-blue-300"
-                      variant="light"
-                    >
-                      {req.user[0]}
-                    </Avatar>
-                    <Box>
-                      <Text size="sm" fw={600} className="text-white">
-                        {req.user}
-                      </Text>
-                    </Box>
-                  </Group>
-                </Table.Td>
-                <Table.Td>
-                  <Badge
-                    variant="dot"
-                    color="gray"
-                    size="lg"
-                    className="bg-transparent text-gray-300 pl-0"
-                  >
-                    {req.type}
-                  </Badge>
-                </Table.Td>
-                <Table.Td>
-                  <Badge
-                    color={
-                      req.status === "Completed"
-                        ? "green"
-                        : req.status === "Pending"
-                          ? "orange"
-                          : "blue"
-                    }
-                    variant="light"
-                    radius="sm"
-                    className="capitalize"
-                  >
-                    {req.status}
-                  </Badge>
-                </Table.Td>
-                <Table.Td>{req.helper}</Table.Td>
-                <Table.Td className="text-right">
-                  <Text
-                    size="sm"
-                    className="text-brand-red font-bold font-manrope"
-                  >
-                    Rs {req.amount.toLocaleString()}
-                  </Text>
-                </Table.Td>
-                <Table.Td>
-                  <Group gap="xs">
-                    <Tooltip
-                      label={
-                        req.hasCommissionPaid
-                          ? "20% received by platform"
-                          : "20% still pending from helper"
-                      }
-                      withArrow
-                      className="bg-gray-800"
-                    >
-                      <div
-                        className={`flex items-center gap-2 px-2 py-1 round-md rounded-lg ${req.hasCommissionPaid ? "bg-emerald-500/10" : "bg-amber-500/10"}`}
-                      >
-                        <div
-                          className={`w-2 h-2 rounded-full ${req.hasCommissionPaid ? "bg-emerald-500" : "bg-amber-500"}`}
-                        />
-                        <Text
-                          size="xs"
-                          className={
-                            req.hasCommissionPaid
-                              ? "text-emerald-400"
-                              : "text-amber-400"
-                          }
-                        >
-                          {req.hasCommissionPaid ? "Paid" : "Pending"}
-                        </Text>
+          <Group justify="space-between" mb={40} align="flex-end">
+            <div>
+              <Title order={3} className="font-manrope text-3xl font-black text-white tracking-tight">Recent Operations</Title>
+              <Text className="text-gray-500 font-bold text-xs uppercase tracking-widest mt-1">Job fulfillment registry</Text>
+            </div>
+            <Button
+              variant="subtle"
+              color="gray"
+              className="hover:bg-white/5 text-gray-500 font-black rounded-xl"
+              component={Link}
+              href="/admin/requests"
+              rightSection={<IconArrowRight size={16} />}
+            >
+              View Full Logs
+            </Button>
+          </Group>
+
+          <Box className="overflow-x-auto">
+            <Table verticalSpacing="lg" horizontalSpacing="xl" className="text-white min-w-[1000px]">
+              <Table.Thead className="bg-white/5 border-none">
+                <Table.Tr>
+                  <Table.Th className="text-gray-500 font-black uppercase text-[10px] tracking-widest border-none">User Profile</Table.Th>
+                  <Table.Th className="text-gray-500 font-black uppercase text-[10px] tracking-widest border-none">Category</Table.Th>
+                  <Table.Th className="text-gray-500 font-black uppercase text-[10px] tracking-widest border-none">Operation Status</Table.Th>
+                  <Table.Th className="text-gray-500 font-black uppercase text-[10px] tracking-widest border-none">Assigned Pro</Table.Th>
+                  <Table.Th className="text-gray-500 font-black uppercase text-[10px] tracking-widest border-none text-right">Value (PKR)</Table.Th>
+                  <Table.Th className="text-gray-500 font-black uppercase text-[10px] tracking-widest border-none">Fee (20%)</Table.Th>
+                  <Table.Th className="border-none"></Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {recentRequests.map((req) => (
+                  <Table.Tr key={req.id} className="hover:bg-white/[0.03] transition-colors border-b border-white/[0.05]">
+                    <Table.Td>
+                      <Group gap="sm">
+                        <Avatar size="md" radius="14px" className="bg-blue-600/20 text-blue-400 font-black border border-blue-500/20">{req.user[0]}</Avatar>
+                        <Text fw={700} className="text-sm">{req.user}</Text>
+                      </Group>
+                    </Table.Td>
+                    <Table.Td>
+                      <Badge variant="outline" color="gray" className="text-gray-400 border-gray-800 font-black uppercase text-[9px]">{req.type}</Badge>
+                    </Table.Td>
+                    <Table.Td>
+                      <div className="flex items-center gap-2">
+                         <div className={cn("w-2 h-2 rounded-full", 
+                           req.status === "Completed" ? "bg-green-500" :
+                           req.status === "Pending" ? "bg-orange-500 shadow-[0_0_10px_#f97316]" : "bg-blue-500"
+                         )} />
+                         <Text size="xs" fw={800} className={cn("uppercase tracking-tighter",
+                           req.status === "Completed" ? "text-green-500" :
+                           req.status === "Pending" ? "text-orange-500" : "text-blue-500"
+                         )}>{req.status}</Text>
                       </div>
-                    </Tooltip>
-                  </Group>
-                </Table.Td>
-                <Table.Td>
-                  <Button
-                    size="xs"
-                    variant="light"
-                    color="gray"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    Details
-                  </Button>
-                </Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-      </Paper>
+                    </Table.Td>
+                    <Table.Td>
+                       <Text size="xs" className="text-gray-400 font-bold">{req.helper !== "-" ? req.helper : "ALLOCATING..."}</Text>
+                    </Table.Td>
+                    <Table.Td className="text-right">
+                      <Text fw={900} className="text-white text-md tracking-tighter">Rs {req.amount.toLocaleString()}</Text>
+                    </Table.Td>
+                    <Table.Td>
+                      <div className={cn("inline-flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-black", 
+                        req.hasCommissionPaid ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-brand-red/5 border-red-500/20 text-brand-red"
+                      )}>
+                         <IconActivity size={10} />
+                         {req.hasCommissionPaid ? "FEE SECURED" : "FEE PENDING"}
+                      </div>
+                    </Table.Td>
+                    <Table.Td>
+                       <ActionIcon variant="subtle" color="gray" radius="lg" component={Link} href={`/admin/requests/${req.id}`}>
+                          <IconArrowRight size={18} />
+                       </ActionIcon>
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+          </Box>
+        </Paper>
+      </motion.div>
     </motion.div>
   );
-}
+};
+
+export default memo(OverviewTab);

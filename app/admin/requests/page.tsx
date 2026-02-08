@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo, memo, useCallback } from "react";
 import {
   Title,
   Text,
@@ -12,14 +12,31 @@ import {
   Tooltip,
   Box,
   Tabs,
+  Avatar,
+  ScrollArea,
+  Button,
 } from "@mantine/core";
-import { motion } from "framer-motion";
-import { Eye, MapPin, Calendar, Download, FileText } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  IconEye,
+  IconMapPin,
+  IconCalendar,
+  IconDownload,
+  IconFileText,
+  IconTruck,
+  IconChecks,
+  IconAlertCircle,
+  IconClock,
+  IconArrowRight,
+  IconReceipt2,
+  IconUser,
+  IconSearch,
+} from "@tabler/icons-react";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
-// Enhanced Mock Data with more fields
+// Enhanced Mock Data
 const allRequests = [
   {
     id: "REQ-001",
@@ -32,7 +49,7 @@ const allRequests = [
     helperPhone: "+92 321 7654321",
     status: "In Progress",
     time: "10 mins ago",
-    amount: "Rs 4,500",
+    amount: "4,500",
     paymentStatus: "Pending",
     notes: "Car broke down near Main Boulevard.",
   },
@@ -47,7 +64,7 @@ const allRequests = [
     helperPhone: "N/A",
     status: "Pending",
     time: "25 mins ago",
-    amount: "Rs 1,200",
+    amount: "1,200",
     paymentStatus: "Unpaid",
     notes: "Need urgent assistance.",
   },
@@ -62,7 +79,7 @@ const allRequests = [
     helperPhone: "+92 301 1122334",
     status: "Completed",
     time: "2 hours ago",
-    amount: "Rs 2,200",
+    amount: "2,200",
     paymentStatus: "Paid",
     notes: "Ran out of fuel on highway exit.",
   },
@@ -77,7 +94,7 @@ const allRequests = [
     helperPhone: "+92 322 4455667",
     status: "Completed",
     time: "5 hours ago",
-    amount: "Rs 3,500",
+    amount: "3,500",
     paymentStatus: "Paid",
     notes: "Engine overheating issues.",
   },
@@ -92,31 +109,38 @@ const allRequests = [
     helperPhone: "N/A",
     status: "Pending",
     time: "1 hour ago",
-    amount: "Rs 1,500",
+    amount: "1,500",
     paymentStatus: "Unpaid",
     notes: "Keys locked inside the car.",
   },
 ];
 
-export default function RequestsPage() {
+const RequestsPage = () => {
   const [activeTab, setActiveTab] = useState<string | null>("all");
+  const [search, setSearch] = useState("");
 
-  const filteredRequests = allRequests.filter((req) => {
-    if (activeTab === "all") return true;
-    if (activeTab === "pending") return req.status === "Pending";
-    if (activeTab === "inprogress") return req.status === "In Progress";
-    if (activeTab === "completed") return req.status === "Completed";
-    return true;
-  });
+  const filteredRequests = useMemo(() => {
+    return allRequests.filter((req) => {
+      const matchesTab =
+        activeTab === "all" ||
+        (activeTab === "pending" && req.status === "Pending") ||
+        (activeTab === "inprogress" && req.status === "In Progress") ||
+        (activeTab === "completed" && req.status === "Completed");
 
-  const handleDownloadReport = () => {
-    // Generate simple CSV content
+      const matchesSearch =
+        req.user.toLowerCase().includes(search.toLowerCase()) ||
+        req.id.toLowerCase().includes(search.toLowerCase()) ||
+        req.service.toLowerCase().includes(search.toLowerCase());
+
+      return matchesTab && matchesSearch;
+    });
+  }, [activeTab, search]);
+
+  const handleDownloadReport = useCallback(() => {
     const headers = [
       "ID",
       "User",
-      "Phone",
       "Service",
-      "Vehicle",
       "Location",
       "Status",
       "Amount",
@@ -126,9 +150,7 @@ export default function RequestsPage() {
       [
         req.id,
         req.user,
-        req.phone,
         req.service,
-        req.vehicle,
         req.location,
         req.status,
         req.amount,
@@ -137,190 +159,330 @@ export default function RequestsPage() {
     );
     const csvContent =
       "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
-
-    // Create download link
-    const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `requests_report_${activeTab || "all"}.csv`);
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute(
+      "download",
+      `fleet_ops_${activeTab}_${new Date().getTime()}.csv`,
+    );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    toast.success("Operational log exported successfully.");
+  }, [filteredRequests, activeTab]);
 
-    toast.success("Report downloaded successfully!");
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 },
   };
 
   return (
-    <Box className="p-4 md:p-8 min-h-screen font-satoshi bg-brand-black text-white">
+    <Box className="relative min-h-screen bg-[#0a0a0a] overflow-hidden p-4 md:p-8 font-satoshi text-white">
+      {/* Dynamic Background */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <motion.div
+          animate={{ scale: [1, 1.3, 1], opacity: [0.03, 0.06, 0.03] }}
+          transition={{ duration: 20, repeat: Infinity }}
+          className="absolute -top-[10%] -right-[5%] w-[50%] h-[50%] bg-brand-red/10 blur-[130px] rounded-full"
+        />
+        <motion.div
+          animate={{ scale: [1.3, 1, 1.3], opacity: [0.02, 0.05, 0.02] }}
+          transition={{ duration: 15, repeat: Infinity }}
+          className="absolute bottom-[5%] left-[0%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full"
+        />
+      </div>
+
       <motion.div
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4 }}
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="relative z-10 max-w-7xl mx-auto"
       >
-        <Group
-          justify="space-between"
-          mb="lg"
-          className="flex-col md:flex-row items-start md:items-center"
-        >
-          <div>
-            <Title className="font-manrope text-3xl font-bold text-white mb-1">
-              Service Requests
+        {/* Header */}
+        <Group justify="space-between" mb={45} align="flex-end">
+          <Box>
+            <motion.div
+              variants={itemVariants}
+              className="flex items-center gap-2 mb-2"
+            >
+              <IconTruck size={16} className="text-brand-red" />
+              <Text className="text-brand-red font-black uppercase tracking-[0.3em] text-[10px]">
+                Fleet Operations
+              </Text>
+            </motion.div>
+            <Title
+              order={1}
+              className="font-manrope font-black text-4xl md:text-5xl text-white tracking-tight"
+            >
+              Service{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">
+                Logistics
+              </span>
             </Title>
-            <Text className="text-gray-400">
-              Monitor and manage ongoing and past service requests.
+            <Text className="text-gray-500 mt-2 font-bold uppercase tracking-tight text-xs">
+              Live deployment monitoring & history
             </Text>
-          </div>
-          <Button
-            onClick={handleDownloadReport}
-            className="bg-brand-red hover:bg-brand-dark-red text-white gap-2 mt-4 md:mt-0"
-          >
-            <Download size={18} />
-            Download Report
-          </Button>
+          </Box>
+          <motion.div variants={itemVariants}>
+            <Button
+              className="bg-brand-red hover:bg-brand-dark-red text-white h-14 rounded-2xl px-8 transition-all font-black shadow-2xl shadow-brand-red/20 group"
+              leftSection={
+                <IconDownload
+                  size={20}
+                  className="group-hover:translate-y-0.5 transition-transform"
+                />
+              }
+              onClick={handleDownloadReport}
+            >
+              Export Intelligence
+            </Button>
+          </motion.div>
         </Group>
 
-        <Paper
-          p="lg"
-          radius="xl"
-          className="glass-dark border border-white/10 overflow-hidden bg-brand-charcoal/50"
+        {/* Filters and Search */}
+        <motion.div
+          variants={itemVariants}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10"
         >
-          {/* Filters */}
-          <Tabs
-            value={activeTab}
-            onChange={setActiveTab}
-            variant="pills"
-            radius="xl"
-            mb="md"
-            classNames={{
-              list: "gap-2",
-              tab: "bg-white/5 text-gray-400 hover:bg-white/10 data-[active=true]:bg-brand-red data-[active=true]:text-white border-0 transition-all",
-            }}
+          <Paper
+            p={12}
+            radius="24px"
+            className="lg:col-span-8 glass-dark border border-white/10 flex items-center shadow-xl"
           >
-            <Tabs.List>
-              <Tabs.Tab value="all">All Requests</Tabs.Tab>
-              <Tabs.Tab value="pending">Pending</Tabs.Tab>
-              <Tabs.Tab value="inprogress">In Progress</Tabs.Tab>
-              <Tabs.Tab value="completed">Completed</Tabs.Tab>
-            </Tabs.List>
-          </Tabs>
+            <Tabs
+              value={activeTab}
+              onChange={setActiveTab}
+              variant="pills"
+              radius="xl"
+              className="w-full"
+              classNames={{
+                list: "gap-1",
+                tab: "h-12 px-6 bg-transparent text-gray-500 font-black uppercase text-[10px] tracking-widest hover:text-white data-[active=true]:bg-white/10 data-[active=true]:text-white border-0 transition-all",
+              }}
+            >
+              <Tabs.List>
+                <Tabs.Tab value="all" leftSection={<IconReceipt2 size={14} />}>
+                  Total Fleet
+                </Tabs.Tab>
+                <Tabs.Tab
+                  value="pending"
+                  leftSection={<IconAlertCircle size={14} />}
+                >
+                  Pending Allocation
+                </Tabs.Tab>
+                <Tabs.Tab
+                  value="inprogress"
+                  leftSection={<IconClock size={14} />}
+                >
+                  Active Duty
+                </Tabs.Tab>
+                <Tabs.Tab
+                  value="completed"
+                  leftSection={<IconChecks size={14} />}
+                >
+                  Fulfillment
+                </Tabs.Tab>
+              </Tabs.List>
+            </Tabs>
+          </Paper>
+          <div className="lg:col-span-4 relative group">
+            <IconSearch
+              size={20}
+              className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-brand-red transition-all"
+            />
+            <input
+              placeholder="Search requests..."
+              className="w-full h-15 bg-white/[0.03] border-2 border-white/5 rounded-2xl pl-14 pr-6 text-white font-bold text-sm outline-none focus:border-brand-red transition-all"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+        </motion.div>
 
-          <div className="overflow-x-auto">
-            <Table verticalSpacing="md" className="text-gray-200">
-              <Table.Thead className="bg-white/5">
-                <Table.Tr>
-                  <Table.Th>ID</Table.Th>
-                  <Table.Th>User Details</Table.Th>
-                  <Table.Th>Service Info</Table.Th>
-                  <Table.Th>Location</Table.Th>
-                  <Table.Th>Status</Table.Th>
-                  <Table.Th>Payment</Table.Th>
-                  <Table.Th>Time</Table.Th>
-                  <Table.Th className="text-right">Action</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {filteredRequests.map((req, i) => (
-                  <motion.tr
-                    key={req.id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="hover:bg-white/5 transition-colors group"
-                  >
-                    <Table.Td className="font-mono text-gray-400 text-xs font-bold">
-                      {req.id}
-                    </Table.Td>
-                    <Table.Td>
-                      <div>
-                        <Text size="sm" fw={600} className="text-white">
-                          {req.user}
-                        </Text>
-                        <Text size="xs" className="text-gray-500">
-                          {req.phone}
-                        </Text>
-                      </div>
-                    </Table.Td>
-                    <Table.Td>
-                      <div>
-                        <Text size="sm" className="text-brand-red font-medium">
-                          {req.service}
-                        </Text>
-                        <Text size="xs" className="text-gray-400">
-                          {req.vehicle}
-                        </Text>
-                      </div>
-                    </Table.Td>
-                    <Table.Td>
-                      <Group gap="xs" className="text-gray-300">
-                        <MapPin size={14} className="text-gray-500" />
-                        <Text
-                          size="xs"
-                          className="truncate max-w-[150px]"
-                          title={req.location}
-                        >
-                          {req.location}
-                        </Text>
-                      </Group>
-                    </Table.Td>
-                    <Table.Td>
-                      <Badge
-                        color={
-                          req.status === "Completed"
-                            ? "green"
-                            : req.status === "Pending"
-                              ? "orange"
-                              : "blue"
-                        }
-                        variant="light"
-                        className="capitalize"
+        {/* Data Registry */}
+        <motion.div variants={itemVariants}>
+          <Paper
+            radius="32px"
+            className="glass-dark border border-white/10 overflow-hidden shadow-2xl relative min-h-[500px]"
+          >
+            <div className="absolute top-0 right-0 p-10 text-white/[0.01]">
+              <IconTruck size={300} />
+            </div>
+
+            <Box className="overflow-x-auto">
+              <Table
+                verticalSpacing="xl"
+                horizontalSpacing="xl"
+                className="text-white min-w-[1100px]"
+              >
+                <Table.Thead className="bg-white/5 border-none">
+                  <Table.Tr>
+                    <Table.Th className="text-gray-600 font-black uppercase text-[10px] tracking-widest border-none py-6">
+                      Reference ID
+                    </Table.Th>
+                    <Table.Th className="text-gray-600 font-black uppercase text-[10px] tracking-widest border-none">
+                      Requester Profile
+                    </Table.Th>
+                    <Table.Th className="text-gray-600 font-black uppercase text-[10px] tracking-widest border-none">
+                      Deployment Detail
+                    </Table.Th>
+                    <Table.Th className="text-gray-600 font-black uppercase text-[10px] tracking-widest border-none">
+                      Operational Area
+                    </Table.Th>
+                    <Table.Th className="text-gray-600 font-black uppercase text-[10px] tracking-widest border-none">
+                      Duty Status
+                    </Table.Th>
+                    <Table.Th className="text-gray-600 font-black uppercase text-[10px] tracking-widest border-none">
+                      Financials
+                    </Table.Th>
+                    <Table.Th className="border-none"></Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  <AnimatePresence mode="popLayout">
+                    {filteredRequests.map((req, idx) => (
+                      <motion.tr
+                        key={req.id}
+                        layout
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.98 }}
+                        transition={{ delay: idx * 0.05 }}
+                        className="group hover:bg-white/[0.03] transition-colors border-b border-white/[0.05] last:border-0"
                       >
-                        {req.status}
-                      </Badge>
-                    </Table.Td>
-                    <Table.Td>
-                      <Badge
-                        variant="dot"
-                        color={req.paymentStatus === "Paid" ? "green" : "red"}
-                        className="bg-transparent pl-0"
-                      >
-                        {req.paymentStatus}
-                      </Badge>
-                      <Text size="xs" fw={700}>
-                        {req.amount}
-                      </Text>
-                    </Table.Td>
-                    <Table.Td>
-                      <Group gap="xs" className="text-gray-400">
-                        <Calendar size={14} />
-                        <Text size="xs">{req.time}</Text>
-                      </Group>
-                    </Table.Td>
-                    <Table.Td className="text-right">
-                      <Tooltip label="View Details" withArrow position="left">
-                        <Link href={`/admin/requests/${req.id}`}>
-                          <ActionIcon
-                            variant="light"
-                            color="gray"
-                            className="bg-white/5 hover:bg-brand-red hover:text-white text-gray-300 transition-all"
+                        <Table.Td className="font-mono text-[11px] font-black text-white/40">
+                          {req.id}
+                        </Table.Td>
+                        <Table.Td>
+                          <Group gap="sm">
+                            <Avatar
+                              size="sm"
+                              radius="10px"
+                              className="bg-brand-red/20 text-brand-red border border-brand-red/10 font-black"
+                            >
+                              {req.user[0]}
+                            </Avatar>
+                            <div>
+                              <Text fw={800} size="sm">
+                                {req.user}
+                              </Text>
+                              <Text size="xs" color="dimmed" fw={600}>
+                                {req.phone}
+                              </Text>
+                            </div>
+                          </Group>
+                        </Table.Td>
+                        <Table.Td>
+                          <div>
+                            <Text
+                              size="xs"
+                              fw={900}
+                              className="text-brand-red uppercase tracking-widest"
+                            >
+                              {req.service}
+                            </Text>
+                            <Text size="xs" className="text-gray-500 font-bold">
+                              {req.vehicle}
+                            </Text>
+                          </div>
+                        </Table.Td>
+                        <Table.Td>
+                          <div className="flex items-center gap-2 group-hover:text-white transition-colors">
+                            <IconMapPin size={12} className="text-gray-600" />
+                            <Text
+                              size="xs"
+                              fw={700}
+                              className="text-gray-500 max-w-[150px] truncate"
+                            >
+                              {req.location}
+                            </Text>
+                          </div>
+                        </Table.Td>
+                        <Table.Td>
+                          <div
+                            className={cn(
+                              "inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border-2 text-[10px] font-black uppercase tracking-widest",
+                              req.status === "Completed"
+                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                                : req.status === "Pending"
+                                  ? "bg-orange-500/10 border-orange-500/20 text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.1)]"
+                                  : "bg-blue-500/10 border-blue-500/20 text-blue-400",
+                            )}
                           >
-                            <Eye size={18} />
-                          </ActionIcon>
-                        </Link>
-                      </Tooltip>
-                    </Table.Td>
-                  </motion.tr>
-                ))}
-              </Table.Tbody>
-            </Table>
+                            <div
+                              className={cn(
+                                "w-1.5 h-1.5 rounded-full animate-pulse",
+                                req.status === "Completed"
+                                  ? "bg-emerald-400"
+                                  : req.status === "Pending"
+                                    ? "bg-orange-400"
+                                    : "bg-blue-400",
+                              )}
+                            />
+                            {req.status}
+                          </div>
+                        </Table.Td>
+                        <Table.Td>
+                          <div className="flex flex-col">
+                            <Text fw={900} className="text-white">
+                              Rs {req.amount}
+                            </Text>
+                            <Text
+                              size="xs"
+                              className={cn(
+                                "font-black text-[9px]",
+                                req.paymentStatus === "Paid"
+                                  ? "text-emerald-500"
+                                  : "text-brand-red",
+                              )}
+                            >
+                              {req.paymentStatus}
+                            </Text>
+                          </div>
+                        </Table.Td>
+                        <Table.Td>
+                          <Tooltip
+                            label="Intel View"
+                            withArrow
+                            position="left"
+                            radius="md"
+                          >
+                            <ActionIcon
+                              variant="subtle"
+                              color="gray"
+                              className="hover:bg-white/10 hover:text-white transition-all scale-110"
+                              component={Link}
+                              href={`/admin/requests/${req.id}`}
+                            >
+                              <IconEye size={18} />
+                            </ActionIcon>
+                          </Tooltip>
+                        </Table.Td>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </Table.Tbody>
+              </Table>
+            </Box>
+
             {filteredRequests.length === 0 && (
-              <div className="text-center py-16 flex flex-col items-center justify-center text-gray-500">
-                <FileText size={48} className="mb-4 opacity-20" />
-                <Text>No requests found in this category.</Text>
+              <div className="flex flex-col items-center justify-center py-32 opacity-30">
+                <IconFileText size={60} stroke={1} />
+                <Text className="mt-4 font-black text-xl uppercase tracking-widest">
+                  No signals found
+                </Text>
               </div>
             )}
-          </div>
-        </Paper>
+          </Paper>
+        </motion.div>
       </motion.div>
     </Box>
   );
-}
+};
+
+export default memo(RequestsPage);

@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase/config";
+import { setCookie } from "cookies-next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,6 +52,11 @@ export default function AdminLoginPage() {
     setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, data.email, data.password);
+      setCookie("userRole", "admin", { maxAge: 60 * 60 * 24 * 7, path: "/" });
+      setCookie("authToken", "verified", {
+        maxAge: 60 * 60 * 24 * 7,
+        path: "/",
+      });
       toast.success("🎉 Welcome back, Admin!");
       router.push("/admin/dashboard");
     } catch (error: any) {

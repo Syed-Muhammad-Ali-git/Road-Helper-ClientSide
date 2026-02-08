@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "@/lib/firebase/config";
+import { setCookie } from "cookies-next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -86,6 +87,14 @@ function RegisterPageContent() {
         data.password,
       );
       await updateProfile(userCredential.user, { displayName: data.fullName });
+      setCookie("userRole", "customer", {
+        maxAge: 60 * 60 * 24 * 7,
+        path: "/",
+      });
+      setCookie("authToken", "verified", {
+        maxAge: 60 * 60 * 24 * 7,
+        path: "/",
+      });
       toast.success("🎉 Account created successfully!");
       router.push("/customer/dashboard");
     } catch (error: any) {
@@ -104,6 +113,11 @@ function RegisterPageContent() {
         data.password,
       );
       await updateProfile(userCredential.user, { displayName: data.fullName });
+      setCookie("userRole", "helper", { maxAge: 60 * 60 * 24 * 7, path: "/" });
+      setCookie("authToken", "verified", {
+        maxAge: 60 * 60 * 24 * 7,
+        path: "/",
+      });
       toast.success("🎉 Application submitted successfully!");
       router.push("/helper/dashboard");
     } catch (error: any) {
@@ -249,7 +263,7 @@ function RegisterPageContent() {
               )}
               transition={{ type: "spring", stiffness: 400, damping: 25 }}
             />
-            <div className="relative z-10 flex">
+            <div className="relative z-10 flex gap-1">
               {[
                 { type: "customer", icon: "👤", label: "Customer" },
                 { type: "helper", icon: "🛠️", label: "Helper" },
@@ -257,11 +271,13 @@ function RegisterPageContent() {
                 <motion.button
                   key={item.type}
                   onClick={() => setRegisterType(item.type as any)}
-                  whileHover={{ scale: 1.02 }}
+                  whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   className={cn(
-                    "flex-1 py-4 text-sm font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2",
-                    registerType === item.type ? "text-white" : "text-gray-400",
+                    "flex-1 py-4 text-sm font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer border-2",
+                    registerType === item.type
+                      ? "text-white border-transparent"
+                      : "text-gray-400 border-transparent hover:border-white/10 hover:text-white",
                   )}
                 >
                   <span className="text-lg">{item.icon}</span>
@@ -670,18 +686,33 @@ const CTA = ({ delay }: any) => (
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     transition={{ delay }}
-    className="mt-6 text-center"
+    className="mt-6 space-y-4"
   >
-    <p className="text-gray-500 text-sm">
+    <p className="text-gray-500 text-sm text-center">
       Already have an account?{" "}
       <Link
         href="/login"
-        className="text-white font-bold hover:text-brand-red transition-colors relative group"
+        className="text-white font-bold hover:text-brand-red transition-colors relative group cursor-pointer"
       >
         Log in
         <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-brand-red group-hover:w-full transition-all duration-300"></span>
       </Link>
     </p>
+
+    {/* Admin Link */}
+    <div className="text-center pt-4 border-t border-white/10">
+      <Link
+        href="/admin/login"
+        className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-brand-red transition-all group cursor-pointer px-4 py-2 rounded-xl hover:bg-white/5"
+      >
+        <Shield size={16} className="group-hover:animate-pulse" />
+        <span>Are you an Admin?</span>
+        <ArrowLeft
+          className="rotate-180 group-hover:translate-x-1 transition-transform"
+          size={14}
+        />
+      </Link>
+    </div>
   </motion.div>
 );
 
