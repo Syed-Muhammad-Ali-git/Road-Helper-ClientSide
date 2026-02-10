@@ -49,7 +49,7 @@ const HeroSectionComponent = () => {
               <Title className="font-satoshi text-5xl md:text-7xl font-extrabold leading-[1.1] text-white mb-6 tracking-tight">
                 Stuck on the road? <br />
                 <span className="text-gradient-red">
-                  We've got you covered.
+                  We&apos;ve got you covered.
                 </span>
               </Title>
 
@@ -64,7 +64,7 @@ const HeroSectionComponent = () => {
                 <Link href="/register?type=customer">
                   <Button
                     size="xl"
-                    className="bg-gradient-to-r from-brand-red to-brand-dark-red hover:from-brand-dark-red hover:to-brand-red transition-all hover:scale-105 active:scale-95 shadow-xl shadow-red-600/20 rounded-full px-8 h-14 text-white font-bold"
+                    className="bg-linear-to-r from-brand-red to-brand-dark-red hover:from-brand-dark-red hover:to-brand-red transition-all hover:scale-105 active:scale-95 shadow-xl shadow-red-600/20 rounded-full px-8 h-14 text-white font-bold"
                     leftSection={<IconMapPin size={22} stroke={2} />}
                   >
                     Request Help Now
@@ -116,8 +116,8 @@ const HeroSectionComponent = () => {
               transition={{ duration: 0.8, delay: 0.2, type: "spring" }}
               className="relative z-10"
             >
-              <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl shadow-black/50 border border-white/10 aspect-[4/3] group">
-                <div className="absolute inset-0 bg-gradient-to-br from-brand-charcoal to-brand-black z-0" />
+              <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl shadow-black/50 border border-white/10 aspect-4/3 group">
+                <div className="absolute inset-0 bg-linear-to-br from-brand-charcoal to-brand-black z-0" />
 
                 <Image
                   src="/assets/images/hero-illustration.png"
@@ -131,7 +131,7 @@ const HeroSectionComponent = () => {
                   initial={{ y: 40, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.6 }}
-                  className="absolute bottom-6 left-6 right-6 glass-dark p-4 rounded-2xl flex items-center gap-4 border border-white/10"
+                  className="absolute bottom-6 left-0 right-6 glass-dark p-4 rounded-2xl flex items-center gap-4 border border-white/10"
                 >
                   <div className="w-12 h-12 rounded-full bg-brand-red/20 flex items-center justify-center text-brand-red">
                     <IconMapPin size={24} />
