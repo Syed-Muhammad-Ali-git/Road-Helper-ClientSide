@@ -11,7 +11,8 @@ import {
   Group,
   ThemeIcon,
 } from "@mantine/core";
-import { useForm, zodResolver } from "@mantine/form";
+import { useForm } from "@mantine/form";
+import { zodResolver } from "mantine-form-zod-resolver";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   IconMail,

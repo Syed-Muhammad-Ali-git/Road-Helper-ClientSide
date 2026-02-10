@@ -13,7 +13,8 @@ const customerItems = [
   { text: "Dashboard", icon: LayoutDashboard, path: "/customer/dashboard" },
   { text: "Profile", icon: User, path: "/customer/profile" },
   { text: "History", icon: History, path: "/customer/history" },
-  { text: "Help", icon: HelpCircle, path: "/customer/help" },
+  { text: "Help", icon: HelpCircle, path: "/customer/request-help" },
+  { text: "My Requests", icon: HelpCircle, path: "/customer/request-status" },
 ];
 
 const CustomerSideBar = ({ open, setOpen }: SideBarProps) => {

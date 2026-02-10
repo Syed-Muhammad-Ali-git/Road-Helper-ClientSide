@@ -165,8 +165,7 @@ function RequestHelpContent() {
               </ThemeIcon>
               <Title order={3}>Request Submitted!</Title>
               <Text c="dimmed">
-                Your request has been logged to the console. In a real
-                application, this would be sent to our servers.
+                Your request has been submitted successfully.
               </Text>
               <Button
                 variant="light"
@@ -179,9 +178,6 @@ function RequestHelpContent() {
               >
                 Make Another Request
               </Button>
-              <Text size="sm" c="dimmed" mt="md">
-                Check browser console for submitted data
-              </Text>
             </Stack>
           </Stepper.Completed>
         </Stepper>

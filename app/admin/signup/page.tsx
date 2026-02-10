@@ -11,8 +11,6 @@ import {
   Group,
   SimpleGrid,
   Box,
-  Label,
-  Input,
 } from "@mantine/core";
 import { setCookie } from "cookies-next";
 import { useForm } from "@mantine/form";

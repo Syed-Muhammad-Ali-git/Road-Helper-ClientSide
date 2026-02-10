@@ -434,10 +434,7 @@ const RequestDetailPage = () => {
                   </div>
                 </Stack>
 
-                <Button
-                  fullWidth
-                  className="mt-10 bg-white/5 hover:bg-white/10 text-white h-14 rounded-2xl border border-white/5 font-black uppercase text-[10px] tracking-widest"
-                >
+                <Button className="w-full mt-10 bg-white/5 hover:bg-white/10 text-white h-14 rounded-2xl border border-white/5 font-black uppercase text-[10px] tracking-widest">
                   Access Personnel File
                 </Button>
               </Paper>
@@ -506,8 +503,7 @@ const RequestDetailPage = () => {
 
                 <Button
                   onClick={() => toast.info("Reassigning...")}
-                  fullWidth
-                  className="bg-transparent hover:bg-brand-red border-2 border-brand-red/30 hover:border-brand-red text-white h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all"
+                  className="w-full bg-transparent hover:bg-brand-red border-2 border-brand-red/30 hover:border-brand-red text-white h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all"
                 >
                   Reassign Specialist
                 </Button>

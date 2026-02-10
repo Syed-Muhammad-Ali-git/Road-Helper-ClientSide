@@ -19,6 +19,7 @@ import {
   SimpleGrid,
   Select,
   ScrollArea,
+  Stack,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {

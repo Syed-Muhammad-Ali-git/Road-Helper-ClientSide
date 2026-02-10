@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, memo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   SimpleGrid,
   Paper,
@@ -12,9 +12,7 @@ import {
   Table,
   Button,
   Box,
-  Tooltip,
   Avatar,
-  ScrollArea,
   ActionIcon,
 } from "@mantine/core";
 import {
@@ -24,14 +22,12 @@ import {
   IconActivity,
   IconTrendingUp,
   IconPercentage,
-  IconUserShield,
-  IconMapPin,
   IconArrowRight,
   IconDownload,
   IconCrown,
   IconSparkles,
 } from "@tabler/icons-react";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   AreaChart,
   Area,
@@ -169,23 +165,23 @@ const AdminDashboard = () => {
         y_target: Math.random() * 100 + "%",
         duration: Math.random() * 15 + 10,
       })),
-    [],
+    []
   );
 
   const totalCommission = useMemo(
     () => recentRequests.reduce((sum, r) => sum + r.amount * 0.2, 0),
-    [],
+    []
   );
   const paidCommission = useMemo(
     () =>
       recentRequests
         .filter((r) => r.hasCommissionPaid)
         .reduce((sum, r) => sum + r.amount * 0.2, 0),
-    [],
+    []
   );
   const pendingCommission = useMemo(
     () => totalCommission - paidCommission,
-    [totalCommission, paidCommission],
+    [totalCommission, paidCommission]
   );
 
   const handleDownloadReport = useCallback(() => {
@@ -195,7 +191,7 @@ const AdminDashboard = () => {
       recentRequests
         .map(
           (e) =>
-            `${e.id},${e.user},${e.type},${e.status},${e.helper},${e.amount}`,
+            `${e.id},${e.user},${e.type},${e.status},${e.helper},${e.amount}`
         )
         .join("\n");
     const encodedUri = encodeURI(csvContent);
@@ -314,14 +310,14 @@ const AdminDashboard = () => {
                 <div
                   className={cn(
                     "absolute inset-0 bg-gradient-to-br opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500",
-                    stat.gradient,
+                    stat.gradient
                   )}
                 />
 
                 <Group justify="space-between" mb={24}>
                   <div
                     className={cn(
-                      "h-12 w-12 rounded-2xl flex items-center justify-center border border-white/5 bg-white/5 shadow-inner transition-transform group-hover:scale-110",
+                      "h-12 w-12 rounded-2xl flex items-center justify-center border border-white/5 bg-white/5 shadow-inner transition-transform group-hover:scale-110"
                     )}
                   >
                     <stat.icon
@@ -330,10 +326,10 @@ const AdminDashboard = () => {
                         stat.color === "blue"
                           ? "text-blue-400"
                           : stat.color === "green"
-                            ? "text-emerald-400"
-                            : stat.color === "violet"
-                              ? "text-violet-400"
-                              : "text-brand-red",
+                          ? "text-emerald-400"
+                          : stat.color === "violet"
+                          ? "text-violet-400"
+                          : "text-brand-red"
                       )}
                     />
                   </div>
@@ -694,8 +690,8 @@ const AdminDashboard = () => {
                               req.status === "Completed"
                                 ? "bg-green-500"
                                 : req.status === "Pending"
-                                  ? "bg-orange-500 shadow-[0_0_10px_#f97316]"
-                                  : "bg-blue-500",
+                                ? "bg-orange-500 shadow-[0_0_10px_#f97316]"
+                                : "bg-blue-500"
                             )}
                           />
                           <Text
@@ -706,8 +702,8 @@ const AdminDashboard = () => {
                               req.status === "Completed"
                                 ? "text-green-500"
                                 : req.status === "Pending"
-                                  ? "text-orange-500"
-                                  : "text-blue-500",
+                                ? "text-orange-500"
+                                : "text-blue-500"
                             )}
                           >
                             {req.status}
@@ -733,7 +729,7 @@ const AdminDashboard = () => {
                             "inline-flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-black",
                             req.hasCommissionPaid
                               ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                              : "bg-brand-red/5 border-red-500/20 text-brand-red",
+                              : "bg-brand-red/5 border-red-500/20 text-brand-red"
                           )}
                         >
                           <IconActivity size={10} />

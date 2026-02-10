@@ -31,6 +31,7 @@ import {
   IconActivity,
   IconSparkles,
   IconMap2,
+  IconShieldCheck,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";

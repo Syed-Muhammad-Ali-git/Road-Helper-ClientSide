@@ -36,7 +36,11 @@ export const CTASection = () => {
             className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-brand-red/30 blur-[120px] rounded-full"
           />
 
-          <SimpleGrid cols={{ base: 1, lg: 2 }} spacing={60} align="center">
+          <SimpleGrid
+            cols={{ base: 1, lg: 2 }}
+            spacing={60}
+            className="items-center"
+          >
             <motion.div
               initial={{ opacity: 0, x: -40 }}
               whileInView={{ opacity: 1, x: 0 }}

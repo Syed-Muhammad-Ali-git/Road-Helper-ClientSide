@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Activity } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -24,6 +24,7 @@ import {
   Shield,
   Eye,
   EyeOff,
+  Activity,
 } from "lucide-react";
 
 const loginSchema = z.object({
@@ -247,7 +248,6 @@ export default function AdminLoginPage() {
                 </Label>
                 <Link
                   href="/forgot-password"
-                  size="xs"
                   className="text-[10px] font-black text-brand-red/70 hover:text-brand-red transition-colors uppercase tracking-widest no-underline"
                 >
                   Reset Link?
@@ -306,9 +306,9 @@ export default function AdminLoginPage() {
           </form>
 
           <div className="mt-12 pt-8 border-t border-white/5 text-center">
-            <Text className="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em]">
+            <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em]">
               System Operator Priority Access Only
-            </Text>
+            </p>
           </div>
         </motion.div>
       </div>

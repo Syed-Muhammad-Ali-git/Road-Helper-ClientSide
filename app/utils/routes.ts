@@ -44,10 +44,6 @@ const publicRoutes = [
 /**
  * All protected routes (for backward compatibility)
  */
-
-/**
- * All protected routes (for backward compatibility)
- */
 const protectedRoutes = [...customerRoutes, ...helperRoutes, ...adminRoutes];
 
 export {
