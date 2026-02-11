@@ -9,7 +9,14 @@ import {
   updateDoc,
   where,
   type Unsubscribe,
+  type Timestamp,
 } from "firebase/firestore";
+
+function toDate(v: unknown): Date {
+  if (v instanceof Date) return v;
+  if (v && typeof (v as Timestamp).toDate === "function") return (v as Timestamp).toDate();
+  return new Date();
+}
 import { db } from "@/lib/firebase/config";
 import { COLLECTIONS } from "@/lib/firebase/collections";
 import type {
@@ -21,6 +28,7 @@ import type {
 
 export interface CreateRideRequestInput {
   customerId: string;
+  customerName?: string;
   serviceType: ServiceType;
   location: GeoLocation;
   vehicleDetails: string;
@@ -30,7 +38,9 @@ export interface CreateRideRequestInput {
 export async function createRideRequest(input: CreateRideRequestInput) {
   const ref = await addDoc(collection(db, COLLECTIONS.RIDE_REQUESTS), {
     customerId: input.customerId,
+    customerName: input.customerName ?? null,
     helperId: null,
+    helperName: null,
     serviceType: input.serviceType,
     status: "pending" as RideStatus,
     location: input.location,
@@ -49,11 +59,13 @@ export async function createRideRequest(input: CreateRideRequestInput) {
 export async function acceptRideRequest(params: {
   requestId: string;
   helperId: string;
+  helperName?: string;
   helperLocation?: GeoLocation | null;
 }) {
   const ref = doc(db, COLLECTIONS.RIDE_REQUESTS, params.requestId);
   await updateDoc(ref, {
     helperId: params.helperId,
+    helperName: params.helperName ?? null,
     status: "accepted" as RideStatus,
     acceptedAt: serverTimestamp(),
     helperLocation: params.helperLocation ?? null,
@@ -121,14 +133,23 @@ export function subscribePendingRequests(params: {
     where("status", "==", "pending"),
     orderBy("createdAt", "desc"),
   );
-  return onSnapshot(q, (snap) => {
-    params.cb(
-      snap.docs.map((d) => ({
-        id: d.id,
-        ...(d.data() as unknown as RideRequestDoc),
-      })),
-    );
-  });
+  return onSnapshot(
+    q,
+    (snap) => {
+      params.cb(
+        snap.docs.map((d) => {
+          const data = d.data() as Record<string, unknown>;
+          return {
+            id: d.id,
+            ...data,
+            createdAt: toDate(data.createdAt),
+            updatedAt: toDate(data.updatedAt),
+          } as { id: string } & RideRequestDoc;
+        }),
+      );
+    },
+    (err) => console.error("[subscribePendingRequests]", err),
+  );
 }
 
 export function subscribeCustomerRequests(params: {
@@ -140,12 +161,23 @@ export function subscribeCustomerRequests(params: {
     where("customerId", "==", params.customerId),
     orderBy("createdAt", "desc"),
   );
-  return onSnapshot(q, (snap) => {
-    params.cb(
-      snap.docs.map((d) => ({
-        id: d.id,
-        ...(d.data() as unknown as RideRequestDoc),
-      })),
-    );
-  });
+  return onSnapshot(
+    q,
+    (snap) => {
+      params.cb(
+        snap.docs.map((d) => {
+          const data = d.data() as Record<string, unknown>;
+          return {
+            id: d.id,
+            ...data,
+            createdAt: toDate(data.createdAt),
+            updatedAt: toDate(data.updatedAt),
+            acceptedAt: data.acceptedAt ? toDate(data.acceptedAt) : undefined,
+            completedAt: data.completedAt ? toDate(data.completedAt) : undefined,
+          } as { id: string } & RideRequestDoc;
+        }),
+      );
+    },
+    (err) => console.error("[subscribeCustomerRequests]", err),
+  );
 }

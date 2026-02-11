@@ -211,5 +211,13 @@
     "fuel_desc": "Ran out of gas? We'll bring fuel.",
     "tyre_desc": "Breakdown, tire change, diagnostics",
     "tow_desc": "Safe towing to nearest garage."
+  },
+  "request_status": {
+    "back": "Back",
+    "my_requests": "My Requests",
+    "no_requests": "No requests found.",
+    "request_help_now": "Request Help Now",
+    "helper": "Helper",
+    "live_view": "Live View"
   }
 }

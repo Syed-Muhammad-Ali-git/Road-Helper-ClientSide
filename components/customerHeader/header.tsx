@@ -78,20 +78,27 @@ const CustomerHeader: React.FC<HeaderProps> = ({
 
   const headerLeft = isMobile ? 0 : sidebarOpen ? drawerWidth : collapsedWidth;
 
+  // RTL: Header starts from left edge (0), avatar on left. LTR: Header after sidebar.
+  const headerStyle: React.CSSProperties = isRTL
+    ? { left: 0, right: "auto", width: isMobile ? "100%" : `calc(100% - ${headerLeft}px)` }
+    : { left: headerLeft, right: "auto", width: isMobile ? "100%" : `calc(100% - ${headerLeft}px)` };
+
   return (
     <div
-      className={`h-16 fixed top-0 right-0 z-40 flex items-center justify-between px-4 md:px-6 border-b transition-all duration-200 ease-in-out backdrop-blur-xl ${
+      className={`h-16 fixed top-0 z-40 flex items-center justify-between border-b transition-all duration-200 ease-in-out backdrop-blur-xl ${
+        isRTL ? "pl-4 pr-4 md:pl-6 md:pr-6" : "px-4 md:px-6"
+      } ${
         isDark
           ? "bg-[#0a0a0a]/98 border-white/10"
           : "bg-white/98 border-black/10"
       }`}
       style={{
-        left: headerLeft,
-        width: isMobile ? "100%" : `calc(100% - ${headerLeft}px)`,
+        ...headerStyle,
         flexDirection: isRTL ? "row-reverse" : "row",
+        justifyContent: "space-between",
       }}
     >
-      {/* ---------------- LEFT CONTROLS ---------------- */}
+      {/* RTL: Avatar group shows first (visual left). LTR: Hamburger first */}
       <div
         className="flex items-center gap-3"
         style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
@@ -108,7 +115,6 @@ const CustomerHeader: React.FC<HeaderProps> = ({
         >
           <IconMenu2 size={20} />
         </ActionIcon>
-
         <Badge
           color="blue"
           radius="xl"
@@ -127,7 +133,6 @@ const CustomerHeader: React.FC<HeaderProps> = ({
         </Text>
       </div>
 
-      {/* ---------------- RIGHT CONTROLS ---------------- */}
       <Group gap={12} style={{ flexDirection: isRTL ? "row-reverse" : "row" }}>
         {/* Theme Toggle */}
         <ActionIcon

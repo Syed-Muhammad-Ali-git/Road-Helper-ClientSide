@@ -58,6 +58,14 @@ service cloud.firestore {
       allow delete: if isAuth();
     }
     
+    // Ride requests - real-time roadside assistance
+    match /rideRequests/{requestId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update: if isAuth();
+      allow delete: if isAuth();
+    }
+    
     // Plans - read-only
     match /plans/{planId} {
       allow read: if isAuth();

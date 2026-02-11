@@ -96,8 +96,10 @@ function RequestHelpContent() {
             }
           : { lat: 24.8607, lng: 67.0011, address: values.location };
 
+        const displayName = auth.currentUser?.displayName ?? auth.currentUser?.email?.split("@")[0] ?? "Customer";
         const id = await createRideRequest({
           customerId: uid,
+          customerName: displayName,
           serviceType,
           location,
           vehicleDetails: values.vehicleDetails,

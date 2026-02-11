@@ -231,10 +231,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
             >
               <Button
                 onClick={() => {
-                  // Immediate skip: set progress to 100 and hide
-                  setProgress(100);
-                  setBootProgress(100);
-                  setTimeout(() => handleComplete(), 100);
+                  handleComplete();
                 }}
                 variant="outline"
                 color="yellow"

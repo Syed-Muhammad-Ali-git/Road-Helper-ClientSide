@@ -23,6 +23,9 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { auth } from "@/lib/firebase/config";
 import { subscribeCustomerRequests } from "@/lib/services/requestService";
+import { useLanguage } from "@/app/context/LanguageContext";
+import { useAppTheme } from "@/app/context/ThemeContext";
+import { cn } from "@/lib/utils";
 import type { RideRequestDoc } from "@/types";
 
 /* ---------------- TYPES ---------------- */
@@ -41,6 +44,8 @@ interface Request {
 export default function RequestStatusList() {
   const [requests, setRequests] = useState<Request[]>([]);
   const [uid, setUid] = useState<string | null>(null);
+  const { dict } = useLanguage();
+  const { isDark } = useAppTheme();
 
   useEffect(() => {
     const unsub = auth.onAuthStateChanged((u) => setUid(u?.uid ?? null));
@@ -57,7 +62,7 @@ export default function RequestStatusList() {
             id: r.id,
             serviceType: r.serviceType,
             status: r.status,
-            helperName: r.customerName ?? null,
+            helperName: r.helperName ?? r.customerName ?? null,
             location: r.location?.address ?? "Live location",
             createdAt: r.createdAt,
           })),
@@ -81,7 +86,7 @@ export default function RequestStatusList() {
   }, []);
 
   return (
-    <Box className="min-h-screen p-4 md:p-8 bg-brand-black text-white">
+    <Box className={cn("min-h-screen p-4 md:p-8 transition-colors", isDark ? "bg-gray-950" : "bg-gray-50")}>
       <Stack gap="xl" className="max-w-5xl mx-auto">
         <Group justify="space-between">
           <Group>
@@ -90,36 +95,51 @@ export default function RequestStatusList() {
               leftSection={<IconArrowLeft size={20} />}
               component={Link}
               href="/customer/dashboard"
-              className="text-gray-400 hover:text-white"
+              className={cn("hover:scale-105 transition-transform", isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900")}
             >
-              Back
+              {dict.request_status.back}
             </Button>
             <Title
               order={1}
-              className="font-manrope text-3xl font-bold bg-linear-to-r from-white to-gray-400 bg-clip-text text-transparent"
+              className={cn(
+                "font-manrope text-3xl font-bold bg-linear-to-r bg-clip-text text-transparent",
+                isDark ? "from-white to-gray-400" : "from-gray-900 to-gray-600"
+              )}
             >
-              My Requests
+              {dict.request_status.my_requests}
             </Title>
           </Group>
         </Group>
 
         {requests.length === 0 ? (
-          <Paper
-            p="xl"
-            radius="xl"
-            className="text-center bg-brand-charcoal border border-gray-800"
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
           >
-            <Text className="text-gray-400">No requests found.</Text>
-            <Button
-              component={Link}
-              href="/customer/request-help"
-              mt="md"
-              variant="light"
-              color="red"
+            <Paper
+              p="xl"
+              radius="xl"
+              className={cn(
+                "text-center border transition-colors",
+                isDark ? "bg-brand-charcoal border-gray-800" : "bg-white border-gray-200"
+              )}
             >
-              Request Help Now
-            </Button>
-          </Paper>
+              <Text className={cn("mb-4", isDark ? "text-gray-400" : "text-gray-600")}>
+                {dict.request_status.no_requests}
+              </Text>
+              <Button
+                component={Link}
+                href="/customer/request-help"
+                mt="md"
+                variant="light"
+                color="red"
+                className="hover:scale-105 active:scale-95 transition-transform"
+              >
+                {dict.request_status.request_help_now}
+              </Button>
+            </Paper>
+          </motion.div>
         ) : (
           <Stack gap="lg">
             {requests.map((request, index) => (
@@ -132,7 +152,10 @@ export default function RequestStatusList() {
                 <Paper
                   p="lg"
                   radius="lg"
-                  className="bg-brand-charcoal border border-gray-800 hover:border-brand-red/50 transition-colors shadow-lg"
+                  className={cn(
+                    "border transition-all shadow-lg hover:shadow-xl hover:-translate-y-1",
+                    isDark ? "bg-brand-charcoal border-gray-800 hover:border-brand-red/50" : "bg-white border-gray-200 hover:border-brand-red/40"
+                  )}
                 >
                   <Group
                     justify="space-between"
@@ -194,9 +217,9 @@ export default function RequestStatusList() {
                         {request.status.replace("_", " ")}
                       </Badge>
                       {request.helperName && (
-                        <Text size="sm" className="text-gray-400">
-                          Helper:{" "}
-                          <span className="text-white font-semibold">
+                        <Text size="sm" className={cn(isDark ? "text-gray-400" : "text-gray-600")}>
+                          {dict.request_status.helper}:{" "}
+                          <span className={cn("font-semibold", isDark ? "text-white" : "text-gray-900")}>
                             {request.helperName}
                           </span>
                         </Text>
@@ -208,9 +231,9 @@ export default function RequestStatusList() {
                         component={Link}
                         href={`/journey/${request.id}`}
                         size="sm"
-                        className="mt-2 w-full md:w-auto shadow-md hover:shadow-xl transition-shadow"
+                        className="mt-2 w-full md:w-auto shadow-md hover:shadow-xl transition-all hover:scale-105 active:scale-95"
                       >
-                        Live View
+                        {dict.request_status.live_view}
                       </Button>
                     </Stack>
                   </Group>

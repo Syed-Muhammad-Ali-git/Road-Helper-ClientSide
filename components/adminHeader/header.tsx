@@ -70,18 +70,21 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
   }, [setSidebarOpen, sidebarOpen]);
 
   const headerLeft = isMobile ? 0 : sidebarOpen ? drawerWidth : collapsedWidth;
+  const headerStyle: React.CSSProperties = isRTL
+    ? { left: 0, right: "auto", width: isMobile ? "100%" : `calc(100% - ${headerLeft}px)` }
+    : { left: headerLeft, right: "auto", width: isMobile ? "100%" : `calc(100% - ${headerLeft}px)` };
 
   return (
     <div
-      className={`h-16 fixed top-0 right-0 z-40 flex items-center justify-between px-4 md:px-6 border-b transition-all duration-200 ease-in-out backdrop-blur-xl ${
+      className={`h-16 fixed top-0 z-40 flex items-center justify-between px-4 md:px-6 border-b transition-all duration-200 ease-in-out backdrop-blur-xl ${
         isDark
           ? "bg-[#0a0a0a]/98 border-white/10"
           : "bg-white/98 border-black/10"
       }`}
       style={{
-        left: headerLeft,
-        width: isMobile ? "100%" : `calc(100% - ${headerLeft}px)`,
+        ...headerStyle,
         flexDirection: isRTL ? "row-reverse" : "row",
+        justifyContent: "space-between",
       }}
     >
       <div

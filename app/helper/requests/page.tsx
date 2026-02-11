@@ -214,6 +214,7 @@ export default function NearbyRequestsUI() {
                         disabled={!isOnline || acceptingId !== null}
                         onClick={async () => {
                           const helperId = auth.currentUser?.uid;
+                          const helperName = auth.currentUser?.displayName ?? auth.currentUser?.email?.split("@")[0] ?? "Helper";
                           if (!helperId) {
                             await showError(
                               "Not signed in",
@@ -233,6 +234,7 @@ export default function NearbyRequestsUI() {
                             await acceptRideRequest({
                               requestId: req.id,
                               helperId,
+                              helperName,
                               helperLocation: {
                                 lat: live.coords.lat,
                                 lng: live.coords.lng,

@@ -25,6 +25,7 @@ export interface RideRequestDoc {
   customerId: string;
   customerName?: string;
   helperId: string | null;
+  helperName?: string | null;
   serviceType: ServiceType;
   status: RideStatus;
   location: GeoLocation;
