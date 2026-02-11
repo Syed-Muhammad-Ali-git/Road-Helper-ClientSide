@@ -71,7 +71,7 @@ function RegisterPageContent() {
   const defaultType =
     searchParams.get("type") === "helper" ? "helper" : "customer";
   const [registerType, setRegisterType] = useState<"customer" | "helper">(
-    defaultType as "customer" | "helper"
+    defaultType as "customer" | "helper",
   );
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -180,11 +180,12 @@ function RegisterPageContent() {
   ];
 
   const safeWidth = typeof window !== "undefined" ? window.innerWidth : 1920;
-const safeHeight = typeof window !== "undefined" ? window.innerHeight : 1080;
-
+  const safeHeight = typeof window !== "undefined" ? window.innerHeight : 1080;
 
   return (
-    <div className={`min-h-screen flex bg-gradient-to-br from-black via-brand-black to-black font-satoshi text-white overflow-hidden relative ${isRTL ? "font-urdu" : "font-satoshi"}`}>
+    <div
+      className={`min-h-screen flex bg-gradient-to-br from-black via-brand-black to-black font-satoshi text-white overflow-hidden relative ${isRTL ? "font-urdu" : "font-satoshi"}`}
+    >
       {/* Animated Background Particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(25)].map((_, i) => (
@@ -192,22 +193,14 @@ const safeHeight = typeof window !== "undefined" ? window.innerHeight : 1080;
             key={i}
             className="absolute w-1.5 h-1.5 bg-gradient-to-r from-brand-red to-orange-500 rounded-full"
             initial={{
-             x: Math.random() * safeWidth,
-y: Math.random() * safeHeight,
+              x: Math.random() * safeWidth,
+              y: Math.random() * safeHeight,
 
               scale: Math.random() * 0.5 + 0.5,
             }}
             animate={{
-              y: [
-                null,
-                Math.random() *
-                 safeHeight,
-              ],
-              x: [
-                null,
-                Math.random() *
-                  safeWidth,
-              ],
+              y: [null, Math.random() * safeHeight],
+              x: [null, Math.random() * safeWidth],
               opacity: [0.1, 1, 0.1],
               scale: [null, Math.random() * 2 + 0.5],
             }}
@@ -250,12 +243,19 @@ y: Math.random() * safeHeight,
 
       {/* Left Side - Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative z-10 bg-black/30 backdrop-blur-sm">
-        <Link href="/" className={`absolute top-4 ${isRTL ? "right-4 sm:right-8" : "left-4 sm:left-8"} sm:top-8 group z-20`}>
+        <Link
+          href="/"
+          className={`absolute top-4 ${isRTL ? "right-4 sm:right-8" : "left-4 sm:left-8"} sm:top-8 group z-20`}
+        >
           <motion.div
             whileHover={{ scale: 1.05, x: isRTL ? 5 : -5 }}
             className="flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-brand-red transition-all"
           >
-            {isRTL ? <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /> : <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />}
+            {isRTL ? (
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            ) : (
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            )}
             <span>{dict.auth.back_to_home}</span>
           </motion.div>
         </Link>
@@ -296,9 +296,7 @@ y: Math.random() * safeHeight,
             <h2 className="font-manrope text-5xl font-bold mb-3 bg-gradient-to-r from-white via-gray-100 to-white bg-clip-text text-transparent">
               {dict.auth.create_account}
             </h2>
-            <p className="text-gray-400 text-lg">
-              {dict.auth.join_roadhelper}
-            </p>
+            <p className="text-gray-400 text-lg">{dict.auth.join_roadhelper}</p>
           </motion.div>
 
           {/* Enhanced Toggle Switch */}
@@ -323,7 +321,9 @@ y: Math.random() * safeHeight,
               ].map((item) => (
                 <motion.button
                   key={item.type}
-                  onClick={() => setRegisterType(item.type as "customer" | "helper")}
+                  onClick={() =>
+                    setRegisterType(item.type as "customer" | "helper")
+                  }
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   className={cn(
@@ -393,11 +393,11 @@ y: Math.random() * safeHeight,
                     delay={0.5}
                   />
                 </form>
-                <CTA 
-                  delay={0.6} 
-                  type="customer" 
-                  onGoogle={handleGoogleSignup} 
-                  isLoading={isLoading} 
+                <CTA
+                  delay={0.6}
+                  type="customer"
+                  onGoogle={handleGoogleSignup}
+                  isLoading={isLoading}
                 />
               </motion.div>
             ) : (
@@ -470,12 +470,11 @@ y: Math.random() * safeHeight,
                     delay={0.4}
                   />
                 </form>
-                </form>
-                <CTA 
-                  delay={0.5} 
-                  type="helper" 
-                  onGoogle={handleGoogleSignup} 
-                  isLoading={isLoading} 
+                <CTA
+                  delay={0.5}
+                  type="helper"
+                  onGoogle={handleGoogleSignup}
+                  isLoading={isLoading}
                 />
               </motion.div>
             )}
@@ -531,13 +530,11 @@ y: Math.random() * safeHeight,
             className="text-7xl font-bold leading-tight mb-6"
           >
             {dict.auth.join_the_future.split("Future").map((part, i) => (
-               // Simple split logic might break in other languages, so using full new text structure would be safer
-               // But for now, let's just replace the content fully with dict values
-               <span key={i}></span>
+              // Simple split logic might break in other languages, so using full new text structure would be safer
+              // But for now, let's just replace the content fully with dict values
+              <span key={i}></span>
             ))}
-            <span className="block">
-              {dict.auth.join_the_future}
-            </span>
+            <span className="block">{dict.auth.join_the_future}</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
@@ -578,7 +575,6 @@ y: Math.random() * safeHeight,
           ))}
         </motion.div>
       </motion.div>
-
     </div>
   );
 }
@@ -756,7 +752,12 @@ interface SubmitButtonProps {
   loadingText?: string;
 }
 
-const SubmitButton = ({ isLoading, text, delay, loadingText = "Creating..." }: SubmitButtonProps) => (
+const SubmitButton = ({
+  isLoading,
+  text,
+  delay,
+  loadingText = "Creating...",
+}: SubmitButtonProps) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
@@ -868,7 +869,17 @@ const CTA = ({ delay, type, onGoogle, isLoading }: CTAProps) => {
         >
           <Shield size={16} className="group-hover:animate-pulse" />
           <span>{dict.auth.are_you_admin}</span>
-          {isRTL ? <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> : <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />}
+          {isRTL ? (
+            <ArrowLeft
+              size={14}
+              className="group-hover:-translate-x-1 transition-transform"
+            />
+          ) : (
+            <ArrowRight
+              size={14}
+              className="group-hover:translate-x-1 transition-transform"
+            />
+          )}
         </Link>
       </div>
     </motion.div>

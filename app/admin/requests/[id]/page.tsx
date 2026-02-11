@@ -183,7 +183,7 @@ const RequestDetailPage = () => {
           {/* Primary Intel */}
           <div className="lg:col-span-8 space-y-8">
             {/* Mission Progress */}
-            <motion.div variants={itemVariants as any}>
+            <motion.div variants={itemVariants}>
               <Paper
                 p={40}
                 radius="40px"
@@ -265,7 +265,7 @@ const RequestDetailPage = () => {
             </motion.div>
 
             {/* Deployment Details */}
-            <motion.div variants={itemVariants as any}>
+            <motion.div variants={itemVariants}>
               <Paper
                 p={40}
                 radius="40px"
@@ -369,7 +369,7 @@ const RequestDetailPage = () => {
           {/* Sidebar Intel */}
           <div className="lg:col-span-4 space-y-8">
             {/* Asset: Requester */}
-            <motion.div variants={itemVariants as any}>
+            <motion.div variants={itemVariants}>
               <Paper
                 p={32}
                 radius="40px"
@@ -443,7 +443,7 @@ const RequestDetailPage = () => {
             </motion.div>
 
             {/* Asset: Deployer */}
-            <motion.div variants={itemVariants as any}>
+            <motion.div variants={itemVariants}>
               <Paper
                 p={32}
                 radius="40px"

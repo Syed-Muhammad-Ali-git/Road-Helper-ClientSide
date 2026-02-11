@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, memo, useCallback } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   Title,
   Text,
@@ -90,11 +90,9 @@ const initialUsers = [
 ];
 
 const UsersPage = () => {
-  const [isLoaded] = useState(true);
   const [opened, { open, close }] = useDisclosure(false);
   const [users, setUsers] = useState(initialUsers);
   const [search, setSearch] = useState("");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [newUser, setNewUser] = useState({
     firstName: "",
     lastName: "",
@@ -127,7 +125,7 @@ const UsersPage = () => {
     const { isConfirmed } = await showConfirm(
       "Delete User",
       "Are you sure you want to delete this user?",
-      "Yes, delete"
+      "Yes, delete",
     );
     if (isConfirmed) {
       setUsers((prev) => prev.filter((u) => u.id !== id));
@@ -180,7 +178,7 @@ const UsersPage = () => {
       </div>
 
       <motion.div
-        variants={containerVariants as any}
+        variants={containerVariants}
         initial="hidden"
         animate="visible"
         className="relative z-10 max-w-7xl mx-auto"
@@ -189,7 +187,7 @@ const UsersPage = () => {
         <Group justify="space-between" mb={40} align="flex-end">
           <Box>
             <motion.div
-              variants={itemVariants as any}
+              variants={itemVariants}
               className="flex items-center gap-2 mb-2"
             >
               <IconUsers size={16} className="text-brand-red" />
@@ -210,7 +208,7 @@ const UsersPage = () => {
               Monitoring {users.length} registered accounts across the platform.
             </Text>
           </Box>
-          <motion.div variants={itemVariants as any} className="flex gap-4">
+          <motion.div variants={itemVariants} className="flex gap-4">
             <Button
               variant="default"
               className="bg-white/5 text-white border-white/10 hover:bg-white/10 h-14 rounded-2xl px-6 transition-all font-bold"
@@ -229,7 +227,7 @@ const UsersPage = () => {
         </Group>
 
         {/* TOOLBAR & SEARCH */}
-        <motion.div variants={itemVariants as any} className="mb-8">
+        <motion.div variants={itemVariants} className="mb-8">
           <Paper
             p={24}
             radius="32px"
@@ -275,7 +273,7 @@ const UsersPage = () => {
         </motion.div>
 
         {/* DATA TABLE */}
-        <motion.div variants={itemVariants as any}>
+        <motion.div variants={itemVariants}>
           <Paper
             radius="32px"
             className="glass-dark border border-white/10 overflow-hidden shadow-2xl relative"
@@ -456,7 +454,7 @@ const UsersPage = () => {
 
         {/* PAGINATION */}
         <motion.div
-          variants={itemVariants as any}
+          variants={itemVariants}
           className="mt-12 flex justify-between items-center"
         >
           <Text className="text-gray-600 text-xs font-bold uppercase tracking-widest">
@@ -502,7 +500,7 @@ const UsersPage = () => {
             <TextInput
               label="Legal First Name"
               placeholder="John"
-              {...newUser}
+              value={newUser.firstName}
               onChange={(e) =>
                 setNewUser({ ...newUser, firstName: e.target.value })
               }
@@ -516,6 +514,7 @@ const UsersPage = () => {
             <TextInput
               label="Legal Last Name"
               placeholder="Doe"
+              value={newUser.lastName}
               className="last"
               onChange={(e) =>
                 setNewUser({ ...newUser, lastName: e.target.value })
@@ -531,6 +530,7 @@ const UsersPage = () => {
           <TextInput
             label="Verification Email"
             placeholder="john@protocol.com"
+            value={newUser.email}
             onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
             classNames={{
               label:
@@ -542,6 +542,7 @@ const UsersPage = () => {
           <Select
             label="Privilege Protocol"
             placeholder="Select Role"
+            value={newUser.role}
             data={["Customer", "Helper", "Admin"]}
             onChange={(val) => setNewUser({ ...newUser, role: val || "" })}
             classNames={{

@@ -112,15 +112,17 @@ const ClientDashboard = () => {
     }
   }, []);
 
-  const particles = useMemo(
-    () =>
+  const [particles, setParticles] = useState<any[]>([]);
+
+  useEffect(() => {
+    setParticles(
       [...Array(15)].map((_, i) => ({
         x: Math.random() * 100 + "%",
         y_target: Math.random() * 100 + "%",
         duration: Math.random() * 10 + 10,
       })),
-    [],
-  );
+    );
+  }, []);
 
   return (
     <Box className="relative min-h-screen bg-[#0a0a0a] overflow-hidden p-4 md:p-8">

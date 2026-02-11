@@ -62,11 +62,6 @@ export const { setUser, setToken, setLoading, setError, logout } =
   authSlice.actions;
 
 // Manual async thunk - Firebase calls ONLY inside
-const setAuthCookies = (token: string, role: UserRole) => {
-  const { setCookie } = require("cookies-next");
-  setCookie("token", token, { maxAge: 60 * 60 * 24 * 7, path: "/" });
-  setCookie("role", role, { maxAge: 60 * 60 * 24 * 7, path: "/" });
-};
 
 export const loginWithEmail =
   (email: string, password: string, role: UserRole) =>

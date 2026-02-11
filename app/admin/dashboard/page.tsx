@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import {
   SimpleGrid,
   Paper,
@@ -152,7 +152,10 @@ const itemVariants: Variants = {
 };
 
 const AdminDashboard = () => {
-  const [isLoaded] = useState(true);
+  const [isLoaded, setIsLoaded] = useState(false);
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
   const [particles] = useState<
     Array<{ x: string; y_target: string; duration: number }>
   >(() =>

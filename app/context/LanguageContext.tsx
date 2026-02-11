@@ -33,9 +33,6 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     if (savedLang === "ur") {
       setLanguageState("ur");
       setDict(ur);
-    } else {
-      setLanguageState("en");
-      setDict(en);
     }
   }, []);
 

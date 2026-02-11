@@ -53,6 +53,18 @@ const HelperDashboard = () => {
     }
   }, []);
 
+  const [particles, setParticles] = useState<any[]>([]);
+
+  useEffect(() => {
+    setParticles(
+      [...Array(12)].map(() => ({
+        x: Math.random() * 100 + "%",
+        y: Math.random() * 100 + "%",
+        duration: Math.random() * 5 + 5,
+      })),
+    );
+  }, []);
+
   const userData = useMemo(
     () => ({
       fullName: helperName,
@@ -119,20 +131,20 @@ const HelperDashboard = () => {
         />
 
         {isLoaded &&
-          [...Array(12)].map((_, i) => (
+          particles.map((p, i) => (
             <motion.div
               key={i}
               className="absolute w-[2px] h-[2px] bg-orange-500/20 rounded-full"
               initial={{
-                x: Math.random() * 100 + "%",
-                y: Math.random() * 100 + "%",
+                x: p.x,
+                y: p.y,
               }}
               animate={{
                 opacity: [0, 0.8, 0],
                 scale: [0, 1.5, 0],
               }}
               transition={{
-                duration: Math.random() * 5 + 5,
+                duration: p.duration,
                 repeat: Infinity,
                 ease: "easeInOut",
               }}
@@ -335,7 +347,8 @@ const HelperDashboard = () => {
                   </div>
                   <div>
                     <Text className="text-white font-extrabold text-xl tracking-tight">
-                      System Fee Overdue: PKR {userData.pendingPayment.toLocaleString("en-PK")}
+                      System Fee Overdue: PKR{" "}
+                      {userData.pendingPayment.toLocaleString("en-PK")}
                     </Text>
                     <Text className="text-gray-400 font-medium">
                       To maintain your priority status, please settle the

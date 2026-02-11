@@ -20,17 +20,14 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const { colorScheme, setColorScheme } = useMantineColorScheme();
+  const { setColorScheme } = useMantineColorScheme();
   const [theme, setThemeState] = useState<Theme>("dark");
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("rh_theme") as Theme;
-    if (savedTheme) {
+    if (savedTheme && savedTheme !== "dark") {
       setThemeState(savedTheme);
       setColorScheme(savedTheme);
-    } else {
-      setThemeState("dark");
-      setColorScheme("dark");
     }
   }, [setColorScheme]);
 
