@@ -1,31 +1,47 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Container, SimpleGrid, Box, Title, Text } from "@mantine/core";
 import { motion } from "framer-motion";
-
-const stats = [
-  {
-    value: "50k+",
-    label: "ACTIVE USERS",
-    color: "from-brand-red to-orange-500",
-  },
-  {
-    value: "15m",
-    label: "AVG ARRIVAL TIME",
-    color: "from-blue-500 to-indigo-500",
-  },
-  {
-    value: "500+",
-    label: "VERIFIED HELPERS",
-    color: "from-green-500 to-emerald-500",
-  },
-  { value: "98%", label: "SUCCESS RATE", color: "from-purple-500 to-pink-500" },
-];
+import { useLanguage } from "@/app/context/LanguageContext";
+import { useAppTheme } from "@/app/context/ThemeContext";
 
 export const StatsSection = () => {
+  const { dict } = useLanguage();
+  const { theme } = useAppTheme();
+
+  const stats = useMemo(
+    () => [
+      {
+        value: "50k+",
+        label: dict.stats.active_users,
+        color: "from-brand-red to-orange-500",
+      },
+      {
+        value: "15m",
+        label: dict.stats.avg_arrival_time,
+        color: "from-blue-500 to-indigo-500",
+      },
+      {
+        value: "500+",
+        label: dict.stats.verified_helpers,
+        color: "from-green-500 to-emerald-500",
+      },
+      {
+        value: "98%",
+        label: dict.stats.success_rate,
+        color: "from-purple-500 to-pink-500",
+      },
+    ],
+    [dict],
+  );
+
+  const isDark = theme === "dark";
+
   return (
-    <section className="py-20 border-y border-white/5 bg-[#050505]">
+    <section
+      className={`py-20 border-y ${isDark ? "border-white/5 bg-[#050505]" : "border-black/5 bg-gray-50"} transition-colors duration-300`}
+    >
       <Container size="xl">
         <SimpleGrid cols={{ base: 2, md: 4 }} spacing={40}>
           {stats.map((stat, i) => (
@@ -51,7 +67,9 @@ export const StatsSection = () => {
                   {stat.value}
                 </Title>
               </Box>
-              <Text className="text-gray-500 font-black uppercase tracking-[0.3em] text-xs">
+              <Text
+                className={`${isDark ? "text-gray-500" : "text-gray-400"} font-black uppercase tracking-[0.3em] text-xs`}
+              >
                 {stat.label}
               </Text>
             </motion.div>

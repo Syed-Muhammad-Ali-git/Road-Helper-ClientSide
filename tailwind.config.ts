@@ -18,11 +18,15 @@ const config: Config = {
         "brand-gray": "#2D2D2D",
         "brand-offwhite": "#F8F9FA",
         "brand-muted": "#A1A1AA",
+        "brand-yellow": "#FFD700",
+        "brand-light-yellow": "#FFF7CC",
+        "brand-gold": "#FFC107",
       },
       backgroundImage: {
-        "primary-gradient": "linear-gradient(135deg, #D72626 0%, #A4161A 100%)",
+        "primary-gradient": "linear-gradient(135deg, #FFD700 0%, #FFC107 100%)",
         "dark-gradient": "linear-gradient(180deg, #1C1C1C 0%, #0F0F0F 100%)",
-        "light-gradient": "linear-gradient(180deg, #FFFFFF 0%, #F3F3F3 100%)",
+        "light-gradient": "linear-gradient(180deg, #FFFFFF 0%, #FFF7CC 100%)",
+        "red-gradient": "linear-gradient(135deg, #D72626 0%, #A4161A 100%)",
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
@@ -30,6 +34,7 @@ const config: Config = {
       fontFamily: {
         satoshi: ["Satoshi", "sans-serif"],
         manrope: ["Manrope", "sans-serif"],
+        urdu: ["Noto Nastaliq Urdu", "serif"],
       },
     },
   },

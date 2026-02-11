@@ -12,6 +12,8 @@ import {
 import { SearchProvider } from "./context/searchContext";
 import { LayoutProvider } from "./context/layoutContext";
 import { ReduxProvider } from "@/components/providers/ReduxProvider";
+import { LanguageProvider } from "./context/LanguageContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import ClientLayout from "./client-layout";
 
 /* ---------------- METADATA ---------------- */
@@ -60,25 +62,34 @@ export const metadata: Metadata = {
 /* ---------------- COMPONENT ---------------- */
 const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
   return (
-    <html lang="en" {...mantineHtmlProps}>
+    <html lang="en" {...mantineHtmlProps} suppressHydrationWarning>
       <head>
         <meta charSet="UTF-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" href="/favicon.ico" />
-        <ColorSchemeScript />
+        <ColorSchemeScript defaultColorScheme="dark" />
       </head>
-      <body
-        className="bg-brand-black text-white"
-        style={{  margin: "0 auto" }}
-      >
+      <body className="antialiased font-satoshi" style={{ margin: "0 auto" }}>
         <ReduxProvider>
           <MantineProvider
             defaultColorScheme="dark"
             theme={{
               fontFamily: "Satoshi, sans-serif",
-              primaryColor: "red",
+              primaryColor: "yellow",
               colors: {
+                yellow: [
+                  "#FFFBEB",
+                  "#FEF3C7",
+                  "#FDE68A",
+                  "#FCD34D",
+                  "#FBBF24",
+                  "#F59E0B",
+                  "#D97706",
+                  "#B45309",
+                  "#92400E",
+                  "#78350F",
+                ],
                 dark: [
                   "#C1C2C5",
                   "#A6A7AB",
@@ -91,18 +102,6 @@ const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
                   "#0A0A0A", // brand-black
                   "#000000",
                 ],
-                red: [
-                  "#FFF5F5",
-                  "#FFE3E3",
-                  "#FFC9C9",
-                  "#FFA8A8",
-                  "#FF8787",
-                  "#FF6B6B",
-                  "#FA5252",
-                  "#E63946", // brand-red
-                  "#C92A2A",
-                  "#A4161A", // brand-dark-red
-                ],
               },
               components: {
                 Button: {
@@ -114,11 +113,15 @@ const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
               },
             }}
           >
-            <LayoutProvider>
-              <SearchProvider>
-                <ClientLayout>{children}</ClientLayout>
-              </SearchProvider>
-            </LayoutProvider>
+            <ThemeProvider>
+              <LanguageProvider>
+                <LayoutProvider>
+                  <SearchProvider>
+                    <ClientLayout>{children}</ClientLayout>
+                  </SearchProvider>
+                </LayoutProvider>
+              </LanguageProvider>
+            </ThemeProvider>
           </MantineProvider>
         </ReduxProvider>
       </body>

@@ -29,7 +29,9 @@ import {
   Sparkles,
   Zap,
   Shield,
+  ArrowLeft, // Added ArrowLeft for RTL support
 } from "lucide-react";
+import { useLanguage } from "@/app/context/LanguageContext"; // Import useLanguage
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -39,6 +41,7 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
+  const { dict, isRTL } = useLanguage(); // Use language hook
   const [loginType, setLoginType] = useState<"customer" | "helper">("customer");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -67,12 +70,14 @@ export default function LoginPage() {
           password: data.password,
         });
         await showSuccess(
-          "Welcome back!",
-          loginType === "customer" ? "User" : "Partner"
+          dict.auth.welcome_back,
+          loginType === "customer" ? dict.auth.customer : dict.auth.helper,
         );
 
         router.push(
-          loginType === "customer" ? "/customer/dashboard" : "/helper/dashboard",
+          loginType === "customer"
+            ? "/customer/dashboard"
+            : "/helper/dashboard",
         );
       } catch (error: unknown) {
         console.error(error);
@@ -87,7 +92,7 @@ export default function LoginPage() {
         setIsLoading(false);
       }
     },
-    [loginType, router],
+    [loginType, router, dict],
   );
 
   const togglePasswordVisibility = useCallback(() => {
@@ -98,7 +103,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await loginWithGoogle({ role: loginType });
-      await showSuccess("Welcome back!", "Signed in with Google.");
+      await showSuccess(dict.auth.welcome_back, "Signed in with Google.");
       router.push(
         loginType === "customer" ? "/customer/dashboard" : "/helper/dashboard",
       );
@@ -113,7 +118,7 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [loginType, router]);
+  }, [loginType, router, dict]);
 
   const tabIcon = useMemo(
     () => (loginType === "customer" ? "👤" : "🔧"),
@@ -128,7 +133,9 @@ export default function LoginPage() {
   );
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-black via-brand-black to-black font-satoshi text-white overflow-hidden relative">
+    <div
+      className={`min-h-screen flex bg-gradient-to-br from-black via-brand-black to-black font-satoshi text-white overflow-hidden relative ${isRTL ? "font-urdu" : "font-satoshi"}`}
+    >
       {/* Animated Background Particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {isClient &&
@@ -184,7 +191,7 @@ export default function LoginPage() {
 
       {/* Left Side - Premium Image */}
       <motion.div
-        initial={{ opacity: 0, x: -100 }}
+        initial={{ opacity: 0, x: isRTL ? 100 : -100 }} // Support RTL animation
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 1, ease: "easeOut" }}
         className="hidden lg:flex w-1/2 relative flex-col justify-between p-12 z-10"
@@ -241,8 +248,7 @@ export default function LoginPage() {
             transition={{ delay: 0.7 }}
             className="text-gray-300 text-xl max-w-md leading-relaxed"
           >
-            Connect with verified mechanics and towing services instantly. Safe,
-            fast, and reliable help whenever you need it.
+            {dict.auth.connect_verified}
           </motion.p>
         </motion.div>
 
@@ -253,8 +259,12 @@ export default function LoginPage() {
           className="relative z-10 flex gap-4"
         >
           {[
-            { icon: Sparkles, label: "24/7 Support", value: "Always On" },
-            { icon: Zap, label: "Avg ETA", value: "15 mins" },
+            {
+              icon: Sparkles,
+              label: dict.auth.support_24_7,
+              value: dict.auth.always_on,
+            },
+            { icon: Zap, label: dict.auth.avg_eta, value: "15 mins" },
           ].map((stat, i) => (
             <motion.div
               key={i}
@@ -278,13 +288,21 @@ export default function LoginPage() {
 
       {/* Right Side - Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative z-10">
-        <Link href="/" className="absolute top-4 right-4 sm:top-8 sm:right-8 group z-20">
+        <Link
+          href="/"
+          className={`absolute top-4 ${isRTL ? "left-4 sm:left-8" : "right-4 sm:right-8"} sm:top-8 group z-20`}
+        >
           <motion.div
-            whileHover={{ scale: 1.05, x: 5 }}
+            whileHover={{ scale: 1.05, x: isRTL ? -5 : 5 }}
             className="flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-brand-red transition-all cursor-pointer"
           >
-            <span>Back to Home</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            {!isRTL && <span>{dict.auth.back_to_home}</span>}
+            {isRTL ? (
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            ) : (
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            )}
+            {isRTL && <span>{dict.auth.back_to_home}</span>}
           </motion.div>
         </Link>
 
@@ -347,10 +365,10 @@ export default function LoginPage() {
               </div>
             </motion.div>
             <h2 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-              Welcome Back
+              {dict.auth.welcome_back}
             </h2>
             <p className="text-gray-400 text-lg">
-              Sign in to continue your journey
+              {dict.auth.sign_in_continue}
             </p>
           </motion.div>
 
@@ -365,7 +383,13 @@ export default function LoginPage() {
               layout
               className={cn(
                 "absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] rounded-xl shadow-xl border-2 transition-all duration-300",
-                loginType === "helper" ? "left-[calc(50%+3px)]" : "left-1.5",
+                loginType === "helper"
+                  ? isRTL
+                    ? "right-[calc(50%+3px)]"
+                    : "left-[calc(50%+3px)]"
+                  : isRTL
+                    ? "right-1.5"
+                    : "left-1.5",
                 loginType === "customer"
                   ? "bg-gradient-to-r from-blue-600 to-blue-800 shadow-blue-500/40 border-blue-400/50"
                   : "bg-gradient-to-r from-orange-600 to-orange-800 shadow-orange-500/40 border-orange-400/50",
@@ -377,13 +401,13 @@ export default function LoginPage() {
                 {
                   type: "customer",
                   icon: "👤",
-                  label: "Customer",
+                  label: dict.auth.customer,
                   color: "blue",
                 },
                 {
                   type: "helper",
                   icon: "🔧",
-                  label: "Helper",
+                  label: dict.auth.helper,
                   color: "orange",
                 },
               ].map((item) => (
@@ -409,24 +433,27 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
               className="space-y-2"
             >
               <Label className="text-gray-300 text-xs uppercase tracking-wider font-bold flex items-center gap-2">
                 <Mail size={14} className="text-brand-red" />
-                Email Address
+                {dict.auth.email_address}
               </Label>
               <motion.div
                 whileFocus={{ scale: 1.01 }}
                 className="relative group"
               >
-                <Mail className="absolute left-4 top-3.5 h-5 w-5 text-gray-500 group-focus-within:text-brand-red transition-colors z-10" />
+                <Mail
+                  className={`absolute ${isRTL ? "right-4" : "left-4"} top-3.5 h-5 w-5 text-gray-500 group-focus-within:text-brand-red transition-colors z-10`}
+                />
                 <Input
                   {...register("email")}
-                  className="pl-12 h-14 bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red rounded-xl transition-all hover:bg-white/10 hover:border-brand-red/50"
+                  className={`${isRTL ? "pr-12" : "pl-12"} h-14 bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red rounded-xl transition-all hover:bg-white/10 hover:border-brand-red/50`}
                   placeholder="name@example.com"
+                  dir="ltr" // Email is usually LTR
                 />
                 <motion.div className="absolute inset-0 rounded-xl bg-gradient-to-r from-brand-red/20 to-transparent opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity pointer-events-none" />
               </motion.div>
@@ -442,32 +469,35 @@ export default function LoginPage() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4 }}
               className="space-y-2"
             >
               <Label className="text-gray-300 text-xs uppercase tracking-wider font-bold flex items-center gap-2">
                 <Lock size={14} className="text-brand-red" />
-                Password
+                {dict.auth.password}
               </Label>
               <motion.div
                 whileFocus={{ scale: 1.01 }}
                 className="relative group"
               >
-                <Lock className="absolute left-4 top-4 h-5 w-5 text-gray-500 group-focus-within:text-brand-red transition-colors z-10" />
+                <Lock
+                  className={`absolute ${isRTL ? "right-4" : "left-4"} top-4 h-5 w-5 text-gray-500 group-focus-within:text-brand-red transition-colors z-10`}
+                />
                 <Input
                   {...register("password")}
                   type={showPassword ? "text" : "password"}
-                  className="pl-12 pr-12 h-14 bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red rounded-xl transition-all hover:bg-white/10 hover:border-brand-red/50"
+                  className={`${isRTL ? "pr-12 pl-12" : "pl-12 pr-12"} h-14 bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red rounded-xl transition-all hover:bg-white/10 hover:border-brand-red/50`}
                   placeholder="••••••••"
+                  dir="ltr"
                 />
                 <motion.button
                   type="button"
                   whileHover={{ scale: 1.1, rotate: 10 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={togglePasswordVisibility}
-                  className="absolute right-4 top-4 text-gray-500 hover:text-brand-red transition-colors z-10 cursor-pointer"
+                  className={`absolute ${isRTL ? "left-4" : "right-4"} top-4 text-gray-500 hover:text-brand-red transition-colors z-10 cursor-pointer`}
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </motion.button>
@@ -484,13 +514,13 @@ export default function LoginPage() {
               )}
 
               {/* Forgot Password Link */}
-              <div className="text-right pt-1">
+              <div className={`text-${isRTL ? "left" : "right"} pt-1`}>
                 <Link
                   href="/forgot-password"
                   className="text-xs font-semibold text-brand-red hover:text-white transition-colors hover:underline cursor-pointer inline-flex items-center gap-1 group"
                 >
                   <Lock size={12} className="group-hover:animate-pulse" />
-                  Forgot Password?
+                  {dict.auth.forgot_password}
                 </Link>
               </div>
             </motion.div>
@@ -515,15 +545,22 @@ export default function LoginPage() {
                   {isLoading ? (
                     <>
                       <Loader2 className="animate-spin" size={20} />
-                      Signing In...
+                      {dict.auth.signing_in}
                     </>
                   ) : (
                     <>
-                      Sign In
-                      <ArrowRight
-                        className="group-hover:translate-x-1 transition-transform"
-                        size={20}
-                      />
+                      {dict.auth.sign_in}
+                      {isRTL ? (
+                        <ArrowLeft
+                          className="group-hover:-translate-x-1 transition-transform"
+                          size={20}
+                        />
+                      ) : (
+                        <ArrowRight
+                          className="group-hover:translate-x-1 transition-transform"
+                          size={20}
+                        />
+                      )}
                     </>
                   )}
                 </span>
@@ -539,7 +576,7 @@ export default function LoginPage() {
             >
               <div className="h-[1px] flex-1 bg-white/10" />
               <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">
-                Or Secure Entry With
+                {dict.auth.or_secure_entry}
               </span>
               <div className="h-[1px] flex-1 bg-white/10" />
             </motion.div>
@@ -577,7 +614,7 @@ export default function LoginPage() {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                Continue with Google
+                {dict.auth.continue_google}
               </Button>
             </motion.div>
           </form>
@@ -589,12 +626,12 @@ export default function LoginPage() {
             className="mt-8 space-y-4"
           >
             <p className="text-gray-500 text-center">
-              Don't have an account?{" "}
+              {dict.auth.dont_have_account}{" "}
               <Link
                 href={`/register?type=${loginType}`}
                 className="text-white font-bold hover:text-brand-red transition-colors relative group cursor-pointer"
               >
-                Create Account
+                {dict.auth.create_account}
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-brand-red group-hover:w-full transition-all duration-300"></span>
               </Link>
             </p>
@@ -606,11 +643,18 @@ export default function LoginPage() {
                 className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-brand-red transition-all group cursor-pointer px-4 py-2 rounded-xl hover:bg-white/5"
               >
                 <Shield size={16} className="group-hover:animate-pulse" />
-                <span>Are you an Admin?</span>
-                <ArrowRight
-                  size={14}
-                  className="group-hover:translate-x-1 transition-transform"
-                />
+                <span>{dict.auth.are_you_admin}</span>
+                {isRTL ? (
+                  <ArrowLeft
+                    size={14}
+                    className="group-hover:-translate-x-1 transition-transform"
+                  />
+                ) : (
+                  <ArrowRight
+                    size={14}
+                    className="group-hover:translate-x-1 transition-transform"
+                  />
+                )}
               </Link>
             </div>
           </motion.div>
