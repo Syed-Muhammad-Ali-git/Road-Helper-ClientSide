@@ -17,7 +17,6 @@ import { useMediaQuery } from "@mantine/hooks";
 import { clearAuthStorage } from "@/lib/auth-utils";
 import { auth } from "@/lib/firebase/config";
 import { getUserByUid } from "@/lib/services/userService";
-import { getCookie } from "cookies-next";
 import { useLanguage } from "@/app/context/LanguageContext";
 import { useAppTheme } from "@/app/context/ThemeContext";
 
@@ -114,9 +113,9 @@ const HelperHeader: React.FC<HeaderProps> = ({
           color="orange"
           radius="xl"
           variant="filled"
-          className="bg-orange-600 text-white uppercase tracking-wide text-[10px]"
+          className="bg-orange-600 text-white uppercase tracking-wide text-[10px] hover:scale-105 transition-transform"
         >
-          {dict.sidebar.help}
+          {dict.roles.helper}
         </Badge>
         <Text
           size="sm"
@@ -245,7 +244,7 @@ const HelperHeader: React.FC<HeaderProps> = ({
                   color="orange"
                   className="mt-1"
                 >
-                  {(getCookie("role") as string | undefined)?.toUpperCase?.() ?? "HELPER"}
+                  {dict.roles.helper}
                 </Badge>
               </div>
             </div>

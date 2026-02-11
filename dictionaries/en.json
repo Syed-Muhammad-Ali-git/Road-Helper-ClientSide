@@ -14,14 +14,25 @@
     "real_time": "Real-time",
     "trusted": "Trusted",
     "fast_value": "< 2 min",
-    "uptime_value": "99.9%"
+    "uptime_value": "99.9%",
+    "you": "You",
+    "user": "User"
+  },
+  "roles": {
+    "admin": "Admin",
+    "helper": "Helper",
+    "customer": "Customer"
   },
   "navbar": {
     "login": "Login",
     "register": "Register",
     "about": "About",
     "features": "Features",
-    "how_it_works": "How it Works"
+    "how_it_works": "How it Works",
+    "light_mode": "Light Mode",
+    "dark_mode": "Dark Mode",
+    "urdu": "Urdu",
+    "english": "English"
   },
   "footer": {
     "rights_reserved": "All rights reserved.",
@@ -170,6 +181,35 @@
     "view_all": "View All",
     "active_requests": "Active Requests",
     "completed": "Completed",
-    "cancelled": "Cancelled"
+    "cancelled": "Cancelled",
+    "welcome_back": "Welcome Back",
+    "member_area": "Member Area",
+    "ready_for_journey": "Ready for your next journey? We've got your back.",
+    "emergency_sos": "Emergency SOS",
+    "membership_status": "Membership Status",
+    "pro": "PRO",
+    "premium_plan": "PREMIUM PLAN",
+    "expires_in_days": "Expires in {days} days",
+    "helpers_nearby": "Helpers Nearby",
+    "online_count": "● {count} Online",
+    "verified_in_radius": "Verified professionals in 5km radius",
+    "select_service": "Select Service Category",
+    "choose_best_match": "Choose what best matches your situation",
+    "get_support": "Get Support",
+    "recent_activity": "Recent Activity",
+    "no_active_requests": "No active requests",
+    "activity_empty_msg": "Your activity feed is empty. When you request help, it will appear here.",
+    "start_new_request": "Start New Request",
+    "live_location": "Live Location",
+    "enable_gps": "Enable GPS",
+    "turn_on_gps": "Turn on GPS to share your location",
+    "mobile_mechanic": "Mobile Mechanic",
+    "fuel_delivery": "Fuel Delivery",
+    "tyre_puncture": "Tyre Puncture",
+    "towing_service": "Towing Service",
+    "mechanic_desc": "Breakdown, tire change, diagnostics",
+    "fuel_desc": "Ran out of gas? We'll bring fuel.",
+    "tyre_desc": "Breakdown, tire change, diagnostics",
+    "tow_desc": "Safe towing to nearest garage."
   }
 }

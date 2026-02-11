@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Title,
   Text,
@@ -32,6 +32,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
 import { useLiveLocation } from "@/hooks/useLiveLocation";
+import { useLanguage } from "@/app/context/LanguageContext";
+import { useAppTheme } from "@/app/context/ThemeContext";
+import { auth } from "@/lib/firebase/config";
+import { getUserByUid } from "@/lib/services/userService";
 
 const LiveMap = dynamic(() => import("@/components/map/LiveMap"), {
   ssr: false,
@@ -45,36 +49,36 @@ const avatars = [
   { name: "Mike Brown", initials: "MB", color: "orange" },
 ];
 
-const serviceCategories = [
+const getServiceCategories = (dict: { dashboard: { mobile_mechanic: string; fuel_delivery: string; tyre_puncture: string; towing_service: string; mechanic_desc: string; fuel_desc: string; tyre_desc: string; tow_desc: string } }) => [
   {
-    title: "Mobile Mechanic",
+    title: dict.dashboard.mobile_mechanic,
     icon: IconCar,
     color: "blue",
-    desc: "Breakdown, tire change, diagnostics",
+    desc: dict.dashboard.mechanic_desc,
     id: "mechanic",
     gradient: "from-blue-600/20 to-indigo-600/20",
   },
   {
-    title: "Fuel Delivery",
+    title: dict.dashboard.fuel_delivery,
     icon: IconDroplet,
     color: "red",
-    desc: "Ran out of gas? We'll bring fuel.",
+    desc: dict.dashboard.fuel_desc,
     id: "fuel",
     gradient: "from-red-600/20 to-rose-600/20",
   },
   {
-    title: "Tyre Punkcher",
+    title: dict.dashboard.tyre_puncture,
     icon: IconWheel,
     color: "blue",
-    desc: "Breakdown, tire change, diagnostics",
+    desc: dict.dashboard.tyre_desc,
     id: "Tyre Punkcher",
     gradient: "from-blue-600/20 to-indigo-600/20",
   },
   {
-    title: "Towing Service",
+    title: dict.dashboard.towing_service,
     icon: IconTruck,
     color: "grape",
-    desc: "Safe towing to nearest garage.",
+    desc: dict.dashboard.tow_desc,
     id: "tow",
     gradient: "from-purple-600/20 to-pink-600/20",
   },
@@ -99,20 +103,33 @@ const itemVariants: any = {
 
 const ClientDashboard = () => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [userName, setUserName] = useState("User");
+  const [userName, setUserName] = useState<string | null>(null);
   const live = useLiveLocation();
+  const { dict } = useLanguage();
+  const { isDark } = useAppTheme();
+  const serviceCategories = getServiceCategories(dict);
+
+  // Firebase: Load user from auth + Firestore
+  useEffect(() => {
+    let alive = true;
+    const unsub = auth.onAuthStateChanged(async (u) => {
+      if (!alive) return;
+      if (!u) {
+        setUserName(dict.common.user);
+        return;
+      }
+      const p = await getUserByUid(u.uid);
+      if (!alive) return;
+      setUserName(p?.displayName ?? u.displayName ?? dict.common.user);
+    });
+    return () => {
+      alive = false;
+      unsub();
+    };
+  }, [dict.common.user]);
 
   useEffect(() => {
     setIsLoaded(true);
-    const loginData = localStorage.getItem("loginData");
-    if (loginData) {
-      try {
-        const parsed = JSON.parse(loginData);
-        if (parsed.fullName) setUserName(parsed.fullName.split(" ")[0]);
-      } catch (e) {
-        console.log(e);
-      }
-    }
   }, []);
 
   const [particles, setParticles] = useState<any[]>([]);
@@ -128,7 +145,10 @@ const ClientDashboard = () => {
   }, []);
 
   return (
-    <Box className="relative min-h-screen bg-[#0a0a0a] overflow-hidden p-4 md:p-8">
+    <Box className={cn(
+      "relative min-h-screen overflow-hidden p-4 md:p-8 transition-colors duration-300",
+      isDark ? "bg-gray-950" : "bg-gray-50"
+    )}>
       {/* --- Premium Background Elements --- */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -188,26 +208,29 @@ const ClientDashboard = () => {
             >
               <div className="h-px w-8 bg-brand-red" />
               <Text className="text-brand-red font-bold uppercase tracking-[0.2em] text-[10px]">
-                Member Area
+                {dict.dashboard.member_area}
               </Text>
             </motion.div>
             <Title
               order={1}
-              className="font-manrope font-extrabold text-4xl md:text-5xl text-white tracking-tight"
+              className={cn(
+                "font-manrope font-extrabold text-4xl md:text-5xl tracking-tight",
+                isDark ? "text-white" : "text-gray-900"
+              )}
             >
-              Welcome Back,{" "}
+              {dict.dashboard.welcome_back},{" "}
               <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-indigo-400">
-                {userName}
+                {userName ?? dict.common.user}
               </span>
             </Title>
-            <Text className="text-gray-400 mt-2 font-medium">
-              Ready for your next journey? We&apos;ve got your back.
+            <Text className={cn("mt-2 font-medium", isDark ? "text-gray-400" : "text-gray-600")}>
+              {dict.dashboard.ready_for_journey}
             </Text>
           </Box>
-          <motion.div variants={itemVariants as any}>
+          <motion.div variants={itemVariants as any} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
             <Button
               variant="filled"
-              className="bg-brand-red text-white shadow-2xl shadow-brand-red/20 hover:bg-brand-dark-red transition-all font-manrope font-bold rounded-2xl h-14 px-8 border border-white/10 group"
+              className="bg-brand-red text-white shadow-2xl shadow-brand-red/20 hover:bg-brand-dark-red transition-all font-manrope font-bold rounded-2xl h-14 px-8 border border-white/10 group hover:shadow-brand-red/30"
               leftSection={
                 <IconPhoneCall
                   size={20}
@@ -215,7 +238,7 @@ const ClientDashboard = () => {
                 />
               }
             >
-              Emergency SOS
+              {dict.dashboard.emergency_sos}
             </Button>
           </motion.div>
         </Group>
@@ -225,7 +248,10 @@ const ClientDashboard = () => {
           <motion.div variants={itemVariants as any} className="lg:col-span-2">
             <Paper
               radius="32px"
-              className="relative overflow-hidden h-87.5 md:h-112.5 border border-white/10 glass-dark shadow-2xl group"
+              className={cn(
+                "relative overflow-hidden h-87.5 md:h-112.5 shadow-2xl group border transition-colors",
+                isDark ? "border-white/10 glass-dark" : "border-gray-200/80 bg-white/80 backdrop-blur"
+              )}
             >
               <LiveMap
                 customer={
@@ -233,7 +259,7 @@ const ClientDashboard = () => {
                     ? {
                         lat: live.coords.lat,
                         lng: live.coords.lng,
-                        label: "You",
+                        label: dict.common.you,
                       }
                     : null
                 }
@@ -242,28 +268,34 @@ const ClientDashboard = () => {
               />
 
               {/* Map Controls */}
-              <div className="absolute bottom-8 left-8 right-8 p-6 glass-dark rounded-3xl border border-white/20 flex flex-col md:flex-row items-center justify-between z-20 gap-4">
+              <div className={cn(
+                "absolute bottom-8 left-8 right-8 p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between z-20 gap-4",
+                isDark ? "glass-dark border border-white/20" : "bg-white/90 border border-gray-200/80"
+              )}>
                 <div className="flex items-center gap-4">
                   <div className="h-12 w-12 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
                     <IconMapPin size={24} />
                   </div>
                   <div>
-                    <Text className="font-bold text-white text-lg leading-tight">
-                      Live Location
+                    <Text className={cn("font-bold text-lg leading-tight", isDark ? "text-white" : "text-gray-900")}>
+                      {dict.dashboard.live_location}
                     </Text>
-                    <Text className="text-sm text-gray-400">
+                    <Text className={cn("text-sm", isDark ? "text-gray-400" : "text-gray-600")}>
                       {live.coords
                         ? `${live.coords.lat.toFixed(5)}, ${live.coords.lng.toFixed(5)}`
-                        : "Turn on GPS to share your location"}
+                        : dict.dashboard.turn_on_gps}
                     </Text>
                   </div>
                 </div>
                 <Button
-                  className="bg-white text-black hover:bg-gray-200 rounded-xl px-8 h-12 font-bold transition-all w-full md:w-auto"
+                  className={cn(
+                    "rounded-xl px-8 h-12 font-bold transition-all w-full md:w-auto hover:scale-105 active:scale-95",
+                    isDark ? "bg-white text-black hover:bg-gray-200" : "bg-brand-red text-white hover:bg-brand-dark-red"
+                  )}
                   onClick={() => live.requestPermission()}
                   rightSection={<IconArrowRight size={18} />}
                 >
-                  Enable GPS
+                  {dict.dashboard.enable_gps}
                 </Button>
               </div>
             </Paper>
@@ -283,26 +315,26 @@ const ClientDashboard = () => {
                 <div>
                   <Group justify="space-between" mb={12}>
                     <Text className="text-blue-400 text-[10px] font-bold uppercase tracking-[0.2em]">
-                      Membership Status
+                      {dict.dashboard.membership_status}
                     </Text>
                     <Badge
                       color="blue"
                       variant="filled"
                       className="bg-blue-500"
                     >
-                      PRO
+                      {dict.dashboard.pro}
                     </Badge>
                   </Group>
                   <Title
                     order={2}
-                    className="font-manrope text-3xl font-black italic"
+                    className="font-manrope text-3xl font-black italic text-white"
                   >
-                    PREMIUM PLAN
+                    {dict.dashboard.premium_plan}
                   </Title>
                 </div>
                 <div className="flex items-center gap-2 text-gray-400 text-xs font-medium">
                   <IconBolt size={14} className="text-yellow-500" />
-                  Expires in 312 days
+                  {dict.dashboard.expires_in_days.replace("{days}", "312")}
                 </div>
               </Paper>
             </motion.div>
@@ -311,19 +343,22 @@ const ClientDashboard = () => {
               <Paper
                 p={24}
                 radius="32px"
-                className="glass-dark border border-white/10 min-h-[210px] shadow-2xl flex flex-col justify-between"
+                className={cn(
+                  "min-h-[210px] shadow-2xl flex flex-col justify-between border transition-colors",
+                  isDark ? "glass-dark border-white/10" : "bg-white border-gray-200/80"
+                )}
               >
                 <div>
                   <Group justify="space-between" mb={8}>
-                    <Text className="font-bold text-white text-lg">
-                      Helpers Nearby
+                    <Text className={cn("font-bold text-lg", isDark ? "text-white" : "text-gray-900")}>
+                      {dict.dashboard.helpers_nearby}
                     </Text>
                     <div className="px-3 py-1 bg-green-500/10 text-green-400 text-[10px] font-bold rounded-full border border-green-500/20 uppercase">
-                      ● 8 Online
+                      {dict.dashboard.online_count.replace("{count}", "8")}
                     </div>
                   </Group>
-                  <Text size="xs" className="text-gray-500 font-medium mb-6">
-                    Verified professionals in 5km radius
+                  <Text size="xs" className={cn("font-medium mb-6", isDark ? "text-gray-500" : "text-gray-600")}>
+                    {dict.dashboard.verified_in_radius}
                   </Text>
                 </div>
 
@@ -351,7 +386,10 @@ const ClientDashboard = () => {
                   <ActionIcon
                     size={48}
                     radius="xl"
-                    className="bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all"
+                    className={cn(
+                      "transition-all hover:scale-110",
+                      isDark ? "bg-white/5 border border-white/10 text-white hover:bg-white/10" : "bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-200"
+                    )}
                   >
                     <IconArrowRight size={20} />
                   </ActionIcon>
@@ -366,12 +404,15 @@ const ClientDashboard = () => {
           <Group justify="space-between" mb={24} align="flex-end">
             <Title
               order={3}
-              className="font-manrope text-2xl font-bold text-white tracking-tight"
+              className={cn(
+                "font-manrope text-2xl font-bold tracking-tight",
+                isDark ? "text-white" : "text-gray-900"
+              )}
             >
-              Select Service Category
+              {dict.dashboard.select_service}
             </Title>
-            <Text className="text-gray-500 font-medium text-sm hidden sm:block">
-              Choose what best matches your situation
+            <Text className={cn("font-medium text-sm hidden sm:block", isDark ? "text-gray-500" : "text-gray-600")}>
+              {dict.dashboard.choose_best_match}
             </Text>
           </Group>
 
@@ -394,12 +435,13 @@ const ClientDashboard = () => {
                     p={32}
                     radius="32px"
                     className={cn(
-                      "relative h-full border border-white/10 glass-dark transition-all duration-300 group overflow-hidden shadow-xl",
+                      "relative h-full border transition-all duration-300 group overflow-hidden shadow-xl hover:shadow-2xl",
+                      isDark ? "border-white/10 glass-dark" : "border-gray-200/80 bg-white hover:border-brand-red/30"
                     )}
                   >
                     <div
                       className={cn(
-                        "absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500",
+                        "absolute inset-0 bg-linear-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500",
                         service.gradient,
                       )}
                     />
@@ -417,19 +459,28 @@ const ClientDashboard = () => {
                       <Text
                         fw={800}
                         size="xl"
-                        className="text-white mb-3 tracking-tight group-hover:text-brand-red transition-colors font-manrope"
+                        className={cn(
+                          "mb-3 tracking-tight group-hover:text-brand-red transition-colors font-manrope",
+                          isDark ? "text-white" : "text-gray-900"
+                        )}
                       >
                         {service.title}
                       </Text>
                       <Text
                         size="sm"
-                        className="text-gray-400 leading-relaxed font-medium mb-8"
+                        className={cn(
+                          "leading-relaxed font-medium mb-8",
+                          isDark ? "text-gray-400" : "text-gray-600"
+                        )}
                       >
                         {service.desc}
                       </Text>
 
-                      <div className="mt-auto flex items-center gap-2 text-white font-bold text-sm">
-                        <span>Get Support</span>
+                      <div className={cn(
+                        "mt-auto flex items-center gap-2 font-bold text-sm",
+                        isDark ? "text-white" : "text-gray-900"
+                      )}>
+                        <span>{dict.dashboard.get_support}</span>
                         <IconArrowRight
                           size={16}
                           className="group-hover:translate-x-2 transition-transform duration-300"
@@ -448,29 +499,43 @@ const ClientDashboard = () => {
           <Paper
             p={40}
             radius="32px"
-            className="glass-dark border border-white/10 shadow-2xl relative overflow-hidden"
+            className={cn(
+              "shadow-2xl relative overflow-hidden border transition-colors",
+              isDark ? "glass-dark border-white/10" : "bg-white border-gray-200/80"
+            )}
           >
             <div className="absolute top-[-50px] left-[-50px] w-40 h-40 bg-blue-600/5 blur-[100px] rounded-full" />
 
             <Group justify="space-between" mb={40}>
               <div className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center text-gray-400">
+                <div className={cn(
+                  "h-10 w-10 rounded-xl flex items-center justify-center",
+                  isDark ? "bg-white/5 text-gray-400" : "bg-gray-100 text-gray-600"
+                )}>
                   <IconHistory size={20} />
                 </div>
                 <Title
                   order={4}
-                  className="font-manrope text-2xl font-bold text-white tracking-tight"
+                  className={cn(
+                    "font-manrope text-2xl font-bold tracking-tight",
+                    isDark ? "text-white" : "text-gray-900"
+                  )}
                 >
-                  Recent Activity
+                  {dict.dashboard.recent_activity}
                 </Title>
               </div>
               <Button
                 variant="subtle"
                 color="gray"
-                className="hover:bg-white/5 text-gray-400 font-bold"
+                className={cn(
+                  "font-bold hover:scale-105 transition-transform",
+                  isDark ? "hover:bg-white/5 text-gray-400" : "hover:bg-gray-100 text-gray-600"
+                )}
                 rightSection={<IconArrowRight size={14} />}
+                component={Link}
+                href="/customer/history"
               >
-                History
+                {dict.sidebar.history}
               </Button>
             </Group>
 
@@ -478,24 +543,29 @@ const ClientDashboard = () => {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="flex flex-col items-center justify-center py-20 bg-white/5 rounded-[24px] border border-white/5"
+                className={cn(
+                  "flex flex-col items-center justify-center py-20 rounded-[24px] border",
+                  isDark ? "bg-white/5 border-white/5" : "bg-gray-50 border-gray-200/80"
+                )}
               >
-                <div className="h-20 w-20 rounded-[28px] bg-white/5 border border-white/10 flex items-center justify-center text-gray-600 mb-6">
+                <div className={cn(
+                  "h-20 w-20 rounded-[28px] flex items-center justify-center mb-6 border",
+                  isDark ? "bg-white/5 border-white/10 text-gray-600" : "bg-gray-100 border-gray-200 text-gray-500"
+                )}>
                   <IconSparkles size={40} />
                 </div>
-                <Text className="text-white font-bold text-xl mb-2">
-                  No active requests
+                <Text className={cn("font-bold text-xl mb-2", isDark ? "text-white" : "text-gray-900")}>
+                  {dict.dashboard.no_active_requests}
                 </Text>
-                <Text className="text-gray-500 font-medium mb-8 text-center max-w-sm px-6">
-                  Your activity feed is empty. When you request help, it will
-                  appear here.
+                <Text className={cn("font-medium mb-8 text-center max-w-sm px-6", isDark ? "text-gray-500" : "text-gray-600")}>
+                  {dict.dashboard.activity_empty_msg}
                 </Text>
                 <Button
-                  className="bg-brand-red hover:bg-brand-dark-red rounded-xl h-12 px-8 font-bold transition-all shadow-xl shadow-brand-red/20"
+                  className="bg-brand-red hover:bg-brand-dark-red rounded-xl h-12 px-8 font-bold transition-all shadow-xl shadow-brand-red/20 hover:scale-105 active:scale-95"
                   component={Link}
                   href="/customer/request-help"
                 >
-                  Start New Request
+                  {dict.dashboard.start_new_request}
                 </Button>
               </motion.div>
             </AnimatePresence>

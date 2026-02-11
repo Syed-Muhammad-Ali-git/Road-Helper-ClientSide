@@ -26,23 +26,39 @@
   }
 }
 
-/* Scrollbar Customization */
+/* Scrollbar - Theme Aware */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
-::-webkit-scrollbar-track {
+.dark ::-webkit-scrollbar-track,
+:root:not(.light) ::-webkit-scrollbar-track {
   background: #1f1f1f;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #333;
+.light ::-webkit-scrollbar-track {
+  background: #f3f4f6;
+}
+
+.dark ::-webkit-scrollbar-thumb,
+:root:not(.light) ::-webkit-scrollbar-thumb {
+  background: #4b5563;
   border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
+.light ::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover,
+:root:not(.light) ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
 }
 
 @layer base {
@@ -65,6 +81,63 @@
   body.light {
     background-color: rgb(255, 255, 255);
     color: rgb(17, 24, 39);
+  }
+
+  /* Interactive elements - hover, focus, active */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  a:not([aria-disabled="true"]) {
+    transition: all 0.2s ease, transform 0.2s ease;
+  }
+
+  button:not(:disabled):hover,
+  [role="button"]:not([aria-disabled="true"]):hover,
+  a:not([aria-disabled="true"]):hover {
+    transform: translateY(-2px);
+  }
+
+  button:not(:disabled):active,
+  [role="button"]:not([aria-disabled="true"]):active,
+  a:not([aria-disabled="true"]):active {
+    transform: translateY(0);
+  }
+
+  /* Card hover effects */
+  [class*="card"],
+  [class*="Card"],
+  .paper,
+  [role="article"],
+  [data-hover-lift] {
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.2s ease;
+  }
+
+  [class*="card"]:hover,
+  [class*="Card"]:hover,
+  .paper:hover,
+  [role="article"]:hover,
+  [data-hover-lift]:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.15);
+  }
+
+  /* ActionIcon / Icon buttons */
+  [data-mantine-action-icon],
+  .mantine-ActionIcon-root {
+    transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease !important;
+  }
+
+  [data-mantine-action-icon]:hover,
+  .mantine-ActionIcon-root:hover {
+    transform: scale(1.08);
+  }
+
+  /* Badge hover */
+  .mantine-Badge-root {
+    transition: transform 0.2s ease;
+  }
+
+  .mantine-Badge-root:hover {
+    transform: scale(1.05);
   }
 }
 

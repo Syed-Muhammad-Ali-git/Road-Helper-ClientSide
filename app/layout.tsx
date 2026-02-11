@@ -71,6 +71,36 @@ const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" href="/favicon.ico" />
         <ColorSchemeScript defaultColorScheme="dark" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const theme = localStorage.getItem('rh_theme') || 'dark';
+                  const lang = localStorage.getItem('rh_lang') || 'en';
+                  
+                  const html = document.documentElement;
+                  const body = document.body;
+                  
+                  html.setAttribute('data-theme', theme);
+                  html.classList.remove('light', 'dark');
+                  html.classList.add(theme);
+                  
+                  if (theme === 'dark') {
+                    body.classList.add('dark');
+                    body.classList.remove('light');
+                  } else {
+                    body.classList.add('light');
+                    body.classList.remove('dark');
+                  }
+                  
+                  html.dir = lang === 'ur' ? 'rtl' : 'ltr';
+                  html.lang = lang;
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
       </head>
       <body className="antialiased font-satoshi light dark:bg-gray-950 dark:text-gray-100 bg-white text-gray-900" style={{ margin: "0 auto" }}>
         <ReduxProvider>

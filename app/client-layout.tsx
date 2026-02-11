@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { RouteChangeLoader } from "@/components/RouteChangeLoader";
 
 import { useLanguage } from "@/app/context/LanguageContext";
+import { useAppTheme } from "@/app/context/ThemeContext";
 
 /* ---------------- INTERFACES ---------------- */
 interface ClientLayoutProps {
@@ -25,6 +26,7 @@ const ClientLayout = ({ children }: ClientLayoutProps) => {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { isRTL } = useLanguage();
+  const { isDark } = useAppTheme();
 
   // ----- MEDIA QUERY FOR DESKTOP VIEW -----
   // Using 900px breakpoint to match MUI default for 'md'
@@ -79,7 +81,8 @@ const ClientLayout = ({ children }: ClientLayoutProps) => {
         hideProgressBar={false}
         newestOnTop={true}
         closeOnClick
-        rtl={false}
+        rtl={isRTL}
+        theme={isDark ? "dark" : "light"}
         pauseOnFocusLoss
         draggable
         pauseOnHover

@@ -75,8 +75,8 @@ const LandingNavbar = () => {
       >
         <Container
           size="xl"
-          className={`flex items-center justify-between ${
-            isRTL ? "flex-row-reverse" : ""
+          className={`flex items-center justify-between gap-4 ${
+            isRTL ? "flex-row-reverse" : "flex-row"
           }`}
         >
           {/* LOGO */}
@@ -158,14 +158,20 @@ const LandingNavbar = () => {
               </Link>
 
               <Link href="/register">
-                <Button
-                  className="bg-brand-yellow text-black font-bold hover:scale-105 transition-transform"
-                  rightSection={
-                    <IconChevronRight className={isRTL ? "rotate-180" : ""} />
-                  }
+                <motion.div
+                  whileHover={{ scale: 1.08 }}
+                  whileTap={{ scale: 0.96 }}
+                  transition={{ type: "spring", stiffness: 300 }}
                 >
-                  {dict.navbar.register}
-                </Button>
+                  <Button
+                    className="bg-brand-yellow text-black font-bold transition-all duration-200"
+                    rightSection={
+                      <IconChevronRight className={isRTL ? "rotate-180" : ""} />
+                    }
+                  >
+                    {dict.navbar.register}
+                  </Button>
+                </motion.div>
               </Link>
             </Group>
           </Group>
@@ -209,11 +215,11 @@ const LandingNavbar = () => {
             onClick={toggleTheme}
             leftSection={isDark ? <IconSun /> : <IconMoon />}
           >
-            {isDark ? "Light Mode" : "Dark Mode"}
+            {isDark ? dict.navbar.light_mode : dict.navbar.dark_mode}
           </Button>
 
           <Button onClick={() => setLanguage(language === "en" ? "ur" : "en")}>
-            {language === "en" ? "Urdu" : "English"}
+            {language === "en" ? dict.navbar.urdu : dict.navbar.english}
           </Button>
 
           <Divider w="100%" />

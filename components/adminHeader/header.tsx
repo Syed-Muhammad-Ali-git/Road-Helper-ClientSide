@@ -105,9 +105,9 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
           color="red"
           radius="xl"
           variant="filled"
-          className="bg-brand-red/90 text-white uppercase tracking-wide text-[10px]"
+          className="bg-brand-red/90 text-white uppercase tracking-wide text-[10px] hover:scale-105 transition-transform"
         >
-          Admin
+          {dict.roles.admin}
         </Badge>
         <Text
           size="sm"
@@ -230,7 +230,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                   color="green"
                   className="mt-1"
                 >
-                  {dict.common.loading.charAt(0).toUpperCase()}
+                  {dict.roles.admin}
                 </Badge>
               </div>
             </div>

@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { Button } from "@mantine/core";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 interface SplashScreenProps {
   onComplete?: () => void;
@@ -19,6 +20,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
   const [bootProgress, setBootProgress] = useState(0);
   const [isSkipped, setIsSkipped] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const { dict } = useLanguage();
   const progressRef = useRef<NodeJS.Timeout | null>(null);
   const bootRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -156,7 +158,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-semibold text-gray-300">
-                    Boot Sequence
+                    {dict.common.boot_sequence}
                   </span>
                   <span className="text-xs text-gray-500">{bootProgress}%</span>
                 </div>
@@ -178,7 +180,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-semibold text-gray-300">
-                    Initializing Systems
+                    {dict.common.initializing} {dict.common.road_helper_systems}
                   </span>
                   <span className="text-xs font-mono text-brand-yellow">
                     {progress}%
@@ -239,7 +241,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
                 size="sm"
                 className="border-brand-yellow/50 text-brand-yellow hover:bg-brand-yellow/10 hover:border-brand-yellow/80 transition-all"
               >
-                Skip Intro
+                {dict.common.skip_intro}
               </Button>
             </motion.div>
           </motion.div>

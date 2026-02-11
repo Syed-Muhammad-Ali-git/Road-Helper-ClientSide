@@ -42,6 +42,7 @@ const publicRoutes = [
   "/admin/login",
   "/admin/signup",
   "/about",
+  "/faq",
 ];
 
 /**

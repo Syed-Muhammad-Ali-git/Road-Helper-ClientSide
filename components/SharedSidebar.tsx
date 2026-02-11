@@ -119,9 +119,8 @@ const SharedSidebarComponent = ({
           `fixed top-0 h-full z-50 flex flex-col shadow-2xl overflow-hidden transition-all duration-300 ${
             isDark ? "bg-brand-black" : "bg-white"
           }`,
-          isRTL
-            ? "right-0 border-l border-white/10"
-            : "left-0 border-r border-white/10",
+          isRTL ? "right-0 border-l" : "left-0 border-r",
+          isDark ? "border-white/10" : "border-gray-200",
           !isDesktop && !open && "pointer-events-none",
         )}
       >

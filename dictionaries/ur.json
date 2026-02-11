@@ -14,14 +14,25 @@
     "real_time": "ریئل ٹائم",
     "trusted": "قابل اعتماد",
     "fast_value": "2 منٹ سے کم",
-    "uptime_value": "99.9%"
+    "uptime_value": "99.9%",
+    "you": "آپ",
+    "user": "صارف"
+  },
+  "roles": {
+    "admin": "ایڈمن",
+    "helper": "ہیلپر",
+    "customer": "کسٹمر"
   },
   "navbar": {
     "login": "لاگ ان",
     "register": "رجسٹر کریں",
     "about": "ہمارے بارے میں",
     "features": "خصوصیات",
-    "how_it_works": "یہ کیسے کام کرتا ہے"
+    "how_it_works": "یہ کیسے کام کرتا ہے",
+    "light_mode": "لائٹ موڈ",
+    "dark_mode": "ڈارک موڈ",
+    "urdu": "اردو",
+    "english": "انگریزی"
   },
   "footer": {
     "rights_reserved": "جملہ حقوق محفوظ ہیں۔",
@@ -170,6 +181,35 @@
     "view_all": "سب دیکھیں",
     "active_requests": "فعال درخواستیں",
     "completed": "مکمل",
-    "cancelled": "منسوخ"
+    "cancelled": "منسوخ",
+    "welcome_back": "واپس خوش آمدید",
+    "member_area": "رکن کا علاقہ",
+    "ready_for_journey": "اپنے اگلے سفر کے لیے تیار ہیں؟ ہم آپ کے ساتھ ہیں۔",
+    "emergency_sos": "ہنگامی ایس او ایس",
+    "membership_status": "رکنیت کی حیثیت",
+    "pro": "پرو",
+    "premium_plan": "پریمیم پلان",
+    "expires_in_days": "{days} دنوں میں ختم ہوتا ہے",
+    "helpers_nearby": "قریب مددگار",
+    "online_count": "● {count} آن لائن",
+    "verified_in_radius": "5 کلومیٹر کے دائرے میں تصدیق شدہ پیشہ ور",
+    "select_service": "سروس کی قسم منتخب کریں",
+    "choose_best_match": "وہ منتخب کریں جو آپ کی صورتحال سے سب سے بہتر مماثل ہو",
+    "get_support": "مدد حاصل کریں",
+    "recent_activity": "حالیہ سرگرمی",
+    "no_active_requests": "کوئی فعال درخواست نہیں",
+    "activity_empty_msg": "آپ کی سرگرمی کی فیڈ خالی ہے۔ جب آپ مدد طلب کریں گے تو یہاں ظاہر ہوگی۔",
+    "start_new_request": "نئی درخواست شروع کریں",
+    "live_location": "لائیو لوکیشن",
+    "enable_gps": "جی پی ایس فعال کریں",
+    "turn_on_gps": "اپنا مقام شیئر کرنے کے لیے جی پی ایس آن کریں",
+    "mobile_mechanic": "موبائل مکینک",
+    "fuel_delivery": "ایندھن کی ترسیل",
+    "tyre_puncture": "ٹائر پنکچر",
+    "towing_service": "ٹونگ سروس",
+    "mechanic_desc": "بریک ڈاؤن، ٹائر تبدیل، تشخیص",
+    "fuel_desc": "پیٹرول ختم ہو گیا؟ ہم ایندھن لائیں گے۔",
+    "tyre_desc": "بریک ڈاؤن، ٹائر تبدیل، تشخیص",
+    "tow_desc": "قریبی گیراج میں محفوظ ٹونگ۔"
   }
 }
