@@ -10,8 +10,18 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/app/context/LanguageContext";
 import { useAppTheme } from "@/app/context/ThemeContext";
-import { Eye, EyeOff, Mail, User, Lock, Phone, CreditCard } from "lucide-react";
-import { MultiSelect, Stack } from "@mantine/core";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  User,
+  Lock,
+  Phone,
+  CreditCard,
+  Loader2,
+  ArrowRight,
+} from "lucide-react";
+import { MultiSelect } from "@mantine/core";
 import { motion } from "framer-motion";
 
 const helperSchema = z.object({
@@ -67,7 +77,7 @@ const FormField = React.memo(
       <Label
         className={cn(
           "text-sm font-semibold",
-          isDark ? "text-gray-300" : "text-gray-700"
+          isDark ? "text-gray-300" : "text-gray-700",
         )}
       >
         {label}
@@ -76,7 +86,7 @@ const FormField = React.memo(
         <Icon
           className={cn(
             "absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none",
-            isDark ? "text-gray-500" : "text-gray-400"
+            isDark ? "text-gray-500" : "text-gray-400",
           )}
           size={18}
         />
@@ -86,14 +96,14 @@ const FormField = React.memo(
         <p
           className={cn(
             "text-sm font-medium",
-            isDark ? "text-red-400" : "text-red-600"
+            isDark ? "text-red-400" : "text-red-600",
           )}
         >
           {error}
         </p>
       )}
     </motion.div>
-  )
+  ),
 );
 
 FormField.displayName = "FormField";
@@ -120,12 +130,12 @@ export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
     async (data: HelperFormData) => {
       await onSubmit(data);
     },
-    [onSubmit]
+    [onSubmit],
   );
 
   const onPasswordToggle = useCallback(
     () => setShowPassword((prev) => !prev),
-    []
+    [],
   );
 
   const serviceOptions = useMemo(() => SERVICE_OPTIONS, []);
@@ -136,7 +146,7 @@ export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
       isDark
         ? "bg-black/40 border-gray-700 text-white placeholder:text-gray-500 focus:border-brand-yellow focus:bg-black/60"
         : "bg-white/80 border-gray-300 text-black placeholder:text-gray-400 focus:border-brand-yellow focus:bg-white",
-      hasError && (isDark ? "border-red-500" : "border-red-500")
+      hasError && (isDark ? "border-red-500" : "border-red-500"),
     );
 
   return (
@@ -148,7 +158,13 @@ export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
       className={cn("space-y-4", isRTL && "text-right")}
     >
       {/* Full Name */}
-      <FormField label={dict.auth.full_name} icon={User} isDark={isDark} isRTL={isRTL} error={errors.fullName?.message}>
+      <FormField
+        label={dict.auth.full_name}
+        icon={User}
+        isDark={isDark}
+        isRTL={isRTL}
+        error={errors.fullName?.message}
+      >
         <Input
           {...register("fullName")}
           placeholder={dict.auth.full_name}
@@ -157,7 +173,13 @@ export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
       </FormField>
 
       {/* Email */}
-      <FormField label={dict.auth.email_address} icon={Mail} isDark={isDark} isRTL={isRTL} error={errors.email?.message}>
+      <FormField
+        label={dict.auth.email_address}
+        icon={Mail}
+        isDark={isDark}
+        isRTL={isRTL}
+        error={errors.email?.message}
+      >
         <Input
           {...register("email")}
           type="email"
@@ -167,7 +189,13 @@ export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
       </FormField>
 
       {/* Phone */}
-      <FormField label={dict.auth.phone_number} icon={Phone} isDark={isDark} isRTL={isRTL} error={errors.phone?.message}>
+      <FormField
+        label={dict.auth.phone_number}
+        icon={Phone}
+        isDark={isDark}
+        isRTL={isRTL}
+        error={errors.phone?.message}
+      >
         <Input
           {...register("phone")}
           type="tel"
@@ -177,7 +205,13 @@ export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
       </FormField>
 
       {/* CNIC */}
-      <FormField label={dict.auth.cnic_number} icon={CreditCard} isDark={isDark} isRTL={isRTL} error={errors.cnic?.message}>
+      <FormField
+        label={dict.auth.cnic_number}
+        icon={CreditCard}
+        isDark={isDark}
+        isRTL={isRTL}
+        error={errors.cnic?.message}
+      >
         <Input
           {...register("cnic")}
           placeholder={dict.auth.cnic_number}
@@ -195,7 +229,7 @@ export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
         <Label
           className={cn(
             "text-sm font-semibold",
-            isDark ? "text-gray-300" : "text-gray-700"
+            isDark ? "text-gray-300" : "text-gray-700",
           )}
         >
           {dict.auth.service_types}
@@ -213,18 +247,28 @@ export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
               className="rounded-lg"
               styles={{
                 input: {
-                  backgroundColor: isDark ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.8)",
-                  borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+                  backgroundColor: isDark
+                    ? "rgba(0,0,0,0.4)"
+                    : "rgba(255,255,255,0.8)",
+                  borderColor: isDark
+                    ? "rgba(255,255,255,0.1)"
+                    : "rgba(0,0,0,0.1)",
                   color: isDark ? "white" : "black",
                 },
                 dropdown: {
-                  backgroundColor: isDark ? "rgba(10,10,10,0.95)" : "rgba(255,255,255,0.95)",
-                  borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+                  backgroundColor: isDark
+                    ? "rgba(10,10,10,0.95)"
+                    : "rgba(255,255,255,0.95)",
+                  borderColor: isDark
+                    ? "rgba(255,255,255,0.1)"
+                    : "rgba(0,0,0,0.1)",
                 },
                 option: {
                   color: isDark ? "white" : "black",
                   "&:hover": {
-                    backgroundColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
+                    backgroundColor: isDark
+                      ? "rgba(255,255,255,0.1)"
+                      : "rgba(0,0,0,0.05)",
                   },
                 },
               }}
@@ -235,7 +279,7 @@ export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
           <p
             className={cn(
               "text-sm font-medium",
-              isDark ? "text-red-400" : "text-red-600"
+              isDark ? "text-red-400" : "text-red-600",
             )}
           >
             {errors.services.message}
@@ -253,7 +297,7 @@ export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
         <Label
           className={cn(
             "text-sm font-semibold",
-            isDark ? "text-gray-300" : "text-gray-700"
+            isDark ? "text-gray-300" : "text-gray-700",
           )}
         >
           {dict.auth.password}
@@ -262,7 +306,7 @@ export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
           <Lock
             className={cn(
               "absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none",
-              isDark ? "text-gray-500" : "text-gray-400"
+              isDark ? "text-gray-500" : "text-gray-400",
             )}
             size={18}
           />
@@ -275,7 +319,7 @@ export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
               isDark
                 ? "bg-black/40 border-gray-700 text-white placeholder:text-gray-500 focus:border-brand-yellow focus:bg-black/60"
                 : "bg-white/80 border-gray-300 text-black placeholder:text-gray-400 focus:border-brand-yellow focus:bg-white",
-              errors.password && (isDark ? "border-red-500" : "border-red-500")
+              errors.password && (isDark ? "border-red-500" : "border-red-500"),
             )}
           />
           <button
@@ -285,7 +329,7 @@ export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
               "absolute right-3 top-1/2 transform -translate-y-1/2 transition-colors",
               isDark
                 ? "text-gray-500 hover:text-gray-300"
-                : "text-gray-500 hover:text-gray-700"
+                : "text-gray-500 hover:text-gray-700",
             )}
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -295,7 +339,7 @@ export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
           <p
             className={cn(
               "text-sm font-medium",
-              isDark ? "text-red-400" : "text-red-600"
+              isDark ? "text-red-400" : "text-red-600",
             )}
           >
             {errors.password.message}
@@ -307,9 +351,35 @@ export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
       <Button
         type="submit"
         disabled={isLoading}
-        className="w-full bg-brand-red hover:bg-brand-dark-red text-white font-semibold py-2 rounded-lg transition-all"
+        className={cn(
+          "w-full font-semibold py-2 rounded-lg transition-all h-12 relative overflow-hidden group",
+          isDark
+            ? "bg-linear-to-r from-brand-red via-brand-dark-red to-brand-red hover:shadow-2xl hover:shadow-brand-red/50 text-white border-2 border-brand-red/50 hover:border-brand-red"
+            : "bg-linear-to-r from-brand-red via-orange-600 to-brand-red hover:shadow-2xl hover:shadow-red-500/30 text-white border-2 border-brand-red hover:border-brand-red",
+        )}
+        style={{ backgroundSize: "200% 100%" }}
       >
-        {isLoading ? dict.auth.creating : dict.auth.apply_as_helper}
+        <motion.div
+          className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent"
+          animate={{ x: ["-100%", "100%"] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+        />
+        <span className="relative z-10 flex items-center justify-center gap-2">
+          {isLoading ? (
+            <>
+              <Loader2 className="animate-spin" size={20} />
+              {dict.auth.creating}
+            </>
+          ) : (
+            <>
+              {dict.auth.apply_as_helper}
+              <ArrowRight
+                size={20}
+                className="group-hover:translate-x-1 transition-transform"
+              />
+            </>
+          )}
+        </span>
       </Button>
     </motion.form>
   );

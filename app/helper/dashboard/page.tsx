@@ -98,7 +98,10 @@ const HelperDashboard = () => {
     [helperName, completedCount],
   );
 
-  const paymentHistory = useMemo(() => [] as { date: string; amount: number; status: string }[], []);
+  const paymentHistory = useMemo(
+    () => [] as { date: string; amount: number; status: string }[],
+    [],
+  );
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -276,7 +279,9 @@ const HelperDashboard = () => {
                   </Title>
                   <Group gap="xs">
                     <div className="px-3 py-1 bg-green-500/20 text-green-400 text-[10px] font-bold rounded-full border border-green-500/30">
-                      {completedCount > 0 ? `${completedCount} completed` : "Start earning"}
+                      {completedCount > 0
+                        ? `${completedCount} completed`
+                        : "Start earning"}
                     </div>
                   </Group>
                 </div>
@@ -311,7 +316,8 @@ const HelperDashboard = () => {
                   Completion Rate
                 </Text>
                 <Title order={2} className="text-white text-4xl font-black">
-                  {userData.totalJobs > 0 ? "98" : "0"} <span className="text-xl text-blue-400">%</span>
+                  {userData.totalJobs > 0 ? "98" : "0"}{" "}
+                  <span className="text-xl text-blue-400">%</span>
                 </Title>
                 <Text className="text-gray-500 text-xs mt-2 font-medium">
                   {userData.totalJobs} Jobs Completed
@@ -340,10 +346,13 @@ const HelperDashboard = () => {
                 </Text>
                 <Title order={2} className="text-white text-4xl font-black">
                   {ridesRemaining}{" "}
-                  <span className="text-xl text-yellow-500">/ {freeRidesLimit}</span>
+                  <span className="text-xl text-yellow-500">
+                    / {freeRidesLimit}
+                  </span>
                 </Title>
                 <Text className="text-gray-500 text-xs mt-2 font-medium">
-                  Free rides left. After {freeRidesLimit}: {commissionRate}% commission
+                  Free rides left. After {freeRidesLimit}: {commissionRate}%
+                  commission
                 </Text>
                 <Text className="text-gray-600 text-[10px] mt-1">
                   Completed: {completedCount}
@@ -579,41 +588,45 @@ const HelperDashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {paymentHistory.length === 0 ? (
                 <div className="col-span-full py-12 text-center">
-                  <Text className="text-gray-500">No settlement history yet. Complete jobs to see earnings.</Text>
+                  <Text className="text-gray-500">
+                    No settlement history yet. Complete jobs to see earnings.
+                  </Text>
                 </div>
-              ) : paymentHistory.map((payment, idx) => (
-                <motion.div
-                  key={idx}
-                  whileHover={{ y: -5 }}
-                  className="flex items-center justify-between p-6 rounded-3xl bg-white/5 border border-white/5 hover:border-green-500/20 transition-all"
-                >
-                  <Group gap="xl">
-                    <ThemeIcon
-                      size={48}
-                      radius="xl"
-                      className="bg-green-500/10 text-green-400"
-                    >
-                      <IconTrendingUp size={24} />
-                    </ThemeIcon>
-                    <div>
-                      <Text className="text-white font-black text-xl">
-                        PKR {(payment.amount * 100).toLocaleString("en-PK")}
-                      </Text>
-                      <Text className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mt-0.5">
-                        {payment.date}
-                      </Text>
-                    </div>
-                  </Group>
-                  <Badge
-                    variant="dot"
-                    color="green"
-                    size="lg"
-                    className="text-green-400 bg-transparent border-none"
+              ) : (
+                paymentHistory.map((payment, idx) => (
+                  <motion.div
+                    key={idx}
+                    whileHover={{ y: -5 }}
+                    className="flex items-center justify-between p-6 rounded-3xl bg-white/5 border border-white/5 hover:border-green-500/20 transition-all"
                   >
-                    Success
-                  </Badge>
-                </motion.div>
-              ))}
+                    <Group gap="xl">
+                      <ThemeIcon
+                        size={48}
+                        radius="xl"
+                        className="bg-green-500/10 text-green-400"
+                      >
+                        <IconTrendingUp size={24} />
+                      </ThemeIcon>
+                      <div>
+                        <Text className="text-white font-black text-xl">
+                          PKR {(payment.amount * 100).toLocaleString("en-PK")}
+                        </Text>
+                        <Text className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mt-0.5">
+                          {payment.date}
+                        </Text>
+                      </div>
+                    </Group>
+                    <Badge
+                      variant="dot"
+                      color="green"
+                      size="lg"
+                      className="text-green-400 bg-transparent border-none"
+                    >
+                      Success
+                    </Badge>
+                  </motion.div>
+                ))
+              )}
             </div>
           </Paper>
         </motion.div>
