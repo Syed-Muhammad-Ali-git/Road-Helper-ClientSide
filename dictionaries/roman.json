@@ -227,6 +227,33 @@
     "language_toggle": "Zaban badlein (English / Urdu / Roman)",
     "login": "Apne account mein log in karein",
     "register": "Naaya RoadHelper account banayein"
+  },
+  "request_help_page": {
+    "service_step_title": "Service",
+    "service_step_desc": "Aap ko kya chahiye?",
+    "details_step_title": "Details",
+    "details_step_desc": "Vehicle & Masla",
+    "review_step_title": "Jaiza",
+    "review_step_desc": "Confirm details",
+    "emergency_service_type": "Emergency Service Ki Qisam",
+    "select_service_placeholder": "Service select karein",
+    "mobile_mechanic": "🔧 Mobile Mechanic",
+    "towing_truck": "🚗 Tow Truck",
+    "fuel_delivery": "⛽ Fuel Delivery",
+    "battery_jump": "🔋 Battery Jump",
+    "lockout_service": "🔑 Lockout Service",
+    "current_location": "Maujooda Maqam",
+    "use_gps": "GPS Istemal Karen",
+    "vehicle_information": "Gari Ki Maloomat",
+    "issue_description": "Maslay Ki Tafseel",
+    "review_your_request": "Apni Darkhwast Ka Jaiza Len",
+    "request_sent": "Darkhwast Bhej Di Gayi",
+    "open_live_view": "Live View Kholen",
+    "waiting_for_helper": "Darkhwast bhej di gayi, helper ka intezar hai",
+    "keep_open_msg": "Is page ko khula rakhen. Jab helper qabool karega, hum aap ko khud ba khud live journey screen par le jayenge.",
+    "make_another_request": "Aik Aur Darkhwast Karen",
+    "back": "Wapas",
+    "next": "Agla",
+    "send_request": "Darkhwast Bhejen"
   }
 }
-

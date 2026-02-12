@@ -21,7 +21,7 @@ import Link from "next/link";
 import { useLanguage } from "@/app/context/LanguageContext";
 import { useAppTheme } from "@/app/context/ThemeContext";
 
-export const CTASection = () => {
+export const CTASection = React.memo(() => {
   const { dict, isRTL } = useLanguage();
   const { theme } = useAppTheme();
 
@@ -181,4 +181,4 @@ export const CTASection = () => {
       </Container>
     </section>
   );
-};
+});

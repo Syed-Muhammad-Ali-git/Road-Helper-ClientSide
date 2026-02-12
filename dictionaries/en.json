@@ -227,5 +227,33 @@
     "language_toggle": "Change language (English / Urdu / Roman)",
     "login": "Sign in to your account",
     "register": "Create a new RoadHelper account"
+  },
+  "request_help_page": {
+    "service_step_title": "Service",
+    "service_step_desc": "What do you need?",
+    "details_step_title": "Details",
+    "details_step_desc": "Vehicle & Issue",
+    "review_step_title": "Review",
+    "review_step_desc": "Confirm details",
+    "emergency_service_type": "Emergency Service Type",
+    "select_service_placeholder": "Select service",
+    "mobile_mechanic": "🔧 Mobile Mechanic",
+    "towing_truck": "🚗 Towing Truck",
+    "fuel_delivery": "⛽ Fuel Delivery",
+    "battery_jump": "🔋 Battery Jump",
+    "lockout_service": "🔑 Lockout Service",
+    "current_location": "Current Location",
+    "use_gps": "Use GPS",
+    "vehicle_information": "Vehicle Information",
+    "issue_description": "Issue Description",
+    "review_your_request": "Review Your Request",
+    "request_sent": "Request Sent",
+    "open_live_view": "Open Live View",
+    "waiting_for_helper": "Request sent, waiting for helper",
+    "keep_open_msg": "Keep this page open. When a helper accepts, we’ll take you to the live journey screen automatically.",
+    "make_another_request": "Make Another Request",
+    "back": "Back",
+    "next": "Next",
+    "send_request": "Send Request"
   }
 }

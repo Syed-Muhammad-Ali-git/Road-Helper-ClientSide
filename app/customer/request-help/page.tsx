@@ -34,13 +34,16 @@ import { zodResolver } from "mantine-form-zod-resolver";
 import { auth } from "@/lib/firebase/config";
 import { useRouter } from "next/navigation";
 import { useLiveLocation } from "@/hooks/useLiveLocation";
-import dynamic from 'next/dynamic';
+import { useLanguage } from "@/app/context/LanguageContext";
+import dynamic from "next/dynamic";
 import {
   createRideRequest,
   subscribeRideRequest,
 } from "@/lib/services/requestService";
 
-const LiveMap = dynamic(() => import('@/components/map/LiveMap'), { ssr: false });
+const LiveMap = dynamic(() => import("@/components/map/LiveMap"), {
+  ssr: false,
+});
 import type { ServiceType } from "@/types";
 
 const requestHelpSchema = z.object({
@@ -57,9 +60,13 @@ function RequestHelpContent() {
   const [requestStatus, setRequestStatus] = useState<string | null>(null);
   const [uid, setUid] = useState<string | null>(null);
   const router = useRouter();
+  const { dict } = useLanguage();
   const live = useLiveLocation({
     onSuccess: (coords) => {
-      form.setFieldValue("location", `Current location (${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)})`);
+      form.setFieldValue(
+        "location",
+        `Current location (${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)})`,
+      );
       toast.success("Location captured! Coordinates filled in.");
     },
   });
@@ -102,7 +109,10 @@ function RequestHelpContent() {
             }
           : { lat: 24.8607, lng: 67.0011, address: values.location };
 
-        const displayName = auth.currentUser?.displayName ?? auth.currentUser?.email?.split("@")[0] ?? "Customer";
+        const displayName =
+          auth.currentUser?.displayName ??
+          auth.currentUser?.email?.split("@")[0] ??
+          "Customer";
         const { getUserByUid } = await import("@/lib/services/userService");
         const customerProfile = await getUserByUid(uid);
         const id = await createRideRequest({
@@ -142,6 +152,8 @@ function RequestHelpContent() {
       if (!req) return;
       setRequestStatus((req as any).status ?? null);
       if ((req as any).status === "accepted" && (req as any).helperId) {
+        toast.dismiss(); // Dismiss any existing toasts
+        toast.success(dict.request_help_page.request_sent); // Optional: notify acceptance
         router.push(`/journey/${requestId}`);
       }
     });
@@ -154,27 +166,39 @@ function RequestHelpContent() {
         <Stepper active={active} allowNextStepsSelect={false}>
           {/* STEP 1 */}
           <Stepper.Step
-            label="Service"
-            description="What do you need?"
+            label={dict.request_help_page.service_step_title}
+            description={dict.request_help_page.service_step_desc}
             icon={<IconCar size={rem(18)} />}
             className="w-full"
           >
             <Stack mt="xl">
               <Select
-                label="Emergency Service Type"
-                placeholder="Select service"
+                label={dict.request_help_page.emergency_service_type}
+                placeholder={dict.request_help_page.select_service_placeholder}
                 required
                 data={[
-                  { value: "mechanic", label: "🔧 Mobile Mechanic" },
-                  { value: "tow", label: "🚗 Towing Truck" },
-                  { value: "fuel", label: "⛽ Fuel Delivery" },
-                  { value: "battery", label: "🔋 Battery Jump" },
-                  { value: "lockout", label: "🔑 Lockout Service" },
+                  {
+                    value: "mechanic",
+                    label: dict.request_help_page.mobile_mechanic,
+                  },
+                  { value: "tow", label: dict.request_help_page.towing_truck },
+                  {
+                    value: "fuel",
+                    label: dict.request_help_page.fuel_delivery,
+                  },
+                  {
+                    value: "battery",
+                    label: dict.request_help_page.battery_jump,
+                  },
+                  {
+                    value: "lockout",
+                    label: dict.request_help_page.lockout_service,
+                  },
                 ]}
                 {...form.getInputProps("serviceType")}
               />
               <TextInput
-                label="Current Location"
+                label={dict.request_help_page.current_location}
                 required
                 leftSection={<IconMapPin size={18} />}
                 rightSection={
@@ -187,7 +211,7 @@ function RequestHelpContent() {
                     }}
                     leftSection={<IconCurrentLocation size={14} />}
                   >
-                    Use GPS
+                    {dict.request_help_page.use_gps}
                   </Button>
                 }
                 {...form.getInputProps("location")}
@@ -202,19 +226,19 @@ function RequestHelpContent() {
 
           {/* STEP 2 */}
           <Stepper.Step
-            label="Details"
-            description="Vehicle & Issue"
+            label={dict.request_help_page.details_step_title}
+            description={dict.request_help_page.details_step_desc}
             icon={<IconMessage2 size={rem(18)} />}
             className="w-full"
           >
             <Stack mt="xl">
               <TextInput
-                label="Vehicle Information"
+                label={dict.request_help_page.vehicle_information}
                 required
                 {...form.getInputProps("vehicleDetails")}
               />
               <Textarea
-                label="Issue Description"
+                label={dict.request_help_page.issue_description}
                 required
                 minRows={4}
                 {...form.getInputProps("issueDescription")}
@@ -224,29 +248,37 @@ function RequestHelpContent() {
 
           {/* STEP 3 */}
           <Stepper.Step
-            label="Review"
-            description="Confirm details"
+            label={dict.request_help_page.review_step_title}
+            description={dict.request_help_page.review_step_desc}
             icon={<IconCheck size={rem(18)} />}
             className="w-full"
           >
             <Stack mt="xl">
-              <Title order={4}>Review Your Request</Title>
+              <Title order={4}>
+                {dict.request_help_page.review_your_request}
+              </Title>
               <SimpleGrid cols={2}>
                 <Box>
-                  <Text fw={600}>Service</Text>
+                  <Text fw={600}>
+                    {dict.request_help_page.service_step_title}
+                  </Text>
                   <Text>{form.values.serviceType.replace("_", " ")}</Text>
                 </Box>
                 <Box>
-                  <Text fw={600}>Location</Text>
+                  <Text fw={600}>
+                    {dict.request_help_page.current_location}
+                  </Text>
                   <Text>{form.values.location}</Text>
                 </Box>
               </SimpleGrid>
               <Box>
-                <Text fw={600}>Vehicle</Text>
+                <Text fw={600}>
+                  {dict.request_help_page.vehicle_information}
+                </Text>
                 <Text>{form.values.vehicleDetails}</Text>
               </Box>
               <Box>
-                <Text fw={600}>Description</Text>
+                <Text fw={600}>{dict.request_help_page.issue_description}</Text>
                 <Text>{form.values.issueDescription}</Text>
               </Box>
             </Stack>
@@ -266,7 +298,9 @@ function RequestHelpContent() {
                     <IconCircleCheck size={32} />
                   </ThemeIcon>
                   <Box>
-                    <Title order={3}>Request Sent</Title>
+                    <Title order={3}>
+                      {dict.request_help_page.request_sent}
+                    </Title>
                     <Text c="dimmed">
                       Status:{" "}
                       <strong>
@@ -283,7 +317,7 @@ function RequestHelpContent() {
                   }
                   disabled={!requestId}
                 >
-                  Open Live View
+                  {dict.request_help_page.open_live_view}
                 </Button>
               </Group>
 
@@ -293,11 +327,10 @@ function RequestHelpContent() {
                 className="bg-black/20 border border-white/10"
               >
                 <Text fw={700} className="text-white mb-1">
-                  Request sent, waiting for helper
+                  {dict.request_help_page.waiting_for_helper}
                 </Text>
                 <Text size="sm" c="dimmed">
-                  Keep this page open. When a helper accepts, we’ll take you to
-                  the live journey screen automatically.
+                  {dict.request_help_page.keep_open_msg}
                 </Text>
               </Paper>
 
@@ -325,7 +358,7 @@ function RequestHelpContent() {
                     form.reset();
                   }}
                 >
-                  Make Another Request
+                  {dict.request_help_page.make_another_request}
                 </Button>
               </Group>
             </Stack>
@@ -336,11 +369,11 @@ function RequestHelpContent() {
           <Group justify="center" mt="xl">
             {active > 0 && (
               <Button variant="default" onClick={prevStep}>
-                Back
+                {dict.request_help_page.back}
               </Button>
             )}
             {active < 2 ? (
-              <Button onClick={nextStep}>Next</Button>
+              <Button onClick={nextStep}>{dict.request_help_page.next}</Button>
             ) : (
               <Button
                 loading={loading}
@@ -348,7 +381,7 @@ function RequestHelpContent() {
                 type="submit"
                 disabled={!uid}
               >
-                Send Request
+                {dict.request_help_page.send_request}
               </Button>
             )}
           </Group>

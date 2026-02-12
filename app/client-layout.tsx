@@ -8,6 +8,7 @@ import { helperRoutes, customerRoutes, adminRoutes, publicRoutes } from "./utils
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import MotionContainer from "@/components/ui/MotionContainer";
 import { RouteChangeLoader } from "@/components/RouteChangeLoader";
 
 import { useLanguage } from "@/app/context/LanguageContext";
