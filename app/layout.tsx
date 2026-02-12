@@ -106,7 +106,7 @@ const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
         />
       </head>
       <body
-        className="antialiased font-satoshi light dark:bg-gray-950 dark:text-gray-100 bg-white text-gray-900"
+        className="antialiased font-satoshi bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100"
         style={{ margin: "0 auto" }}
       >
         <ReduxProvider>

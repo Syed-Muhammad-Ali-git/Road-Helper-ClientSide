@@ -27,16 +27,22 @@ const applyThemeToDOM = (newTheme: Theme) => {
   const htmlElement = document.documentElement;
   const bodyElement = document.body;
 
+  // Set data attribute for CSS selectors
   htmlElement.setAttribute("data-theme", newTheme);
+  
+  // Remove all theme classes first
   htmlElement.classList.remove("light", "dark");
+  bodyElement.classList.remove("light", "dark");
+  
+  // Add the correct theme class
   htmlElement.classList.add(newTheme);
+  bodyElement.classList.add(newTheme);
 
+  // Ensure Tailwind dark mode works
   if (newTheme === "dark") {
-    bodyElement.classList.add("dark");
-    bodyElement.classList.remove("light");
+    htmlElement.classList.add("dark");
   } else {
-    bodyElement.classList.add("light");
-    bodyElement.classList.remove("dark");
+    htmlElement.classList.remove("dark");
   }
 };
 

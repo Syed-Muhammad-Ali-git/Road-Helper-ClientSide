@@ -27,10 +27,38 @@ const ClientLayout = ({ children }: ClientLayoutProps) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { isRTL } = useLanguage();
   const { isDark } = useAppTheme();
-
   // ----- MEDIA QUERY FOR DESKTOP VIEW -----
   // Using 900px breakpoint to match MUI default for 'md'
   const isDesktop = useMediaQuery("(min-width: 900px)");
+
+  // ----- ENSURE THEME AND LANGUAGE ON HTML ELEMENT -----
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+
+    // Apply theme classes
+    if (isDark) {
+      html.classList.add("dark");
+      body.classList.add("dark");
+      html.classList.remove("light");
+      body.classList.remove("light");
+    } else {
+      html.classList.add("light");
+      body.classList.add("light");
+      html.classList.remove("dark");
+      body.classList.remove("dark");
+    }
+
+    // Apply language/direction
+    html.dir = isRTL ? "rtl" : "ltr";
+    if (isRTL) {
+      html.classList.add("rtl");
+      html.classList.remove("ltr");
+    } else {
+      html.classList.add("ltr");
+      html.classList.remove("rtl");
+    }
+  }, [isDark, isRTL]);
 
   // ----- EFFECT TO SET DRAWER STATE BASED ON VIEWPORT -----
   useEffect(() => {
