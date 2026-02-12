@@ -11,8 +11,6 @@ import {
 } from "@mantine/core";
 import { SearchProvider } from "./context/searchContext";
 import { LayoutProvider } from "./context/layoutContext";
-import { LoadingProvider } from "./context/LoadingContext";
-import { GlobalLoaderProvider } from "./context/GlobalLoaderContext";
 import { ReduxProvider } from "@/components/providers/ReduxProvider";
 import { LanguageProvider } from "./context/LanguageContext";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -30,8 +28,13 @@ export const metadata: Metadata = {
     "Emergency Road Help",
     "Vehicle Assistance",
   ],
-  authors: [{ name: "Road Helper Team", url: "https://roadhelper.vercel.app" }],
-  creator: "Road Helper",
+  authors: [
+    {
+      name: "Syed Muhammad Ali",
+      url: "https://ali-portfolio-nine.vercel.app/",
+    },
+  ],
+  creator: "Syed Muhammad Ali",
   publisher: "Road Helper",
   robots: "index, follow",
   openGraph: {
@@ -102,7 +105,10 @@ const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
           }}
         />
       </head>
-      <body className="antialiased font-satoshi light dark:bg-gray-950 dark:text-gray-100 bg-white text-gray-900" style={{ margin: "0 auto" }}>
+      <body
+        className="antialiased font-satoshi light dark:bg-gray-950 dark:text-gray-100 bg-white text-gray-900"
+        style={{ margin: "0 auto" }}
+      >
         <ReduxProvider>
           <MantineProvider
             defaultColorScheme="dark"

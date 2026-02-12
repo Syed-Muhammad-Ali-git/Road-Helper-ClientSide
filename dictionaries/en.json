@@ -32,7 +32,8 @@
     "light_mode": "Light Mode",
     "dark_mode": "Dark Mode",
     "urdu": "Urdu",
-    "english": "English"
+    "english": "English",
+    "roman": "Roman English"
   },
   "footer": {
     "rights_reserved": "All rights reserved.",
@@ -219,5 +220,12 @@
     "request_help_now": "Request Help Now",
     "helper": "Helper",
     "live_view": "Live View"
+  },
+  "tooltips": {
+    "theme_light": "Switch to light theme",
+    "theme_dark": "Switch to dark theme",
+    "language_toggle": "Change language (English / Urdu / Roman)",
+    "login": "Sign in to your account",
+    "register": "Create a new RoadHelper account"
   }
 }

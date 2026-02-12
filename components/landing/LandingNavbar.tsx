@@ -6,7 +6,6 @@ import {
   IconSun,
   IconMoon,
   IconLanguage,
-  IconMenu2,
   IconArrowRight,
 } from "@tabler/icons-react";
 import {
@@ -20,6 +19,7 @@ import {
   Divider,
   Title,
   Burger,
+  Tooltip,
 } from "@mantine/core";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import Link from "next/link";
@@ -139,40 +139,82 @@ const LandingNavbar = () => {
             />
 
             {/* THEME */}
-            <ActionIcon onClick={toggleTheme} variant="subtle">
-              {isDark ? <IconSun size={20} /> : <IconMoon size={20} />}
-            </ActionIcon>
+            <Tooltip
+              label={
+                isDark
+                  ? (dict?.tooltips?.theme_light ?? "Switch to light theme")
+                  : (dict?.tooltips?.theme_dark ?? "Switch to dark theme")
+              }
+              withArrow
+              position="bottom"
+            >
+              <ActionIcon onClick={toggleTheme} variant="subtle">
+                {isDark ? <IconSun size={20} /> : <IconMoon size={20} />}
+              </ActionIcon>
+            </Tooltip>
 
             {/* LANGUAGE */}
-            <ActionIcon
-              variant="subtle"
-              onClick={() => setLanguage(language === "en" ? "ur" : "en")}
+            <Tooltip
+              label={
+                dict?.tooltips?.language_toggle ??
+                "Change language (English / Urdu / Roman)"
+              }
+              withArrow
+              position="bottom"
             >
-              <IconLanguage size={20} />
-            </ActionIcon>
+              <ActionIcon
+                variant="subtle"
+                onClick={() => {
+                  const next =
+                    language === "en"
+                      ? "ur"
+                      : language === "ur"
+                        ? "roman"
+                        : "en";
+                  // @ts-expect-error - language includes roman in context
+                  setLanguage(next);
+                }}
+              >
+                <IconLanguage size={20} />
+              </ActionIcon>
+            </Tooltip>
 
             {/* AUTH (DESKTOP ONLY) */}
             <Group visibleFrom="md">
-              <Link href="/login">
-                <Button variant="subtle">{dict.navbar.login}</Button>
-              </Link>
+              <Tooltip
+                label={dict?.tooltips?.login ?? "Login to your account"}
+                withArrow
+                position="bottom"
+              >
+                <Link href="/login">
+                  <Button variant="subtle">{dict.navbar.login}</Button>
+                </Link>
+              </Tooltip>
 
-              <Link href="/register">
-                <motion.div
-                  whileHover={{ scale: 1.08 }}
-                  whileTap={{ scale: 0.96 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  <Button
-                    className="bg-brand-yellow text-black font-bold transition-all duration-200"
-                    rightSection={
-                      <IconChevronRight className={isRTL ? "rotate-180" : ""} />
-                    }
+              <Tooltip
+                label={dict?.tooltips?.register ?? "Create a new account"}
+                withArrow
+                position="bottom"
+              >
+                <Link href="/register">
+                  <motion.div
+                    whileHover={{ scale: 1.08 }}
+                    whileTap={{ scale: 0.96 }}
+                    transition={{ type: "spring", stiffness: 300 }}
                   >
-                    {dict.navbar.register}
-                  </Button>
-                </motion.div>
-              </Link>
+                    <Button
+                      className="bg-brand-yellow text-black font-bold transition-all duration-200"
+                      rightSection={
+                        <IconChevronRight
+                          className={isRTL ? "rotate-180" : ""}
+                        />
+                      }
+                    >
+                      {dict.navbar.register}
+                    </Button>
+                  </motion.div>
+                </Link>
+              </Tooltip>
             </Group>
           </Group>
         </Container>

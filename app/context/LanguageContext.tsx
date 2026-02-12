@@ -10,8 +10,9 @@ import React, {
 } from "react";
 import en from "@/dictionaries/en.json";
 import ur from "@/dictionaries/ur.json";
+import roman from "@/dictionaries/roman.json";
 
-type Language = "en" | "ur";
+type Language = "en" | "ur" | "roman";
 type Dictionary = typeof en;
 
 interface LanguageContextType {
@@ -50,7 +51,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const savedLang = (localStorage.getItem("rh_lang") || "en") as Language;
     setLanguageState(savedLang);
-    setDict(savedLang === "ur" ? ur : en);
+    setDict(savedLang === "ur" ? ur : savedLang === "roman" ? roman : en);
     applyLanguageToDOM(savedLang);
     setMounted(true);
   }, []);
@@ -63,7 +64,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
 
   const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang);
-    setDict(lang === "ur" ? ur : en);
+    setDict(lang === "ur" ? ur : lang === "roman" ? roman : en);
     localStorage.setItem("rh_lang", lang);
     applyLanguageToDOM(lang);
   }, []);

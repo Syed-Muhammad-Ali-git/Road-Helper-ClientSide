@@ -40,6 +40,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useAppTheme } from "@/app/context/ThemeContext";
 
 // Mock Data
 const stats = [
@@ -152,6 +153,7 @@ const itemVariants: Variants = {
 };
 
 const AdminDashboard = () => {
+  const { isDark } = useAppTheme();
   const [isLoaded, setIsLoaded] = useState(false);
   useEffect(() => {
     setIsLoaded(true);
@@ -204,7 +206,12 @@ const AdminDashboard = () => {
   // No changes needed here as they are moved out
 
   return (
-    <Box className="relative min-h-screen bg-[#0a0a0a] overflow-hidden p-4 md:p-8 font-satoshi">
+    <Box
+      className={cn(
+        "relative min-h-screen overflow-hidden p-4 md:p-8 font-satoshi transition-colors",
+        isDark ? "bg-[#0a0a0a]" : "bg-gray-50",
+      )}
+    >
       {/* Premium Background Effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
